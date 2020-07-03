@@ -14,6 +14,23 @@
  *	BSD license (see license.txt)
  */
 
+/*
+
+  This is a Hello world example code written for the AS7241 XWing Spectral
+  Sensor I2C interface with Arduino µC. The main idea is to get fimilar with the
+  register configuration. This code helps to learn basic settings and procedure
+  to read out raw values with different SMUX configuration. Also defined the
+  procedure to set the default flicker detection for 100 and 120 Hz.
+
+  Written by Sijo John @ ams AG, Application Support in October, 2018
+
+  Development environment specifics: Arduino IDE 1.8.5
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+*/
 #ifndef _ADAFRUIT_AS7341_H
 #define _ADAFRUIT_AS7341_H
 
@@ -23,10 +40,9 @@
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
 #define AS7341_I2CADDR_DEFAULT 0x39 ///< AS7341 default i2c address
-#define AS7341_CHIP_ID 0x09 ///< AS7341 default device id from WHOAMI
+#define AS7341_CHIP_ID 0x09         ///< AS7341 default device id from WHOAMI
 
 #define AS7341_WHOAMI 0x92 ///< Chip ID register
-
 
 ///////////////////////////////////////////////////////////////
 /**
@@ -63,7 +79,8 @@ class Adafruit_AS7341;
 //  */
 // class Adafruit_AS7341_Pressure : public Adafruit_Sensor {
 // public:
-//   /** @brief Create an Adafruit_Sensor compatible object for the pressure sensor
+//   /** @brief Create an Adafruit_Sensor compatible object for the pressure
+//   sensor
 //       @param parent A pointer to the AS7341 class */
 //   Adafruit_AS7341_Pressure(Adafruit_AS7341 *parent) { _theAS7341 = parent; }
 //   bool getEvent(sensors_event_t *);
@@ -83,8 +100,8 @@ public:
   Adafruit_AS7341();
   ~Adafruit_AS7341();
 
-  bool begin(uint8_t i2c_addr = AS7341_I2CADDR_DEFAULT,
-                 TwoWire *wire = &Wire, int32_t sensor_id = 0);
+  bool begin(uint8_t i2c_addr = AS7341_I2CADDR_DEFAULT, TwoWire *wire = &Wire,
+             int32_t sensor_id = 0);
 
   void reset(void);
   // void interruptsActiveLow(bool active_low);
@@ -102,20 +119,21 @@ protected:
   virtual bool _init(int32_t sensor_id);
 
   // float unscaled_temp,   ///< Last reading's temperature (C) before scaling
-      // unscaled_pressure; ///< Last reading's pressure (hPa) before scaling
+  // unscaled_pressure; ///< Last reading's pressure (hPa) before scaling
 
   // uint16_t _sensorid_pressure, ///< ID number for pressure
-      // _sensorid_temp;          ///< ID number for temperature
+  // _sensorid_temp;          ///< ID number for temperature
 
   Adafruit_I2CDevice *i2c_dev = NULL; ///< Pointer to I2C bus interface
   Adafruit_SPIDevice *spi_dev = NULL; ///< Pointer to SPI bus interface
 
   // Adafruit_AS7341_Temp *temp_sensor = NULL; ///< Temp sensor data object
   // Adafruit_AS7341_Pressure *pressure_sensor =
-      // NULL; ///< Pressure sensor data object
+  // NULL; ///< Pressure sensor data object
 
 private:
-  // friend class Adafruit_AS7341_Temp;     ///< Gives access to private members to
+  // friend class Adafruit_AS7341_Temp;     ///< Gives access to private members
+  // to
   //                                        ///< Temp data object
   // friend class Adafruit_AS7341_Pressure; ///< Gives access to private
   //                                        ///< members to Pressure data
@@ -126,3 +144,24 @@ private:
 };
 
 #endif
+
+void F1F4_Clear_NIR();
+void F5F8_Clear_NIR();
+void FDConfig();
+void flickerDetection();
+void flickerDetection1K();
+void PON();
+void readAUXID();
+void readID();
+void ReadRawValuesMode1();
+void ReadRawValuesMode2();
+void readRegisterPrint(byte addr);
+void readREVID();
+void setASTEP(byte value1, byte value2);
+void setATIME(byte value);
+void setGAIN(byte value);
+void SmuxConfigRAM();
+void SMUXEN();
+void SpEn(bool isEnable);
+void writeRegister(byte addr, byte val);
+byte readRegister(byte addr);
