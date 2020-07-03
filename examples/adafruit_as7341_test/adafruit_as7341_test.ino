@@ -5,12 +5,17 @@ Adafruit_AS7341 as7341;
 void setup() {
 
   // Initiate the Wire library and join the I2C bus as a master or slave
-  Wire.begin();
+//  Wire.begin();
+
 
   // communication with the host computer serial monitor
-  Serial.begin(9600);
+  Serial.begin(115200);
   while (!Serial) {
     delay(1);
+  }
+  if (!as7341.begin()){
+    Serial.println("Could not find AS7341");
+    return;
   }
 }
 
@@ -50,9 +55,10 @@ void loop() {
   // FD_STATUS(fd_measurement_valid=1 fd_1200Hz_flicker_valid=1
   // fd_1000Hz_flicker_valid=1 fd_1200Hz_flicker)
 
-  int flicker_value = as7341.readRegister(byte(0xDB));
-  //             Serial.print("Flicker Status-");
-  //             Serial.println(flicker_value);
+  int flicker_value = as7341.getFlickerValue();
+               Serial.print("Flicker Status-");
+               Serial.println(flicker_value);
+
 
   Serial.println("** 1k flicker test **");
   if (flicker_value == 44) {

@@ -66,7 +66,6 @@ Adafruit_AS7341::~Adafruit_AS7341(void) {
  */
 bool Adafruit_AS7341::begin(uint8_t i2c_address, TwoWire *wire,
                             int32_t sensor_id) {
-  spi_dev = NULL;
   if (i2c_dev) {
     delete i2c_dev; // remove old interface
   }
@@ -86,8 +85,8 @@ bool Adafruit_AS7341::begin(uint8_t i2c_address, TwoWire *wire,
  */
 bool Adafruit_AS7341::_init(int32_t sensor_id) {
 
-  Adafruit_BusIO_Register chip_id = Adafruit_BusIO_Register(
-      i2c_dev, spi_dev, ADDRBIT8_HIGH_TOREAD, AS7341_WHOAMI, 1);
+  Adafruit_BusIO_Register chip_id =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_WHOAMI);
 
   // make sure we're talking to the right chip
   if (chip_id.read() != AS7341_CHIP_ID) {
@@ -127,6 +126,12 @@ void Adafruit_AS7341::Adafruit_AS7341::reset(void) {
 }
 
 /********************* EXAMPLE EXTRACTS **************/
+
+int8_t Adafruit_AS7341::getFlickerValue(void) {
+  // int flicker_value = as7341.readRegister(byte(0xDB));
+  Adafruit_BusIO_Register flicker_val = Adafruit_BusIO_Register(i2c_dev, 0xDB);
+  return (int8_t)flicker_val.read();
+}
 
 // <summary>
 // Read two consecutive i2c registers
@@ -178,12 +183,15 @@ void Adafruit_AS7341::writeRegister(byte addr, byte val) {
 // the other bits <summary>
 
 void Adafruit_AS7341::PON() {
-
-  byte regVal = readRegister(byte(0x80));
-  byte temp = regVal;
-  regVal = regVal & 0xFE;
-  regVal = regVal | 0x01;
-  writeRegister(byte(0x80), byte(regVal));
+  Adafruit_BusIO_Register eighty = Adafruit_BusIO_Register(i2c_dev, 0x80);
+  Adafruit_BusIO_RegisterBits pon_en =
+      Adafruit_BusIO_RegisterBits(&eighty, 1, 0);
+  pon_en.write(true);
+  // byte regVal = readRegister(byte(0x80));
+  // byte temp = regVal;
+  // regVal = regVal & 0xFE;
+  // regVal = regVal | 0x01;
+  // writeRegister(byte(0x80), byte(regVal));
 }
 
 // <summary>

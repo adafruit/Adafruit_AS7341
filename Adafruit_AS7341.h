@@ -103,6 +103,8 @@ public:
   bool begin(uint8_t i2c_addr = AS7341_I2CADDR_DEFAULT, TwoWire *wire = &Wire,
              int32_t sensor_id = 0);
 
+  int8_t getFlickerValue(void);
+
   void FDConfig(void);
   void F1F4_Clear_NIR(void);
   void F5F8_Clear_NIR(void);
@@ -142,7 +144,6 @@ protected:
   virtual bool _init(int32_t sensor_id);
 
   Adafruit_I2CDevice *i2c_dev = NULL; ///< Pointer to I2C bus interface
-  Adafruit_SPIDevice *spi_dev = NULL; ///< Pointer to SPI bus interface
   // float unscaled_temp,   ///< Last reading's temperature (C) before scaling
   // unscaled_pressure; ///< Last reading's pressure (hPa) before scaling
 
