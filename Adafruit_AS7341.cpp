@@ -128,8 +128,9 @@ void Adafruit_AS7341::Adafruit_AS7341::reset(void) {
 /********************* EXAMPLE EXTRACTS **************/
 
 int8_t Adafruit_AS7341::getFlickerValue(void) {
-  // int flicker_value = as7341.readRegister(byte(0xDB));
-  Adafruit_BusIO_Register flicker_val = Adafruit_BusIO_Register(i2c_dev, 0xDB);
+  // int flicker_value = as7341.readRegister(byte(AS7341_FD_STATUS));
+  Adafruit_BusIO_Register flicker_val =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_FD_STATUS);
   return (int8_t)flicker_val.read();
 }
 
@@ -183,15 +184,11 @@ void Adafruit_AS7341::writeRegister(byte addr, byte val) {
 // the other bits <summary>
 
 void Adafruit_AS7341::PON() {
-  Adafruit_BusIO_Register eighty = Adafruit_BusIO_Register(i2c_dev, 0x80);
+  Adafruit_BusIO_Register eighty =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_ENABLE);
   Adafruit_BusIO_RegisterBits pon_en =
       Adafruit_BusIO_RegisterBits(&eighty, 1, 0);
   pon_en.write(true);
-  // byte regVal = readRegister(byte(0x80));
-  // byte temp = regVal;
-  // regVal = regVal & 0xFE;
-  // regVal = regVal | 0x01;
-  // writeRegister(byte(0x80), byte(regVal));
 }
 
 // <summary>
@@ -207,7 +204,7 @@ void Adafruit_AS7341::SmuxConfigRAM() { writeRegister(byte(0xAF), byte(0x10)); }
 
 void Adafruit_AS7341::SpEn(bool isEnable) {
 
-  byte regVal = readRegister(byte(0x80));
+  byte regVal = readRegister(byte(AS7341_ENABLE));
   byte temp = regVal;
   regVal = regVal & 0xFD;
 
@@ -217,7 +214,7 @@ void Adafruit_AS7341::SpEn(bool isEnable) {
     regVal = temp & 0xFD;
   }
 
-  writeRegister(byte(0x80), byte(regVal));
+  writeRegister(byte(AS7341_ENABLE), byte(regVal));
 }
 
 // <summary>
@@ -227,11 +224,11 @@ void Adafruit_AS7341::SpEn(bool isEnable) {
 
 void Adafruit_AS7341::SMUXEN() {
 
-  byte regVal = readRegister(byte(0x80));
+  byte regVal = readRegister(byte(AS7341_ENABLE));
   byte temp = regVal;
   regVal = regVal & 0xEF;
   regVal = regVal | 0x10;
-  writeRegister(byte(0x80), byte(regVal));
+  writeRegister(byte(AS7341_ENABLE), byte(regVal));
 }
 
 // <summary>
@@ -242,7 +239,7 @@ void Adafruit_AS7341::SMUXEN() {
 bool Adafruit_AS7341::getSmuxEnabled() {
 
   bool isEnabled = false;
-  byte regVal = readRegister(byte(0x80));
+  byte regVal = readRegister(byte(AS7341_ENABLE));
 
   if ((regVal & 0x10) == 0x10) {
     return isEnabled = true;
@@ -260,7 +257,7 @@ bool Adafruit_AS7341::getSmuxEnabled() {
 
 bool Adafruit_AS7341::getIsDataReady() {
   bool isDataReady = false;
-  byte regVal = readRegister(byte(0xA3));
+  byte regVal = readRegister(byte(AS7341_STATUS2));
 
   if ((regVal & 0x40) == 0x40) {
 
@@ -279,7 +276,7 @@ bool Adafruit_AS7341::getIsDataReady() {
 
 bool Adafruit_AS7341::getFdMeasReady() {
   bool isFdmeasReady = false;
-  byte regVal = readRegister(byte(0xDB));
+  byte regVal = readRegister(byte(AS7341_FD_STATUS));
 
   if ((regVal & 0x20) == 0x20) {
 
@@ -399,7 +396,9 @@ void Adafruit_AS7341::FDConfig() {
 // param name = "value"> integer value from 0 to 255 written to ATIME register
 // 0x81
 
-void Adafruit_AS7341::setATIME(byte value) { writeRegister(byte(0x81), value); }
+void Adafruit_AS7341::setATIME(byte value) {
+  writeRegister(byte(AS7341_ATIME), value);
+}
 
 //<summary>
 // Sets the ASTEP for integration time from 0 to 65535, integration time =
@@ -412,10 +411,10 @@ void Adafruit_AS7341::setATIME(byte value) { writeRegister(byte(0x81), value); }
 void Adafruit_AS7341::setASTEP(byte value1, byte value2) {
 
   // astep[7:0]
-  writeRegister(byte(0xCA), value1);
+  writeRegister(byte(AS7341_ASTEP_L), value1);
 
   // astep[15:8]
-  writeRegister(byte(0xCB), value2);
+  writeRegister(byte(AS7341_ASTEP_H), value2);
 }
 
 //<summary>
@@ -424,7 +423,9 @@ void Adafruit_AS7341::setASTEP(byte value1, byte value2) {
 // param name = "value"> integer value from 0 to 10 written to AGAIN register
 // 0xAA
 
-void Adafruit_AS7341::setGAIN(byte value) { writeRegister(byte(0xAA), value); }
+void Adafruit_AS7341::setGAIN(byte value) {
+  writeRegister(byte(AS7341_CFG1), value);
+}
 
 /*----- Device ID, revision ID and auxiliary ID are read(These function are not
  * implemented in main code. This is to give just an idea regarding these
@@ -434,18 +435,18 @@ void Adafruit_AS7341::setGAIN(byte value) { writeRegister(byte(0xAA), value); }
 // Reads Identification number register in 0x92
 //<summary>
 
-void Adafruit_AS7341::readID() { readRegister(byte(0x92)); }
+void Adafruit_AS7341::readID() { readRegister(byte(AS7341_ID)); }
 
 //<summary>
 // Reads Revision identification number in 0x91
 //<summary>
 
-void Adafruit_AS7341::readREVID() { readRegister(byte(0x91)); }
+void Adafruit_AS7341::readREVID() { readRegister(byte(AS7341_REVID)); }
 
 //<summary>
-// Reads Auxiliary identification number in 0x93
+// Reads Auxiliary identification number in 0x93 (Datasheet says 0x90 =BS)
 //<summary>
-void Adafruit_AS7341::readAUXID() { readRegister(byte(0x93)); }
+void Adafruit_AS7341::readAUXID() { readRegister(byte(AS7341_AUXID)); }
 
 /*----- Function to detect Flickering at 100 and 120 Hz(default detection in
  * XWing Sensor) -----*/
@@ -459,7 +460,7 @@ void Adafruit_AS7341::flickerDetection() {
   bool isEnabled = true;
   bool isFdmeasReady = false;
 
-  writeRegister(byte(0x80), byte(0x00));
+  writeRegister(byte(AS7341_ENABLE), byte(0x00));
 
   // Setting the PON bit in Enable register 0x80
 
@@ -467,20 +468,15 @@ void Adafruit_AS7341::flickerDetection() {
 
   // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
   // to CFG6)
-
   SmuxConfigRAM();
 
   // Write new configuration to all the 20 registers for detecting Flicker
-
   FDConfig();
 
   // Start SMUX command: Enable the SMUXEN bit (bit 4) in register ENABLE
-
-  SMUXEN();
-
   // Checking on the enabled SMUXEN bit whether back to zero- Poll the SMUXEN
   // bit -> if it is 0 SMUX command is started
-
+  SMUXEN();
   while (isEnabled) {
     isEnabled = getSmuxEnabled();
   }
@@ -490,24 +486,25 @@ void Adafruit_AS7341::flickerDetection() {
 
   /*----- Functions for setting Flicker Sample, Flicker time, Flicker Gain (not
    * implemented for default flicker detection)------*/
-  //            writeRegister(byte(0xD7), byte(0x21)); //33 default value,
-  //            function for setting for Fd_sample and Fd_compare_value
+  //            writeRegister(byte(AS7341_FD_CFG0), byte(0x21)); //33 default
+  //            value, function for setting for Fd_sample and Fd_compare_value
   //
-  //            writeRegister(byte(0xD8), byte(0x68)); //104 default value,
-  //            function for setting for Fd_time lower bit(7:0)
+  //            writeRegister(byte(AS7341_FD_TIME1), byte(0x68)); //104 default
+  //            value, function for setting for Fd_time lower bit(7:0)
   //
-  //            writeRegister(byte(0xDA), byte(0x49)); //73 default value,
-  //            function for setting for fd_gain and fd_time higher bit(10:8)
+  //            writeRegister(byte(AS7341_FD_TIME2), byte(0x49)); //73 default
+  //            value, function for setting for fd_gain and fd_time higher
+  //            bit(10:8)
 
   // Function to set the Flicker detection via enabling the fden bit in 0x80
   // register
 
-  writeRegister(byte(0x80), byte(0x41));
+  writeRegister(byte(AS7341_ENABLE), byte(0x41));
   delay(500);
 
   // reading the flicker status in FD_STATUS register 0xDB
 
-  int flicker_value = readRegister(byte(0xDB));
+  int flicker_value = readRegister(byte(AS7341_FD_STATUS));
   Serial.print("Flicker value-");
   Serial.println(flicker_value);
 
@@ -523,7 +520,7 @@ void Adafruit_AS7341::flickerDetection() {
 
   // Setting back the PON bit in the ENABLE Register
 
-  writeRegister(byte(0x80), byte(0x01));
+  writeRegister(byte(AS7341_ENABLE), byte(0x01));
 
   Serial.println("");
 }
@@ -537,7 +534,7 @@ void Adafruit_AS7341::flickerDetection() {
 void Adafruit_AS7341::flickerDetection1K() {
 
   // RAM_BANK 0 select which RAM bank to access in register addresses 0x00-0x7f
-  writeRegister(byte(0xA9), byte(0x00));
+  writeRegister(byte(AS7341_CFG0), byte(0x00));
 
   // The coefficient calculated are stored into the RAM bank 0 and RAM bank 1,
   // they are used instead of 100Hz and 120Hz coefficients which are the default
@@ -571,7 +568,7 @@ void Adafruit_AS7341::flickerDetection1K() {
   writeRegister(byte(0x7D), byte(0x35));
 
   // RAM_BANK 1 select which RAM bank to access in register addresses 0x00-0x7f
-  writeRegister(byte(0xA9), byte(0x01));
+  writeRegister(byte(AS7341_CFG0), byte(0x01));
 
   // write new coefficients to detect the 1000Hz and 1200Hz - part 1
   writeRegister(byte(0x06), byte(0x54));
@@ -581,33 +578,33 @@ void Adafruit_AS7341::flickerDetection1K() {
   writeRegister(byte(0x1A), byte(0x2F));
   writeRegister(byte(0x1B), byte(0x1A));
 
-  writeRegister(byte(0xA9), byte(0x01));
+  writeRegister(byte(AS7341_CFG0), byte(0x01));
 
   // select RAM coefficients for flicker detection by setting
   // fd_disable_constant_init to „1“ (FD_CFG0 register) in FD_CFG0 register -
   // 0xd7  fd_disable_constant_init=1 fd_samples=4
-  writeRegister(byte(0xD7), byte(0x60));
-  // readRegisterPrint(byte(0xD7));
+  writeRegister(byte(AS7341_FD_CFG0), byte(0x60));
+  // readRegisterPrint(byte(AS7341_FD_CFG0));
 
   // in FD_CFG1 register - 0xd8 fd_time(7:0) = 0x40
-  writeRegister(byte(0xD8), byte(0x40));
-  // readRegisterPrint(byte(0xD8));
+  writeRegister(byte(AS7341_FD_TIME1), byte(0x40));
+  // readRegisterPrint(byte(AS7341_FD_TIME1));
 
   // in FD_CFG2 register - 0xd9  fd_dcr_filter_size=1 fd_nr_data_sets(2:0)=5
   writeRegister(byte(0xD9), byte(0x25));
   // readRegisterPrint(byte(0xD9));
 
   // in FD_CFG3 register - 0xda fd_gain=9
-  writeRegister(byte(0xDA), byte(0x48));
-  // readRegisterPrint(byte(0xDA));
+  writeRegister(byte(AS7341_FD_TIME2), byte(0x48));
+  // readRegisterPrint(byte(AS7341_FD_TIME2));
 
   // in CFG9 register - 0xb2 sien_fd=1
-  writeRegister(byte(0xB2), byte(0x40));
-  // readRegisterPrint(byte(0xB2));
+  writeRegister(byte(AS7341_CFG9), byte(0x40));
+  // readRegisterPrint(byte(AS7341_CFG9));
 
   // in ENABLE - 0x80  fden=1 and pon=1 are enabled
-  writeRegister(byte(0x80), byte(0x41));
-  // readRegisterPrint(byte(0x80));
+  writeRegister(byte(AS7341_ENABLE), byte(0x41));
+  // readRegisterPrint(byte(AS7341_ENABLE));
 }
 
 /*#####################  END 1K Flicker detect
@@ -688,22 +685,19 @@ void Adafruit_AS7341::readRawValuesMode2() {
 
   PON();
 
-  // Disable SP_EN bit
+  // Disable SP_EN bit while  making config changes
 
   SpEn(false);
 
   // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
   // to CFG6)
-
   SmuxConfigRAM();
 
   // Write new configuration to all the 20 registers for reading channels from
   // F5-F8, Clear and NIR
-
   F5F8_Clear_NIR();
 
   // Start SMUX command: Enable the SMUXEN bit (bit 4) in register ENABLE
-
   SMUXEN();
 
   // Checking on the enabled SMUXEN bit whether back to zero- Poll the SMUXEN
@@ -716,13 +710,11 @@ void Adafruit_AS7341::readRawValuesMode2() {
   }
 
   // Enable SP_EN bit
-
   SpEn(true);
 
   // Reading and Polling the the AVALID bit in Status 2 Register 0xA3
 
   while (!(isDataReady)) {
-
     isDataReady = getIsDataReady();
   }
 
