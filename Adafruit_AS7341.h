@@ -13,8 +13,7 @@
  *
  *	BSD license (see license.txt)
  */
-// "requires_busio": "y",
-//   "requires_sensor": "y",
+
 #ifndef _ADAFRUIT_AS7341_H
 #define _ADAFRUIT_AS7341_H
 
@@ -27,6 +26,7 @@
 #define AS7341_CHIP_ID 0x09 ///< AS7341 default device id from WHOAMI
 
 #define AS7341_WHOAMI 0x92 ///< Chip ID register
+
 
 ///////////////////////////////////////////////////////////////
 /**
@@ -83,18 +83,13 @@ public:
   Adafruit_AS7341();
   ~Adafruit_AS7341();
 
-  bool begin_I2C(uint8_t i2c_addr = AS7341_I2CADDR_DEFAULT,
+  bool begin(uint8_t i2c_addr = AS7341_I2CADDR_DEFAULT,
                  TwoWire *wire = &Wire, int32_t sensor_id = 0);
-
-  bool begin_SPI(uint8_t cs_pin, SPIClass *theSPI = &SPI,
-                 int32_t sensor_id = 0);
-  bool begin_SPI(int8_t cs_pin, int8_t sck_pin, int8_t miso_pin,
-                 int8_t mosi_pin, int32_t sensor_id = 0);
 
   void reset(void);
   // void interruptsActiveLow(bool active_low);
 
-  as7341_rate_t getDataRate(void);
+  // as7341_rate_t getDataRate(void);
 
   // void setDataRate(as7341_rate_t data_rate);
   bool getEvent(sensors_event_t *pressure, sensors_event_t *temp);
