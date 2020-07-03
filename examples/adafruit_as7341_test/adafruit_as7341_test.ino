@@ -1,7 +1,7 @@
 
-#include <Wire.h>
 #include <Adafruit_AS7341.h>
-
+#include <Wire.h>
+Adafruit_AS7341 as7341;
 void setup() {
 
   // Initiate the Wire library and join the I2C bus as a master or slave
@@ -16,30 +16,31 @@ void setup() {
 
 void loop() {
 
- // Sets the Atime for integration time from 0 to 255 in register (0x81),
- // integration time = (ATIME + 1) * (ASTEP + 1) * 2.78µS
- setATIME(byte(0x64));
+  // Sets the Atime for integration time from 0 to 255 in register (0x81),
+  // integration time = (ATIME + 1) * (ASTEP + 1) * 2.78µS
 
- // Sets the Astep for integration time from 0 to 65535 in register (0xCA[7:0])
- // and (0xCB[15:8]), integration time = (ATIME + 1) * (ASTEP + 1) * 2.78µS
- setASTEP(byte(0xE7), byte(0x03));
+  as7341.setATIME(byte(0x64));
 
- // Sets the Spectral Gain in CFG1 Register (0xAA) in [4:0] bit
- setGAIN(byte(0x09));
+  // Sets the Astep for integration time from 0 to 65535 in register (0xCA[7:0])
+  // and (0xCB[15:8]), integration time = (ATIME + 1) * (ASTEP + 1) * 2.78µS
+  as7341.setASTEP(byte(0xE7), byte(0x03));
 
- // Function defined to read out channels with SMUX configration 1- F1-F4,
- // Clear, NIR
- ReadRawValuesMode1();
+  // Sets the Spectral Gain in CFG1 Register (0xAA) in [4:0] bit
+  as7341.setGAIN(byte(0x09));
 
- // Function defined to read out channels with SMUX configration 2- F5-F8,
- // Clear, NIR
- ReadRawValuesMode2();
- delay(1000);
-//
-//  // Function detects Flicker for 100 and 120 Hz
-//  flickerDetection();
+  // Function defined to read out channels with SMUX configration 1- F1-F4,
+  // Clear, NIR
+  as7341.readRawValuesMode1();
 
-  flickerDetection1K();
+  // Function defined to read out channels with SMUX configration 2- F5-F8,
+  // Clear, NIR
+  as7341.readRawValuesMode2();
+  delay(1000);
+
+  //  // Function detects Flicker for 100 and 120 Hz
+  //  flickerDetection();
+
+  as7341.flickerDetection1K();
 
   // reading the flicker status in FD_STATUS register 0xDB
   // data=0x2c=0b00101100  FD_STATUS(fd_measurement_valid=1
@@ -49,7 +50,7 @@ void loop() {
   // FD_STATUS(fd_measurement_valid=1 fd_1200Hz_flicker_valid=1
   // fd_1000Hz_flicker_valid=1 fd_1200Hz_flicker)
 
-  int flicker_value = readRegister(byte(0xDB));
+  int flicker_value = as7341.readRegister(byte(0xDB));
   //             Serial.print("Flicker Status-");
   //             Serial.println(flicker_value);
 
@@ -63,7 +64,7 @@ void loop() {
   } else {
     Serial.println("Error in reading");
   }
-  
+
   Serial.println("** 1k flicker test end **");
   delay(500);
 }

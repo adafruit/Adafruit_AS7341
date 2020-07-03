@@ -103,13 +103,36 @@ public:
   bool begin(uint8_t i2c_addr = AS7341_I2CADDR_DEFAULT, TwoWire *wire = &Wire,
              int32_t sensor_id = 0);
 
+  void FDConfig(void);
+  void F1F4_Clear_NIR(void);
+  void F5F8_Clear_NIR(void);
+  void flickerDetection(void); // merge with 1k
+  void flickerDetection1K(void);
+  void PON(void);
+  void readAUXID(void);
+  void readID(void);
+  void readRawValuesMode1(void);
+  void readRawValuesMode2(void);
+  void readRegisterPrint(byte addr);
+  void readREVID(void);
+  void setASTEP(byte value1, byte value2);
+  void setATIME(byte value);
+  void setGAIN(byte value);
+  void SmuxConfigRAM(void);
+  void SMUXEN(void);
+  void SpEn(bool isEnable);
+  void writeRegister(byte addr, byte val);
+  byte readRegister(byte addr);
+  uint16_t readTwoRegister1(byte addr);
+  bool getSmuxEnabled();
+  bool getFdMeasReady();
+  bool getIsDataReady();
+
   void reset(void);
-  // void interruptsActiveLow(bool active_low);
-
-  // as7341_rate_t getDataRate(void);
-
-  // void setDataRate(as7341_rate_t data_rate);
   bool getEvent(sensors_event_t *pressure, sensors_event_t *temp);
+  // void interruptsActiveLow(bool active_low);
+  // as7341_rate_t getDataRate(void);
+  // void setDataRate(as7341_rate_t data_rate);
 
   // Adafruit_Sensor *getTemperatureSensor(void);
   // Adafruit_Sensor *getPressureSensor(void);
@@ -118,14 +141,13 @@ protected:
   void _read(void);
   virtual bool _init(int32_t sensor_id);
 
+  Adafruit_I2CDevice *i2c_dev = NULL; ///< Pointer to I2C bus interface
+  Adafruit_SPIDevice *spi_dev = NULL; ///< Pointer to SPI bus interface
   // float unscaled_temp,   ///< Last reading's temperature (C) before scaling
   // unscaled_pressure; ///< Last reading's pressure (hPa) before scaling
 
   // uint16_t _sensorid_pressure, ///< ID number for pressure
   // _sensorid_temp;          ///< ID number for temperature
-
-  Adafruit_I2CDevice *i2c_dev = NULL; ///< Pointer to I2C bus interface
-  Adafruit_SPIDevice *spi_dev = NULL; ///< Pointer to SPI bus interface
 
   // Adafruit_AS7341_Temp *temp_sensor = NULL; ///< Temp sensor data object
   // Adafruit_AS7341_Pressure *pressure_sensor =
@@ -144,24 +166,3 @@ private:
 };
 
 #endif
-
-void F1F4_Clear_NIR();
-void F5F8_Clear_NIR();
-void FDConfig();
-void flickerDetection();
-void flickerDetection1K();
-void PON();
-void readAUXID();
-void readID();
-void ReadRawValuesMode1();
-void ReadRawValuesMode2();
-void readRegisterPrint(byte addr);
-void readREVID();
-void setASTEP(byte value1, byte value2);
-void setATIME(byte value);
-void setGAIN(byte value);
-void SmuxConfigRAM();
-void SMUXEN();
-void SpEn(bool isEnable);
-void writeRegister(byte addr, byte val);
-byte readRegister(byte addr);
