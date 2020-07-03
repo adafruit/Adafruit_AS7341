@@ -207,10 +207,7 @@ public:
   uint16_t readTwoRegister1(byte addr);
   void readRegisterPrint(byte addr);
 
-  // Checking on the enabled SMUXEN bit whether back to zero- Poll the SMUXEN
-  // bit -> if it is 0 SMUX command is started
-  bool getSmuxEnabled();
-  void SMUXEN(void);
+  void enableSMUX(void);
   void SmuxConfigRAM(void);
 
   bool getIsDataReady();

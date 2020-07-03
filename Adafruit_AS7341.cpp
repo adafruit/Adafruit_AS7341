@@ -216,40 +216,16 @@ void Adafruit_AS7341::SpEn(bool isEnable) {
 
   writeRegister(byte(AS7341_ENABLE), byte(regVal));
 }
-
-// <summary>
-// Starting the SMUX command via enabling the SMUXEN bit (bit 4) in register
-// ENABLE 0x80 The SMUXEN bit gets cleared automatically as soon as SMUX
-// operation is finished <summary>
-
-void Adafruit_AS7341::SMUXEN() {
-
-  byte regVal = readRegister(byte(AS7341_ENABLE));
-  byte temp = regVal;
-  regVal = regVal & 0xEF;
-  regVal = regVal | 0x10;
-  writeRegister(byte(AS7341_ENABLE), byte(regVal));
-}
-
-// <summary>
-// Reading and Polling the the SMUX Enable bit in Enable Register 0x80
-// The SMUXEN bit gets cleared automatically as soon as SMUX operation is
-// finished <summary>
-
-bool Adafruit_AS7341::getSmuxEnabled() {
-
-  bool isEnabled = false;
-  byte regVal = readRegister(byte(AS7341_ENABLE));
-
-  if ((regVal & 0x10) == 0x10) {
-    return isEnabled = true;
-  }
-
-  else {
-    return isEnabled = false;
+void Adafruit_AS7341::enableSMUX(void) {
+  Adafruit_BusIO_Register enable_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_ENABLE);
+  Adafruit_BusIO_RegisterBits smux_enable_bit =
+      Adafruit_BusIO_RegisterBits(&enable_reg, 1, 4);
+  smux_enable_bit.write(true);
+  while (smux_enable_bit.read()) {
+    delay(1);
   }
 }
-
 // <summary>
 // Reading and Polling the the AVALID bit in Status 2 Register 0xA3,if the
 // spectral measurement is ready or busy. True indicates that a cycle is
@@ -473,13 +449,8 @@ void Adafruit_AS7341::flickerDetection() {
   // Write new configuration to all the 20 registers for detecting Flicker
   FDConfig();
 
-  // Start SMUX command: Enable the SMUXEN bit (bit 4) in register ENABLE
-  // Checking on the enabled SMUXEN bit whether back to zero- Poll the SMUXEN
-  // bit -> if it is 0 SMUX command is started
-  SMUXEN();
-  while (isEnabled) {
-    isEnabled = getSmuxEnabled();
-  }
+  // Start SMUX command
+  enableSMUX();
 
   // Enable SP_EN bit
   SpEn(true);
@@ -634,16 +605,8 @@ void Adafruit_AS7341::readRawValuesMode1() {
 
   F1F4_Clear_NIR();
 
-  // Start SMUX command: Enable the SMUXEN bit (bit 4) in register ENABLE
-
-  SMUXEN();
-
-  // Checking on the enabled SMUXEN bit whether back to zero- Poll the SMUXEN
-  // bit -> if it is 0 SMUX command is started
-
-  while (isEnabled) {
-    isEnabled = getSmuxEnabled();
-  }
+  // Start SMUX command
+  enableSMUX();
 
   // Enable SP_EN bit
 
@@ -696,18 +659,8 @@ void Adafruit_AS7341::readRawValuesMode2() {
   // Write new configuration to all the 20 registers for reading channels from
   // F5-F8, Clear and NIR
   F5F8_Clear_NIR();
-
-  // Start SMUX command: Enable the SMUXEN bit (bit 4) in register ENABLE
-  SMUXEN();
-
-  // Checking on the enabled SMUXEN bit whether back to zero- Poll the SMUXEN
-  // bit -> if it is 0 SMUX command is started
-
-  while (isEnabled)
-
-  {
-    isEnabled = getSmuxEnabled();
-  }
+  // Start SMUX command
+  enableSMUX();
 
   // Enable SP_EN bit
   SpEn(true);
