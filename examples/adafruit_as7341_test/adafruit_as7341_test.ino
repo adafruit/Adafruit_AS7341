@@ -16,16 +16,9 @@ void setup() {
 
 void loop() {
 
-  // Sets the Atime for integration time from 0 to 255 in register (0x81),
-  // integration time = (ATIME + 1) * (ASTEP + 1) * 2.78µS
 
   as7341.setATIME(100);
-
-  // Sets the Astep for integration time from 0 to 65535
-  // ntegration time = (ATIME + 1) * (ASTEP + 1) * 2.78µS
   as7341.setASTEP(999);
-
-  // Sets the Spectral Gain in CFG1 Register (0xAA) in [4:0] bit
   as7341.setGain(AS7341_GAIN_256X);
 
   // Function defined to read out channels with SMUX configration 1- F1-F4,

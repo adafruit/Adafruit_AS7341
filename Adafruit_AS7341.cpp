@@ -100,7 +100,6 @@ bool Adafruit_AS7341::_init(int32_t sensor_id) {
 /********************* EXAMPLE EXTRACTS **************/
 // maybe return a typedef enum
 int8_t Adafruit_AS7341::getFlickerValue(void) {
-  // int flicker_value = as7341.readRegister(byte(AS7341_FD_STATUS));
   Adafruit_BusIO_Register flicker_val =
       Adafruit_BusIO_Register(i2c_dev, AS7341_FD_STATUS);
   return (int8_t)flicker_val.read();
@@ -148,6 +147,14 @@ void Adafruit_AS7341::writeRegister(byte addr, byte val) {
   Wire.endTransmission();
 }
 
+uint16_t Adafruit_AS7341::readChannel(as7341_channel_t channel) {
+  // each channel has two bytes, so offset by two for each next channel
+  Adafruit_BusIO_Register channel_data_reg = Adafruit_BusIO_Register(
+      i2c_dev, (AS7341_CH0_DATA_L + 2 * channel), 2, LSBFIRST);
+
+  return channel_data_reg.read();
+}
+
 /*----- Register configuration  -----*/
 
 // <summary>
@@ -182,7 +189,7 @@ void Adafruit_AS7341::enableSMUX(void) {
   Adafruit_BusIO_Register enable_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_ENABLE);
   Adafruit_BusIO_RegisterBits smux_enable_bit =
-      Adafruit_BusIO_RegisterBits(&enable_reG, 1, 4);
+      Adafruit_BusIO_RegisterBits(&enable_reg, 1, 4);
   smux_enable_bit.write(true);
   while (smux_enable_bit.read()) {
     delay(1);
@@ -194,17 +201,12 @@ void Adafruit_AS7341::enableSMUX(void) {
 // completed since the last readout of the Raw Data register <summary>
 
 bool Adafruit_AS7341::getIsDataReady() {
-  bool isDataReady = false;
-  byte regVal = readRegister(byte(AS7341_STATUS2));
+  Adafruit_BusIO_Register status2_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_STATUS2);
+  Adafruit_BusIO_RegisterBits fd_data_ready_bit =
+      Adafruit_BusIO_RegisterBits(&status2_reg, 1, 6);
 
-  if ((regVal & 0x40) == 0x40) {
-
-    return isDataReady = true;
-  }
-
-  else {
-    return isDataReady = false;
-  }
+  return fd_data_ready_bit.read();
 }
 
 //<summary>
@@ -414,16 +416,25 @@ void Adafruit_AS7341::flickerDetection() {
   writeRegister(byte(AS7341_ENABLE), byte(0x41));
   delay(500);
 
-  // reading the flicker status in FD_STATUS register 0xDB
-
-  int flicker_value = readRegister(byte(AS7341_FD_STATUS));
+  int flicker_value = getFlickerValue();
   Serial.print("Flicker value-");
   Serial.println(flicker_value);
 
+  // we can group this as "is valid"
+  // flicker detect valid
+  // no flicker saturation
+  // 120Hz detection valid
+  // 100 Hz Detection valid
+
+  // 120Hz flicker detected
+  // 100Hz Flicker detected
+  // 0b 10 11 00
   if (flicker_value == 44) {
     Serial.println("Unknown frequency");
+    // 0b 10 11 01
   } else if (flicker_value == 45) {
     Serial.println("100 Hz detected");
+    // 0b 10 11 10
   } else if (flicker_value == 46) {
     Serial.println("120 Hz detected");
   } else {
@@ -530,9 +541,6 @@ void Adafruit_AS7341::flickerDetection1K() {
 
 void Adafruit_AS7341::readRawValuesMode1() {
 
-  bool isEnabled = true;
-  bool isDataReady = false;
-
   // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
   // to CFG6)
 
@@ -551,24 +559,23 @@ void Adafruit_AS7341::readRawValuesMode1() {
 
   // Reading and Polling the the AVALID bit in Status 2 Register 0xA3
 
-  while (!(isDataReady)) {
-    isDataReady = getIsDataReady();
+  while (!getIsDataReady()) {
+    delay(1);
   }
-
   // Steps defined to print out 6 channels F1,F2,F3,F4,NIR,Clear
 
   Serial.print("ADC0/F1-");
-  Serial.println(readTwoRegister1(0x95));
+  Serial.println(readChannel(AS7341_CHANNEL_0));
   Serial.print("ADC1/F2-");
-  Serial.println(readTwoRegister1(0x97));
+  Serial.println(readChannel(AS7341_CHANNEL_1));
   Serial.print("ADC2/F3-");
-  Serial.println(readTwoRegister1(0x99));
+  Serial.println(readChannel(AS7341_CHANNEL_2));
   Serial.print("ADC3/F4-");
-  Serial.println(readTwoRegister1(0x9B));
+  Serial.println(readChannel(AS7341_CHANNEL_3));
   Serial.print("ADC4/Clear-");
-  Serial.println(readTwoRegister1(0x9D));
+  Serial.println(readChannel(AS7341_CHANNEL_4));
   Serial.print("ADC5/NIR-");
-  Serial.println(readTwoRegister1(0x9F));
+  Serial.println(readChannel(AS7341_CHANNEL_5));
 }
 
 /*----- Function defined to read out channels with SMUX configration 2 -----*/
@@ -578,10 +585,6 @@ void Adafruit_AS7341::readRawValuesMode1() {
 //<summary>
 
 void Adafruit_AS7341::readRawValuesMode2() {
-  bool isEnabled = true;
-  bool isDataReady = false;
-  ;
-
   // Disable SP_EN bit while  making config changes
   enableSpectralMeasurement(false);
 
@@ -600,24 +603,24 @@ void Adafruit_AS7341::readRawValuesMode2() {
 
   // Reading and Polling the the AVALID bit in Status 2 Register 0xA3
 
-  while (!(isDataReady)) {
-    isDataReady = getIsDataReady();
+  while (!getIsDataReady()) {
+    delay(1);
   }
 
   // Steps defined to printout 6 channels F5,F6,F7,F8,NIR,Clear
 
   Serial.print("ADC0/F5-");
-  Serial.println(readTwoRegister1(0x95));
+  Serial.println(readChannel(AS7341_CHANNEL_0));
   Serial.print("ADC1/F6-");
-  Serial.println(readTwoRegister1(0x97));
+  Serial.println(readChannel(AS7341_CHANNEL_1));
   Serial.print("ADC2/F7-");
-  Serial.println(readTwoRegister1(0x99));
+  Serial.println(readChannel(AS7341_CHANNEL_2));
   Serial.print("ADC3/F8-");
-  Serial.println(readTwoRegister1(0x9B));
+  Serial.println(readChannel(AS7341_CHANNEL_3));
   Serial.print("ADC4/Clear-");
-  Serial.println(readTwoRegister1(0x9D));
+  Serial.println(readChannel(AS7341_CHANNEL_4));
   Serial.print("ADC5/NIR-");
-  Serial.println(readTwoRegister1(0x9F));
+  Serial.println(readChannel(AS7341_CHANNEL_5));
   Serial.println("");
 }
 

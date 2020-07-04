@@ -136,6 +136,15 @@ typedef enum {
   AS7341_GAIN_512X,
 } as7341_gain_t;
 
+typedef enum {
+  AS7341_CHANNEL_0,
+  AS7341_CHANNEL_1,
+  AS7341_CHANNEL_2,
+  AS7341_CHANNEL_3,
+  AS7341_CHANNEL_4,
+  AS7341_CHANNEL_5,
+} as7341_channel_t;
+
 class Adafruit_AS7341;
 
 // /** Adafruit Unified Sensor interface for temperature component of AS7341 */
@@ -184,6 +193,8 @@ public:
   bool setASTEP(uint16_t astep_value);
   bool setATIME(uint8_t atime_value);
   bool setGain(as7341_gain_t gain_value);
+
+  uint16_t readChannel(as7341_channel_t channel);
 
   void readRawValuesMode1(void);
   void readRawValuesMode2(void);
