@@ -19,11 +19,11 @@ void loop() {
   // Sets the Atime for integration time from 0 to 255 in register (0x81),
   // integration time = (ATIME + 1) * (ASTEP + 1) * 2.78µS
 
-  as7341.setATIME(byte(0x64));
+  as7341.setATIME(100);
 
-  // Sets the Astep for integration time from 0 to 65535 in register (0xCA[7:0])
-  // and (0xCB[15:8]), integration time = (ATIME + 1) * (ASTEP + 1) * 2.78µS
-  as7341.setASTEP(byte(0xE7), byte(0x03));
+  // Sets the Astep for integration time from 0 to 65535
+  // ntegration time = (ATIME + 1) * (ASTEP + 1) * 2.78µS
+  as7341.setASTEP(999);
 
   // Sets the Spectral Gain in CFG1 Register (0xAA) in [4:0] bit
   as7341.setGAIN(byte(0x09));

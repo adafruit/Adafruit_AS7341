@@ -92,34 +92,13 @@ bool Adafruit_AS7341::_init(int32_t sensor_id) {
   if (chip_id.read() & 0xFC != AS7341_CHIP_ID << 2) {
     return false;
   }
-  // _sensorid_pressure = sensor_id;
-  // _sensorid_temp = sensor_id + 1;
 
-  reset();
   powerEnable(true);
-
   return true;
 }
 
-/**
- * @brief Performs a software reset initializing registers to their power on
- * state
- *
- */
-void Adafruit_AS7341::Adafruit_AS7341::reset(void) {
-  // Adafruit_BusIO_Register ctrl_2 = Adafruit_BusIO_Register(
-  //     i2c_dev, spi_dev, ADDRBIT8_HIGH_TOREAD, AS7341_CTRL_REG2, 1);
-  // Adafruit_BusIO_RegisterBits sw_reset =
-  //     Adafruit_BusIO_RegisterBits(&ctrl_2, 1, 2);
-
-  // sw_reset.write(1);
-  // while (sw_reset.read()) {
-  //   delay(1);
-  // }
-}
-
 /********************* EXAMPLE EXTRACTS **************/
-
+// maybe return a typedef enum
 int8_t Adafruit_AS7341::getFlickerValue(void) {
   // int flicker_value = as7341.readRegister(byte(AS7341_FD_STATUS));
   Adafruit_BusIO_Register flicker_val =
@@ -189,25 +168,16 @@ void Adafruit_AS7341::powerEnable(bool enable_power) {
 
 void Adafruit_AS7341::SmuxConfigRAM() { writeRegister(byte(0xAF), byte(0x10)); }
 
-// <summary>
-// Setting the SP_EN (spectral measurement enabled) bit on the chip (bit 1 in
-// register ENABLE) <summary> <param name="isEnable">Enabling (true) or
-// disabling (false) the SP_EN bit</param>
+bool Adafruit_AS7341::enableSpectralMeasurement(bool enable_measurement) {
 
-void Adafruit_AS7341::SpEn(bool isEnable) {
+  Adafruit_BusIO_Register enable_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_ENABLE);
 
-  byte regVal = readRegister(byte(AS7341_ENABLE));
-  byte temp = regVal;
-  regVal = regVal & 0xFD;
-
-  if (isEnable == true) {
-    regVal = regVal | 0x02;
-  } else {
-    regVal = temp & 0xFD;
-  }
-
-  writeRegister(byte(AS7341_ENABLE), byte(regVal));
+  Adafruit_BusIO_RegisterBits spec_enable_bit =
+      Adafruit_BusIO_RegisterBits(&enable_reg, 1, 1);
+  return spec_enable_bit.write(enable_measurement);
 }
+
 void Adafruit_AS7341::enableSMUX(void) {
   Adafruit_BusIO_Register enable_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_ENABLE);
@@ -364,8 +334,11 @@ void Adafruit_AS7341::FDConfig() {
 // param name = "value"> integer value from 0 to 255 written to ATIME register
 // 0x81
 
+// TODO; check for valid values
 void Adafruit_AS7341::setATIME(byte value) {
-  writeRegister(byte(AS7341_ATIME), value);
+  Adafruit_BusIO_Register atime_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_ATIME);
+  atime_reg.write(value);
 }
 
 //<summary>
@@ -376,15 +349,11 @@ void Adafruit_AS7341::setATIME(byte value) {
 // written to ASTEP register 0xCA param name = "value2,"> Defines the higher
 // byte[15:8] of the base step time written to ASTEP register 0xCB
 
-void Adafruit_AS7341::setASTEP(byte value1, byte value2) {
-
-  // astep[7:0]
-  writeRegister(byte(AS7341_ASTEP_L), value1);
-
-  // astep[15:8]
-  writeRegister(byte(AS7341_ASTEP_H), value2);
+void Adafruit_AS7341::setASTEP(uint16_t astep_value) {
+  Adafruit_BusIO_Register astep_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_ASTEP_L, 2, LSBFIRST);
+  astep_reg.write(astep_value);
 }
-
 //<summary>
 // Sets the Spectral Gain in CFG1 Register (0xAA) in [4:0] bit
 //<summary>
@@ -394,27 +363,6 @@ void Adafruit_AS7341::setASTEP(byte value1, byte value2) {
 void Adafruit_AS7341::setGAIN(byte value) {
   writeRegister(byte(AS7341_CFG1), value);
 }
-
-/*----- Device ID, revision ID and auxiliary ID are read(These function are not
- * implemented in main code. This is to give just an idea regarding these
- * register) -----*/
-
-//<summary>
-// Reads Identification number register in 0x92
-//<summary>
-
-void Adafruit_AS7341::readID() { readRegister(byte(AS7341_ID)); }
-
-//<summary>
-// Reads Revision identification number in 0x91
-//<summary>
-
-void Adafruit_AS7341::readREVID() { readRegister(byte(AS7341_REVID)); }
-
-//<summary>
-// Reads Auxiliary identification number in 0x93 (Datasheet says 0x90 =BS)
-//<summary>
-void Adafruit_AS7341::readAUXID() { readRegister(byte(AS7341_AUXID)); }
 
 /*----- Function to detect Flickering at 100 and 120 Hz(default detection in
  * XWing Sensor) -----*/
@@ -428,6 +376,7 @@ void Adafruit_AS7341::flickerDetection() {
   bool isEnabled = true;
   bool isFdmeasReady = false;
 
+  // disable everything; Flicker detect, smux, wait, spectral, power
   writeRegister(byte(AS7341_ENABLE), byte(0x00));
 
   // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
@@ -441,7 +390,7 @@ void Adafruit_AS7341::flickerDetection() {
   enableSMUX();
 
   // Enable SP_EN bit
-  SpEn(true);
+  enableSpectralMeasurement(true);
 
   /*----- Functions for setting Flicker Sample, Flicker time, Flicker Gain (not
    * implemented for default flicker detection)------*/
@@ -457,7 +406,8 @@ void Adafruit_AS7341::flickerDetection() {
 
   // Function to set the Flicker detection via enabling the fden bit in 0x80
   // register
-
+  // enablePower(true);
+  // enableFlickerDetect(true);
   writeRegister(byte(AS7341_ENABLE), byte(0x41));
   delay(500);
 
@@ -594,7 +544,7 @@ void Adafruit_AS7341::readRawValuesMode1() {
 
   // Enable SP_EN bit
 
-  SpEn(true);
+  enableSpectralMeasurement(true);
 
   // Reading and Polling the the AVALID bit in Status 2 Register 0xA3
 
@@ -630,7 +580,7 @@ void Adafruit_AS7341::readRawValuesMode2() {
   ;
 
   // Disable SP_EN bit while  making config changes
-  SpEn(false);
+  enableSpectralMeasurement(false);
 
   // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
   // to CFG6)
@@ -643,7 +593,7 @@ void Adafruit_AS7341::readRawValuesMode2() {
   enableSMUX();
 
   // Enable SP_EN bit
-  SpEn(true);
+  enableSpectralMeasurement(true);
 
   // Reading and Polling the the AVALID bit in Status 2 Register 0xA3
 

@@ -177,11 +177,7 @@ public:
   bool begin(uint8_t i2c_addr = AS7341_I2CADDR_DEFAULT, TwoWire *wire = &Wire,
              int32_t sensor_id = 0);
 
-  void readAUXID(void); // use one or merge all three
-  void readID(void);
-  void readREVID(void);
-
-  void setASTEP(byte value1, byte value2);
+  void setASTEP(uint16_t astep_value);
   void setATIME(byte value);
   void setGAIN(byte value);
 
@@ -199,9 +195,8 @@ public:
   void F1F4_Clear_NIR(void);
   void F5F8_Clear_NIR(void);
 
-  void PON(void);
   void powerEnable(bool enable_power);
-  void SpEn(bool isEnable);
+  bool enableSpectralMeasurement(bool enable_measurement);
 
   void writeRegister(byte addr, byte val);
   byte readRegister(byte addr);
@@ -213,7 +208,6 @@ public:
 
   bool getIsDataReady();
 
-  void reset(void);
   bool getEvent(sensors_event_t *pressure, sensors_event_t *temp);
   // void interruptsActiveLow(bool active_low);
   // as7341_rate_t getDataRate(void);
