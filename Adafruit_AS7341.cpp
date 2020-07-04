@@ -182,7 +182,7 @@ void Adafruit_AS7341::enableSMUX(void) {
   Adafruit_BusIO_Register enable_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_ENABLE);
   Adafruit_BusIO_RegisterBits smux_enable_bit =
-      Adafruit_BusIO_RegisterBits(&enable_reg, 1, 4);
+      Adafruit_BusIO_RegisterBits(&enable_reG, 1, 4);
   smux_enable_bit.write(true);
   while (smux_enable_bit.read()) {
     delay(1);
@@ -335,10 +335,10 @@ void Adafruit_AS7341::FDConfig() {
 // 0x81
 
 // TODO; check for valid values
-void Adafruit_AS7341::setATIME(byte value) {
+bool Adafruit_AS7341::setATIME(uint8_t atime_value) {
   Adafruit_BusIO_Register atime_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_ATIME);
-  atime_reg.write(value);
+  return atime_reg.write(atime_value);
 }
 
 //<summary>
@@ -349,10 +349,10 @@ void Adafruit_AS7341::setATIME(byte value) {
 // written to ASTEP register 0xCA param name = "value2,"> Defines the higher
 // byte[15:8] of the base step time written to ASTEP register 0xCB
 
-void Adafruit_AS7341::setASTEP(uint16_t astep_value) {
+bool Adafruit_AS7341::setASTEP(uint16_t astep_value) {
   Adafruit_BusIO_Register astep_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_ASTEP_L, 2, LSBFIRST);
-  astep_reg.write(astep_value);
+  return astep_reg.write(astep_value);
 }
 //<summary>
 // Sets the Spectral Gain in CFG1 Register (0xAA) in [4:0] bit
@@ -360,8 +360,11 @@ void Adafruit_AS7341::setASTEP(uint16_t astep_value) {
 // param name = "value"> integer value from 0 to 10 written to AGAIN register
 // 0xAA
 
-void Adafruit_AS7341::setGAIN(byte value) {
-  writeRegister(byte(AS7341_CFG1), value);
+bool Adafruit_AS7341::setGain(as7341_gain_t gain_value) {
+  Adafruit_BusIO_Register cfg1_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_CFG1);
+  return cfg1_reg.write(gain_value);
+  // AGAIN bitfield is only[0:4] but the rest is empty
 }
 
 /*----- Function to detect Flickering at 100 and 120 Hz(default detection in

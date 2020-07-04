@@ -26,7 +26,7 @@ void loop() {
   as7341.setASTEP(999);
 
   // Sets the Spectral Gain in CFG1 Register (0xAA) in [4:0] bit
-  as7341.setGAIN(byte(0x09));
+  as7341.setGain(AS7341_GAIN_256X);
 
   // Function defined to read out channels with SMUX configration 1- F1-F4,
   // Clear, NIR

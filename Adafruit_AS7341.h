@@ -118,19 +118,23 @@
 #define AS7341_FDATA_L 0xFE      ///<
 #define AS7341_FDATA_H 0xFF      ///<
 
-///////////////////////////////////////////////////////////////
 /**
- * @brief
+ * @brief Allowable gain multipliers for `setGain`
  *
- * Allowed values for `setDataRate`.
  */
-// typedef enum {
-//   AS7341_RATE_ONE_SHOT,
-//   AS7341_RATE_1_HZ,
-//   AS7341_RATE_7_HZ,
-//   AS7341_RATE_12_5_HZ,
-//   AS7341_RATE_25_HZ,
-// } as7341_rate_t;
+typedef enum {
+  AS7341_GAIN_0_5X,
+  AS7341_GAIN_1X,
+  AS7341_GAIN_2X,
+  AS7341_GAIN_4X,
+  AS7341_GAIN_8X,
+  AS7341_GAIN_16X,
+  AS7341_GAIN_32X,
+  AS7341_GAIN_64X,
+  AS7341_GAIN_128X,
+  AS7341_GAIN_256X,
+  AS7341_GAIN_512X,
+} as7341_gain_t;
 
 class Adafruit_AS7341;
 
@@ -177,9 +181,9 @@ public:
   bool begin(uint8_t i2c_addr = AS7341_I2CADDR_DEFAULT, TwoWire *wire = &Wire,
              int32_t sensor_id = 0);
 
-  void setASTEP(uint16_t astep_value);
-  void setATIME(byte value);
-  void setGAIN(byte value);
+  bool setASTEP(uint16_t astep_value);
+  bool setATIME(uint8_t atime_value);
+  bool setGain(as7341_gain_t gain_value);
 
   void readRawValuesMode1(void);
   void readRawValuesMode2(void);
