@@ -3,11 +3,6 @@
 #include <Wire.h>
 Adafruit_AS7341 as7341;
 void setup() {
-
-  // Initiate the Wire library and join the I2C bus as a master or slave
-//  Wire.begin();
-
-
   // communication with the host computer serial monitor
   Serial.begin(115200);
   while (!Serial) {
@@ -15,7 +10,7 @@ void setup() {
   }
   if (!as7341.begin()){
     Serial.println("Could not find AS7341");
-    return;
+    while (1) { delay(10); }
   }
 }
 

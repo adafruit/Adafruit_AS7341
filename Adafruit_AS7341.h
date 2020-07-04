@@ -200,6 +200,7 @@ public:
   void F5F8_Clear_NIR(void);
 
   void PON(void);
+  void powerEnable(bool enable_power);
   void SpEn(bool isEnable);
 
   void writeRegister(byte addr, byte val);

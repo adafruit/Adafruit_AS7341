@@ -89,21 +89,14 @@ bool Adafruit_AS7341::_init(int32_t sensor_id) {
       Adafruit_BusIO_Register(i2c_dev, AS7341_WHOAMI);
 
   // make sure we're talking to the right chip
-  if (chip_id.read() != AS7341_CHIP_ID) {
+  if (chip_id.read() & 0xFC != AS7341_CHIP_ID << 2) {
     return false;
   }
   // _sensorid_pressure = sensor_id;
   // _sensorid_temp = sensor_id + 1;
 
   reset();
-  // do any software reset or other initial setup
-
-  // Set to highest rate
-  // setDataRate(AS7341_RATE_25_HZ);
-
-  // TODO: update for correct sensor types
-  // pressure_sensor = new Adafruit_AS7341_Pressure(this);
-  // temp_sensor = new Adafruit_AS7341_Temp(this);
+  powerEnable(true);
 
   return true;
 }
@@ -182,13 +175,12 @@ void Adafruit_AS7341::writeRegister(byte addr, byte val) {
 // Setting the PON (Power on) bit on the chip (bit0 at register ENABLE 0x80)
 // Attention: This function clears only the PON bit in ENABLE register and keeps
 // the other bits <summary>
-
-void Adafruit_AS7341::PON() {
-  Adafruit_BusIO_Register eighty =
+void Adafruit_AS7341::powerEnable(bool enable_power) {
+  Adafruit_BusIO_Register enable_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_ENABLE);
   Adafruit_BusIO_RegisterBits pon_en =
-      Adafruit_BusIO_RegisterBits(&eighty, 1, 0);
-  pon_en.write(true);
+      Adafruit_BusIO_RegisterBits(&enable_reg, 1, 0);
+  pon_en.write(enable_power);
 }
 
 // <summary>
@@ -438,10 +430,6 @@ void Adafruit_AS7341::flickerDetection() {
 
   writeRegister(byte(AS7341_ENABLE), byte(0x00));
 
-  // Setting the PON bit in Enable register 0x80
-
-  PON();
-
   // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
   // to CFG6)
   SmuxConfigRAM();
@@ -592,10 +580,6 @@ void Adafruit_AS7341::readRawValuesMode1() {
   bool isEnabled = true;
   bool isDataReady = false;
 
-  // Setting the PON bit in Enable register 0x80
-
-  PON();
-
   // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
   // to CFG6)
 
@@ -643,13 +627,9 @@ void Adafruit_AS7341::readRawValuesMode1() {
 void Adafruit_AS7341::readRawValuesMode2() {
   bool isEnabled = true;
   bool isDataReady = false;
-
-  // Setting the PON bit in Enable register 0x80
-
-  PON();
+  ;
 
   // Disable SP_EN bit while  making config changes
-
   SpEn(false);
 
   // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
