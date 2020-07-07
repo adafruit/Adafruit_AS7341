@@ -195,6 +195,78 @@ void Adafruit_AS7341::enableSMUX(void) {
     delay(1);
   }
 }
+
+// LDR/LED setup
+bool Adafruit_AS7341::enableLED(bool enable_led){
+  Adafruit_BusIO_Register config_reg =
+    Adafruit_BusIO_Register(i2c_dev, AS7341_CONFIG);
+  // Enables control of the LED via the LDR pin
+  // 1=control enabled 0 = control disabled
+  Adafruit_BusIO_RegisterBits led_sel_bit =
+    Adafruit_BusIO_RegisterBits(&config_reg, 1, 3);
+
+  Adafruit_BusIO_Register led_reg =
+    Adafruit_BusIO_Register(i2c_dev, AS7341_LED);
+  // turns the LED on or off
+  Adafruit_BusIO_RegisterBits led_act_bit =
+    Adafruit_BusIO_RegisterBits(&led_reg, 1, 7);
+
+  led_sel_bit.write(enable_led);
+  led_act_bit.write(enable_led);
+  return true; // TODO return && of above writes
+}
+
+/**
+ * @brief Set the current limit for the LED
+ *
+ * @param led_current the value to set.
+ *
+ * Actual current  amount will be `(led_current * 2) + 4mA`
+ * Range is 4mA to 258mA
+ * @return true: success false: failure
+ */
+// TODO: make it take mA and do the math ourselves
+bool Adafruit_AS7341::setLEDCurrent(uint8_t led_current){
+  // check within permissible range
+  if (led_current > 127){
+    return false;
+  }
+
+  /*
+  EAHC2835WD6  LED included on breakout has an absolute max 180mA current
+  or 300mA peak at 1/10 duty cycle at 10ms
+  Forward voltage is 3.4V, so drop to 5-3.4 = 1.6V
+  Datasheet Ratings are at 150 mA
+
+  100mA = 50-2 = 48
+  150mA = 146/2 = 50+20+3 = 73
+  180 = 90-2 = 88
+  */
+  Adafruit_BusIO_Register led_reg =
+    Adafruit_BusIO_Register(i2c_dev, AS7341_LED);
+
+  // true = led on , false = off
+  Adafruit_BusIO_RegisterBits led_current_bits =
+    Adafruit_BusIO_RegisterBits(&led_reg, 7, 0);
+
+  return led_current_bits.write(led_current);
+}
+                          // 1,       0
+// 0x73	GPIO							PD_GPIO	PD_INT
+//                        3             2       1        0
+// 0xBE	GPIO 2					GPIO_INV	GPIO_IN	GPIO_OUT	GPIO_IN
+bool Adafruit_AS7341::enableGPIO(bool enable_gpio){
+  Adafruit_BusIO_Register gpio_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_GPIO);
+  Adafruit_BusIO_Register gpio2_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_GPIO2);
+
+  // Adafruit_BusIO_RegisterBits smux_enable_bit =
+  //     Adafruit_BusIO_RegisterBits(&enable_reg, 1, 4);
+
+  // GPIO talks to MUX so we'll have to set that up
+  return true;
+}
 // <summary>
 // Reading and Polling the the AVALID bit in Status 2 Register 0xA3,if the
 // spectral measurement is ready or busy. True indicates that a cycle is

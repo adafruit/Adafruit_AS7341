@@ -102,7 +102,7 @@
 #define AS7341_CFG10 0xB3        ///<
 #define AS7341_CFG12 0xB5        ///<
 #define AS7341_PERS 0xBD         ///<
-#define AS7341_GPIO 2 0xBE       ///<
+#define AS7341_GPIO2 0xBE       ///<
 #define AS7341_ASTEP_L 0xCA      ///<
 #define AS7341_ASTEP_H 0xCB      ///<
 #define AS7341_AGC_GAIN_MAX 0xCF ///<
@@ -220,6 +220,11 @@ public:
 
   void enableSMUX(void);
   void SmuxConfigRAM(void);
+
+  bool enableGPIO(bool enable_gpio);
+  bool enableLED(bool enable_led);
+
+  bool setLEDCurrent(uint8_t led_current);
 
   bool getIsDataReady();
 
