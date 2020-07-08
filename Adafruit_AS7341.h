@@ -51,6 +51,7 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 */
+
 #ifndef _ADAFRUIT_AS7341_H
 #define _ADAFRUIT_AS7341_H
 
@@ -64,82 +65,91 @@
 
 #define AS7341_WHOAMI 0x92 ///< Chip ID register
 
-#define AS7341_ASTATUS 0x60      ///<
-#define AS7341_CH0_DATA_L 0x61   ///<
-#define AS7341_CH0_DATA_H 0x62   ///<
-#define AS7341_ITIME_L 0x63      ///<
-#define AS7341_ITIME_M 0x64      ///<
-#define AS7341_ITIME_H 0x65      ///<
-#define AS7341_CH1_DATA_L 0x66   ///<
-#define AS7341_CH1_DATA_H 0x67   ///<
-#define AS7341_CH2_DATA_L 0x68   ///<
-#define AS7341_CH2_DATA_H 0x69   ///<
-#define AS7341_CH3_DATA_L 0x6A   ///<
-#define AS7341_CH3_DATA_H 0x6B   ///<
-#define AS7341_CH4_DATA_L 0x6C   ///<
-#define AS7341_CH4_DATA_H 0x6D   ///<
-#define AS7341_CH5_DATA_L 0x6E   ///<
-#define AS7341_CH5_DATA_H 0x6F   ///<
-#define AS7341_CONFIG 0x70       ///<
-#define AS7341_STAT 0x71         ///<
-#define AS7341_EDGE 0x72         ///<
-#define AS7341_GPIO 0x73         ///<
-#define AS7341_LED 0x74          ///<
-#define AS7341_ENABLE 0x80       ///<
-#define AS7341_ATIME 0x81        ///<
-#define AS7341_WTIME 0x83        ///<
-#define AS7341_SP_LOW_TH_L 0x84  ///<
-#define AS7341_SP_LOW_TH_H 0x85  ///<
-#define AS7341_SP_HIGH_TH_L 0x86 ///<
-#define AS7341_SP_HIGH_TH_H 0x87 ///<
-#define AS7341_AUXID 0x90        ///<
-#define AS7341_REVID 0x91        ///<
-#define AS7341_ID 0x92           ///<
-#define AS7341_STATUS 0x93       ///<
-#define AS7341_ASTATUS 0x94      ///<
-#define AS7341_CH0_DATA_L 0x95   ///<
-#define AS7341_CH0_DATA_H 0x96   ///<
-#define AS7341_CH1_DATA_L 0x97   ///<
-#define AS7341_CH1_DATA_H 0x98   ///<
-#define AS7341_CH2_DATA_L 0x99   ///<
-#define AS7341_CH2_DATA_H 0x9A   ///<
-#define AS7341_CH3_DATA_L 0x9B   ///<
-#define AS7341_CH3_DATA_H 0x9C   ///<
-#define AS7341_CH4_DATA_L 0x9D   ///<
-#define AS7341_CH4_DATA_H 0x9E   ///<
-#define AS7341_CH5_DATA_L 0x9F   ///<
-#define AS7341_CH5_DATA_H 0xA0   ///<
-#define AS7341_STATUS2 0xA3      ///<
-#define AS7341_STATUS3 0xA4      ///<
-#define AS7341_STATUS5 0xA6      ///<
-#define AS7341_STATUS6 0xA7      ///<
-#define AS7341_CFG0 0xA9         ///<
-#define AS7341_CFG1 0xAA         ///<
-#define AS7341_CFG3 0xAC         ///<
-#define AS7341_CFG6 0xAF         ///<
-#define AS7341_CFG8 0xB1         ///<
-#define AS7341_CFG9 0xB2         ///<
-#define AS7341_CFG10 0xB3        ///<
-#define AS7341_CFG12 0xB5        ///<
-#define AS7341_PERS 0xBD         ///<
-#define AS7341_GPIO2 0xBE        ///<
-#define AS7341_ASTEP_L 0xCA      ///<
-#define AS7341_ASTEP_H 0xCB      ///<
-#define AS7341_AGC_GAIN_MAX 0xCF ///<
-#define AS7341_AZ_CONFIG 0xD6    ///<
-#define AS7341_FD_TIME1 0xD8     ///<
-#define AS7341_FD_TIME2 0xDA     ///<
-#define AS7341_FD_CFG0 0xD7      ///<
-#define AS7341_FD_STATUS 0xDB    ///<
-#define AS7341_INTENAB 0xF9      ///<
-#define AS7341_CONTROL 0xFA      ///<
-#define AS7341_FIFO_MAP 0xFC     ///<
-#define AS7341_FIFO_LVL 0xFD     ///<
-#define AS7341_FDATA_L 0xFE      ///<
-#define AS7341_FDATA_H 0xFF      ///<
+#define AS7341_ASTATUS 0x60    ///< AS7341_ASTATUS (unused)
+#define AS7341_CH0_DATA_L 0x61 ///< AS7341_CH0_DATA_L (unused)
+#define AS7341_CH0_DATA_H 0x62 ///< AS7341_CH0_DATA_H (unused)
+#define AS7341_ITIME_L 0x63    ///< AS7341_ITIME_L (unused)
+#define AS7341_ITIME_M 0x64    ///< AS7341_ITIME_M (unused)
+#define AS7341_ITIME_H 0x65    ///< AS7341_ITIME_H (unused)
+#define AS7341_CONFIG 0x70 ///< Enables LED control and sets light sensing mode
+#define AS7341_STAT 0x71   ///< AS7341_STAT (unused)
+#define AS7341_EDGE 0x72   ///< AS7341_EDGE (unused)
+#define AS7341_GPIO 0x73   ///< Connects photo diode to GPIO or INT pins
+#define AS7341_LED 0x74    ///< LED Register; Enables and sets current limit
+#define AS7341_ENABLE                                                          \
+  0x80 ///< Main enable register. Controls SMUX, Flicker Detection, Spectral
+       ///< Measurements and Power
+#define AS7341_ATIME 0x81       ///< Sets ADC integration step count
+#define AS7341_WTIME 0x83       ///< AS7341_WTIME (unused)
+#define AS7341_SP_LOW_TH_L 0x84 ///< Spectral measurement Low Threshold low byte
+#define AS7341_SP_LOW_TH_H                                                     \
+  0x85 ///< Spectral measurement Low Threshold high byte
+#define AS7341_SP_HIGH_TH_L                                                    \
+  0x86 ///< Spectral measurement High Threshold low byte
+#define AS7341_SP_HIGH_TH_H                                                    \
+  0x87                    ///< Spectral measurement High Threshold low byte
+#define AS7341_AUXID 0x90 ///< AS7341_AUXID (unused)
+#define AS7341_REVID 0x91 ///< AS7341_REVID (unused)
+#define AS7341_ID 0x92    ///< AS7341_ID (unused)
+#define AS7341_STATUS                                                          \
+  0x93 ///< Interrupt status registers. Indicates the occourance of an interrupt
+#define AS7341_ASTATUS 0x94    ///< AS7341_ASTATUS (unused)
+#define AS7341_CH0_DATA_L 0x95 ///< ADC Channel Data
+#define AS7341_CH0_DATA_H 0x96 ///< ADC Channel Data
+#define AS7341_CH1_DATA_L 0x97 ///< ADC Channel Data
+#define AS7341_CH1_DATA_H 0x98 ///< ADC Channel Data
+#define AS7341_CH2_DATA_L 0x99 ///< ADC Channel Data
+#define AS7341_CH2_DATA_H 0x9A ///< ADC Channel Data
+#define AS7341_CH3_DATA_L 0x9B ///< ADC Channel Data
+#define AS7341_CH3_DATA_H 0x9C ///< ADC Channel Data
+#define AS7341_CH4_DATA_L 0x9D ///< ADC Channel Data
+#define AS7341_CH4_DATA_H 0x9E ///< ADC Channel Data
+#define AS7341_CH5_DATA_L 0x9F ///< ADC Channel Data
+#define AS7341_CH5_DATA_H 0xA0 ///< ADC Channel Data
+#define AS7341_STATUS2 0xA3 ///< Measurement status flags; saturation, validity
+#define AS7341_STATUS3                                                         \
+  0xA4 ///< Spectral interrupt source, high or low threshold
+#define AS7341_STATUS5 0xA6 ///< AS7341_STATUS5 (unused)
+#define AS7341_STATUS6 0xA7 ///< AS7341_STATUS6 (unused)
+#define AS7341_CFG0                                                            \
+  0xA9 ///< Sets Low power mode, Register bank, and Trigger lengthening
+#define AS7341_CFG1 0xAA ///< Controls ADC Gain
+#define AS7341_CFG3 0xAC ///< AS7341_CFG3 (unused)
+#define AS7341_CFG6 0xAF ///< AS7341_CFG6 (unused)
+#define AS7341_CFG8 0xB1 ///< AS7341_CFG8 (unused)
+#define AS7341_CFG9                                                            \
+  0xB2 ///< Enables flicker detection and smux command completion system
+       ///< interrupts
+#define AS7341_CFG10 0xB3 ///< AS7341_CFG10 (unused)
+#define AS7341_CFG12                                                           \
+  0xB5 ///< Spectral threshold channel for interrupts, persistence and auto-gain
+#define AS7341_PERS                                                            \
+  0xBD ///< Number of measurement cycles outside thresholds to trigger an
+       ///< interupt
+#define AS7341_GPIO2                                                           \
+  0xBE ///< GPIO Settings and status: polarity, direction, sets output, reads
+       ///< input
+#define AS7341_ASTEP_L 0xCA      ///< Integration step size ow byte
+#define AS7341_ASTEP_H 0xCB      ///< Integration step size high byte
+#define AS7341_AGC_GAIN_MAX 0xCF ///< AS7341_AGC_GAIN_MAX (unused)
+#define AS7341_AZ_CONFIG 0xD6    ///< AS7341_AZ_CONFIG (unused)
+#define AS7341_FD_TIME1 0xD8 ///< Flicker detection integration time low byte
+#define AS7341_FD_TIME2 0xDA ///< Flicker detection gain and high nibble
+#define AS7341_FD_CFG0 0xD7  ///< AS7341_FD_CFG0 (unused)
+#define AS7341_FD_STATUS                                                       \
+  0xDB ///< Flicker detection status; measurement valid, saturation, flicker
+       ///< type
+#define AS7341_INTENAB 0xF9  ///< Enables individual interrupt types
+#define AS7341_CONTROL 0xFA  ///< Auto-zero, fifo clear, clear SAI active
+#define AS7341_FIFO_MAP 0xFC ///< AS7341_FIFO_MAP (unused)
+#define AS7341_FIFO_LVL 0xFD ///< AS7341_FIFO_LVL (unused)
+#define AS7341_FDATA_L 0xFE  ///< AS7341_FDATA_L (unused)
+#define AS7341_FDATA_H 0xFF  ///< AS7341_FDATA_H (unused)
 
-#define AS7341_SPECTRAL_INT_HIGH_MSK 0b00100000
-#define AS7341_SPECTRAL_INT_LOW_MSK 0b00010000
+#define AS7341_SPECTRAL_INT_HIGH_MSK                                           \
+  0b00100000 ///< bitmask to check for a high threshold interrupt
+#define AS7341_SPECTRAL_INT_LOW_MSK                                            \
+  0b00010000 ///< bitmask to check for a low threshold interrupt
 
 /**
  * @brief Allowable gain multipliers for `setGain`
