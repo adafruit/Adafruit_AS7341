@@ -197,9 +197,7 @@ bool Adafruit_AS7341::enableLED(bool enable_led) {
       Adafruit_BusIO_RegisterBits(&led_reg, 1, 7);
 
   setBank(true); // Access 0x60-0x74
-  led_sel_bit.write(enable_led);
-  led_act_bit.write(enable_led);
-  return true; // TODO return && of above writes
+  return (led_sel_bit.write(enable_led) && led_act_bit.write(enable_led));
 }
 
 /**
@@ -219,16 +217,6 @@ bool Adafruit_AS7341::setLEDCurrent(uint8_t led_current) {
   }
   setBank(true); // Access 0x60 0x74
 
-  /*
-  EAHC2835WD6  LED included on breakout has an absolute max 180mA current
-  or 300mA peak at 1/10 duty cycle at 10ms
-  Forward voltage is 3.4V, so drop to 5-3.4 = 1.6V
-  Datasheet Ratings are at 150 mA
-
-  100mA = 50-2 = 48
-  150mA = 146/2 = 50+20+3 = 73
-  180 = 90-2 = 88
-  */
   Adafruit_BusIO_Register led_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_LED);
 
@@ -238,24 +226,19 @@ bool Adafruit_AS7341::setLEDCurrent(uint8_t led_current) {
 
   return led_current_bits.write(led_current);
 }
-// 1,       0
-// 0x73	GPIO							PD_GPIO	PD_INT
-//                        3             2       1        0
-// 0xBE	GPIO 2					GPIO_INV	GPIO_IN	GPIO_OUT
-// GPIO_IN
-bool Adafruit_AS7341::enableGPIO(bool enable_gpio) {
-  Adafruit_BusIO_Register gpio_reg =
-      Adafruit_BusIO_Register(i2c_dev, AS7341_GPIO);
-  Adafruit_BusIO_Register gpio2_reg =
-      Adafruit_BusIO_Register(i2c_dev, AS7341_GPIO2);
 
-  // Adafruit_BusIO_RegisterBits smux_enable_bit =
-  //     Adafruit_BusIO_RegisterBits(&enable_reg, 1, 4);
+/**
+ * @brief Sets the active register bank
+ *
+ * The AS7341 uses banks to organize the register making it nescessary to set
+ * the correct bank to access a register.
+ *
 
-  // GPIO talks to MUX so we'll have to set that up
-  return true;
-}
-
+ * @param low **true**:
+ * **false**: Set the current bank to allow access to registers with addresses
+ of `0x80` and above
+ * @return true: success false: failure
+ */
 bool Adafruit_AS7341::setBank(bool low) {
   Adafruit_BusIO_Register cfg0_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_CFG0);
@@ -265,75 +248,8 @@ bool Adafruit_AS7341::setBank(bool low) {
       Adafruit_BusIO_RegisterBits(&cfg0_reg, 1, 4);
 
   bank_bit.write(low);
-  // Register Bank Access
-  // 0: Register access to register 0x80 and above
-  // 1: Register access to register 0x60 to 0x74
-  // Note: Bit needs to be set to access registers 0x60 to
-  // 0x74. If registers 0x80 and above needs to be
-  // accessed bit needs to be set to “0”.
 }
 
-/**************** Interrupt Configuration ***********/
-// CFG9 Register (Address 0xB2)
-// Figure 84:
-// CFG 9 Register
-// Addr: 0xB2 CFG9
-// Bit Bit Name Default Access Bit Description
-// 7 reserved 0 reserved
-// 6 SIEN_FD 0 RW
-// System Interrupt Flicker Detection.
-// Enables system interrupt when flicker detection
-// status change has occurred.
-// 5 reserved reserved
-// 4 SIEN_SMUX 0 RW
-// System Interrupt SMUX Operation.
-// Enables system interrupt when SMUX command has
-// finished
-// 3:0 reserved reserved
-
-// STATUS 5 Register (Address 0xA6)
-// Figure 65:
-// STATUS 5 Register
-// Addr: 0xA6 STATUS 5
-// Bit Bit Name Default Access Bit Description
-// 7:4 reserved 0 reserved
-// Document Feedback AS7341
-// Register Description
-// Datasheet • CONFIDENTIAL
-// DS000504 • v1-00 • 2018-Oct-17 67 │ 46
-// Addr: 0xA6 STATUS 5
-// Bit Bit Name Default Access Bit Description
-// 3 SINT_FD 0 R
-// Flicker Detect interrupt.
-// If SIEN_FD is set, indicates that the FD_STATUS
-// register status has changed
-// 2 SINT_SMUX 0 R
-// SMUX operation interrupt.
-// Indicates that SMUX command execution has
-// finished.
-// 1:0 reserved 0 reserved
-
-// STATUS 3 Register (Address 0xA4)
-// Figure 64:
-// STATUS 3 Register
-// Addr: 0xA4 STATUS 3
-// Bit Bit Name Default Access Bit Description
-// 7:6 reserved 0 reserved
-// 5 INT_SP_H 0 R
-// Spectral interrupt high.
-// Indicates that a spectral interrupt occurred because
-// the data exceeded the high threshold.
-// 4 INT_SP_L 0 R
-// Spectral interrupt low.
-// Indicates that a spectral interrupt occurred because
-// the data is below the low threshold.
-// 3:0 reserved 0 reserved
-
-// The spectral interrupt threshold registers provide 16-bit values to be used
-// as the high and low thresholds for comparison to the 16-bit CH0_DATA values
-// (ADC CH0). If SP_IEN (register 0xF9) is enabled and CH0_DATA is not between
-// the two thresholds for the number of consecutive measurements specified in
-// APERS (register 0xBD) an interrupt is set.
 bool Adafruit_AS7341::setLowThreshold(int16_t low_threshold) {
   Adafruit_BusIO_Register sp_low_threshold_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_SP_LOW_TH_L, 2, LSBFIRST);
