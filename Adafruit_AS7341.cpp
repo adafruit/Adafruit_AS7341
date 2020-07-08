@@ -82,56 +82,33 @@ bool Adafruit_AS7341::_init(int32_t sensor_id) {
 
 /********************* EXAMPLE EXTRACTS **************/
 // maybe return a typedef enum
-int8_t Adafruit_AS7341::getFlickerValue(void) {
+/**
+ * @brief Returns the flicker detection status
+ *
+ * @return int8_t
+ */
+int8_t Adafruit_AS7341::getFlickerDetectStatus(void) {
   Adafruit_BusIO_Register flicker_val =
       Adafruit_BusIO_Register(i2c_dev, AS7341_FD_STATUS);
   return (int8_t)flicker_val.read();
 }
 
-// <summary>
-// Read two consecutive i2c registers
-// <summary>
-// param name = "addr">First register address of two consecutive registers to be
-// read param name = "AS7341_I2CADDR_DEFAULT">Device address 0x39
-
-uint16_t Adafruit_AS7341::readTwoRegister1(byte addr) {
-  uint8_t readingL;
-  uint16_t readingH;
-  uint16_t reading = 0;
-  Wire.beginTransmission(AS7341_I2CADDR_DEFAULT);
-  Wire.write(addr);
-  Wire.endTransmission();
-
-  Wire.requestFrom(AS7341_I2CADDR_DEFAULT, 2);
-
-  if (2 <= Wire.available()) {
-    readingL = Wire.read();
-    readingH = Wire.read();
-    readingH = readingH << 8;
-    reading = (readingH | readingL);
-    return (reading);
-  } else {
-    Serial.println("I2C Error");
-    return (0xFFFF); // Error
-  }
-}
-
-// <summary>
-// Write a value to a single i2c register
-// <summary>
-// param name = "addr">Register address of the the register to the value to be
-// written param name = "val">The value written to the Register param name =
-// "AS7341_I2CADDR_DEFAULT">Device address 0x39
-
+/**
+ * @brief Write a byte to the given register
+ *
+ * @param addr Register address
+ * @param val The value to set the register to
+ */
 void Adafruit_AS7341::writeRegister(byte addr, byte val) {
   Adafruit_BusIO_Register reg = Adafruit_BusIO_Register(i2c_dev, addr);
   reg.write(val);
-  // Wire.beginTransmission(AS7341_I2CADDR_DEFAULT);
-  // Wire.write(addr);
-  // Wire.write(val);
-  // Wire.endTransmission();
 }
-
+/**
+ * @brief Returns the ADC data for a given channel
+ *
+ * @param channel The ADC channel to read
+ * @return uint16_t The measured data for the currently configured sensor
+ */
 uint16_t Adafruit_AS7341::readChannel(as7341_channel_t channel) {
   // each channel has two bytes, so offset by two for each next channel
   Adafruit_BusIO_Register channel_data_reg = Adafruit_BusIO_Register(
@@ -140,12 +117,11 @@ uint16_t Adafruit_AS7341::readChannel(as7341_channel_t channel) {
   return channel_data_reg.read();
 }
 
-/*----- Register configuration  -----*/
-
-// <summary>
-// Setting the PON (Power on) bit on the chip (bit0 at register ENABLE 0x80)
-// Attention: This function clears only the PON bit in ENABLE register and keeps
-// the other bits <summary>
+/**
+ * @brief Sets the power state of the sensor
+ *
+ * @param enable_power true: on false: off
+ */
 void Adafruit_AS7341::powerEnable(bool enable_power) {
   Adafruit_BusIO_Register enable_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_ENABLE);
@@ -160,6 +136,12 @@ void Adafruit_AS7341::powerEnable(bool enable_power) {
 
 void Adafruit_AS7341::SmuxConfigRAM() { writeRegister(byte(0xAF), byte(0x10)); }
 
+/**
+ * @brief Enables measurement of spectral data
+ *
+ * @param enable_measurement true: enabled false: disabled
+ * @return true: success false: failure
+ */
 bool Adafruit_AS7341::enableSpectralMeasurement(bool enable_measurement) {
 
   Adafruit_BusIO_Register enable_reg =
@@ -181,7 +163,12 @@ void Adafruit_AS7341::enableSMUX(void) {
   }
 }
 
-// LDR/LED setup
+/**
+ * @brief Enable control of an attached LED on the LDR pin
+ *
+ * @param enable_led true: LED enabled false: LED disabled
+ * @return true: success false: failure
+ */
 bool Adafruit_AS7341::enableLED(bool enable_led) {
   Adafruit_BusIO_Register config_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_CONFIG);
@@ -249,24 +236,46 @@ bool Adafruit_AS7341::setBank(bool low) {
 
   bank_bit.write(low);
 }
-
+/**
+ * @brief Sets the threshold below which spectral measurements will trigger
+ * interrupts when the APERS count is reached
+ *
+ * @param low_threshold the new threshold
+ * @return true: success false: failure
+ */
 bool Adafruit_AS7341::setLowThreshold(int16_t low_threshold) {
   Adafruit_BusIO_Register sp_low_threshold_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_SP_LOW_TH_L, 2, LSBFIRST);
   return sp_low_threshold_reg.write(low_threshold);
 }
-
+/**
+ * @brief Returns the current low thighreshold for spectral measurements
+ *
+ * @return int16_t The current low threshold
+ */
 int16_t Adafruit_AS7341::getLowThreshold(void) {
   Adafruit_BusIO_Register sp_low_threshold_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_SP_LOW_TH_L, 2, LSBFIRST);
   return sp_low_threshold_reg.read();
 }
 
+/**
+ * @brief Sets the threshold above which spectral measurements will trigger
+ * interrupts when the APERS count is reached
+ *
+ * @param high_threshold
+ * @return true: success false: failure
+ */
 bool Adafruit_AS7341::setHighThreshold(int16_t high_threshold) {
   Adafruit_BusIO_Register sp_high_threshold_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_SP_HIGH_TH_L, 2, LSBFIRST);
   return sp_high_threshold_reg.write(high_threshold);
 }
+/**
+ * @brief Returns the current high thighreshold for spectral measurements
+ *
+ * @return int16_t The current high threshold
+ */
 int16_t Adafruit_AS7341::getHighThreshold(void) {
   Adafruit_BusIO_Register sp_high_threshold_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_SP_HIGH_TH_L, 2, LSBFIRST);
@@ -328,12 +337,21 @@ bool Adafruit_AS7341::setSpectralThresholdChannel(as7341_channel_t channel) {
       Adafruit_BusIO_RegisterBits(&cfg_12_reg, 2, 0);
   return spectral_threshold_ch_bits.write(channel);
 }
-
+/**
+ * @brief Returns the current value of the Interupt status register
+ *
+ * @return uint8_t
+ */
 uint8_t Adafruit_AS7341::getInterruptStatus(void) {
   Adafruit_BusIO_Register int_status_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_STATUS);
   return (uint8_t)int_status_reg.read();
 }
+/**
+ * @brief Returns the status of the spectral measurement threshold interrupts
+ *
+ * @return true: interrupt triggered false: interrupt not triggered
+ */
 bool Adafruit_AS7341::spectralInterruptTriggered(void) {
   Adafruit_BusIO_Register int_status_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_STATUS);
@@ -355,6 +373,12 @@ bool Adafruit_AS7341::clearInterruptStatus(void) {
   return int_status_reg.write(0xFF);
 }
 
+/**
+ * @brief The current state of the spectral measurement interrupt status
+ * register
+ *
+ * @return uint8_t The current status register
+ */
 uint8_t Adafruit_AS7341::spectralINTSource(void) {
   Adafruit_BusIO_Register status3_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_STATUS3);
@@ -363,17 +387,29 @@ uint8_t Adafruit_AS7341::spectralINTSource(void) {
   last_spectral_int_source = spectral_int_source;
   return spectral_int_source;
 }
+/**
+ * @brief The status of the low threshold interrupt
+ *
+ * @return true: low interrupt triggered false: interrupt not triggered
+ */
 bool Adafruit_AS7341::spectralLowTriggered(void) {
   return (last_spectral_int_source & AS7341_SPECTRAL_INT_LOW_MSK > 0);
 }
+
+/**
+ * @brief The status of the high threshold interrupt
+ *
+ * @return true: high interrupt triggered false: interrupt not triggered
+ */
 bool Adafruit_AS7341::spectralHighTriggered(void) {
   return (last_spectral_int_source & AS7341_SPECTRAL_INT_HIGH_MSK > 0);
 }
-// <summary>
-// Reading and Polling the the AVALID bit in Status 2 Register 0xA3,if the
-// spectral measurement is ready or busy. True indicates that a cycle is
-// completed since the last readout of the Raw Data register <summary>
 
+/**
+ * @brief
+ *
+ * @return true: success false: failure
+ */
 bool Adafruit_AS7341::getIsDataReady() {
   Adafruit_BusIO_Register status2_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_STATUS2);
@@ -383,32 +419,10 @@ bool Adafruit_AS7341::getIsDataReady() {
   return fd_data_ready_bit.read();
 }
 
-//<summary>
-// Reading and polling of Flicker measurement ready bit (bit [5] on FD_Status
-// register True indicates that the Flicker Detection measurement was finished
-//<summary>
-
-bool Adafruit_AS7341::getFdMeasReady() {
-  bool isFdmeasReady = false;
-  byte regVal = readRegister(byte(AS7341_FD_STATUS));
-
-  if ((regVal & 0x20) == 0x20) {
-
-    return isFdmeasReady = true;
-  }
-
-  else {
-    return isFdmeasReady = false;
-  }
-}
-
-/*----- SMUX Configuration for F1,F2,F3,F4,CLEAR,NIR -----*/
-
-//<summary>
-// Mapping the individual Photo diodes to dedicated ADCs using SMUX
-// Configuration for F1-F4,Clear,NIR
-//<summary>
-
+/**
+ * @brief Configure SMUX for sensors F1-4, Clear and NIR
+ *
+ */
 void Adafruit_AS7341::F1F4_Clear_NIR() {
   // SMUX Config for F1,F2,F3,F4,NIR,Clear
   writeRegister(byte(0x00), byte(0x30)); // F3 left set to ADC2
@@ -435,13 +449,10 @@ void Adafruit_AS7341::F1F4_Clear_NIR() {
   writeRegister(byte(0x13), byte(0x06)); // NIR connected to ADC5
 }
 
-/*----- SMUX Configuration for F5,F6,F7,F8,CLEAR,NIR -----*/
-
-//<summary>
-// Mapping the individual Photo diodes to dedicated ADCs using SMUX
-// Configuration for F5-F8,Clear,NIR
-//<summary>
-
+/**
+ * @brief Configure SMUX for sensors F5-8, Clear and NIR
+ *
+ */
 void Adafruit_AS7341::F5F8_Clear_NIR() {
   // SMUX Config for F5,F6,F7,F8,NIR,Clear
   writeRegister(byte(0x00), byte(0x00)); // F3 left disable
@@ -467,14 +478,10 @@ void Adafruit_AS7341::F5F8_Clear_NIR() {
   writeRegister(byte(0x13), byte(0x06)); // NIR connected to ADC5
 }
 
-/*----- //SMUX Configuration for Flicker detection - register (0x13)left set to
- * ADC6 for flicker detection-----*/
-
-//<summary>
-// Mapping the individual Photo diodes to dedicated ADCs using SMUX
-// Configuration for Flicker detection
-//<summary>
-
+/**
+ * @brief Configure SMUX for flicker detection
+ *
+ */
 void Adafruit_AS7341::FDConfig() {
   // SMUX Config for Flicker- register (0x13)left set to ADC6 for flicker
   // detection
@@ -501,41 +508,40 @@ void Adafruit_AS7341::FDConfig() {
                 byte(0x60)); // Flicker connected to ADC5 to left of 0x13
 }
 
-/*----- Set integration time = (ATIME + 1) * (ASTEP + 1) * 2.78µS -----*/
-
-//<summary>
-// Sets the ATIME for integration time from 0 to 255, integration time = (ATIME
-// + 1) * (ASTEP + 1) * 2.78µS
-//<summary>
-// param name = "value"> integer value from 0 to 255 written to ATIME register
-// 0x81
-
 // TODO; check for valid values
+/**
+ * @brief Sets the integration time step count
+ *
+ * Total integration time will be `(ATIME + 1) * (ASTEP + 1) * 2.78µS`
+ *
+ * @param atime_value The integration time step count
+ * @return true: success false: failure
+ */
 bool Adafruit_AS7341::setATIME(uint8_t atime_value) {
   Adafruit_BusIO_Register atime_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_ATIME);
   return atime_reg.write(atime_value);
 }
 
-//<summary>
-// Sets the ASTEP for integration time from 0 to 65535, integration time =
-// (ATIME + 1) * (ASTEP + 1) * 2.78µS
-//<summary>
-// param name = "value1,"> Defines the lower byte[7:0] of the base step time
-// written to ASTEP register 0xCA param name = "value2,"> Defines the higher
-// byte[15:8] of the base step time written to ASTEP register 0xCB
-
+/**
+ * @brief Sets the integration time step size
+ *
+ * @param astep_value Integration time step size in 2.78 microsecon increments
+ * Step size is `(astep_value+1) * 2.78 uS`
+ * @return true: success false: failure
+ */
 bool Adafruit_AS7341::setASTEP(uint16_t astep_value) {
   Adafruit_BusIO_Register astep_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_ASTEP_L, 2, LSBFIRST);
   return astep_reg.write(astep_value);
 }
-//<summary>
-// Sets the Spectral Gain in CFG1 Register (0xAA) in [4:0] bit
-//<summary>
-// param name = "value"> integer value from 0 to 10 written to AGAIN register
-// 0xAA
 
+/**
+ * @brief Set the ADC gain multiplier
+ *
+ * @param gain_value The gain amount. must be an `as7341_gain_t`
+ * @return true: success false: failure
+ */
 bool Adafruit_AS7341::setGain(as7341_gain_t gain_value) {
   Adafruit_BusIO_Register cfg1_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_CFG1);
@@ -543,14 +549,11 @@ bool Adafruit_AS7341::setGain(as7341_gain_t gain_value) {
   // AGAIN bitfield is only[0:4] but the rest is empty
 }
 
-/*----- Function to detect Flickering at 100 and 120 Hz(default detection in
- * XWing Sensor) -----*/
-
-//<summary>
-// Executing a flicker measurement cycle, displaying the status from FD_Status
-// register
-//<summary>
-
+// TODO: make this an example
+/**
+ * @brief Performs flicker detection
+ *
+ */
 void Adafruit_AS7341::flickerDetection() {
   bool isEnabled = true;
   bool isFdmeasReady = false;
@@ -571,38 +574,13 @@ void Adafruit_AS7341::flickerDetection() {
   // Enable SP_EN bit
   enableSpectralMeasurement(true);
 
-  /*----- Functions for setting Flicker Sample, Flicker time, Flicker Gain (not
-   * implemented for default flicker detection)------*/
-  //            writeRegister(byte(AS7341_FD_CFG0), byte(0x21)); //33 default
-  //            value, function for setting for Fd_sample and Fd_compare_value
-  //
-  //            writeRegister(byte(AS7341_FD_TIME1), byte(0x68)); //104 default
-  //            value, function for setting for Fd_time lower bit(7:0)
-  //
-  //            writeRegister(byte(AS7341_FD_TIME2), byte(0x49)); //73 default
-  //            value, function for setting for fd_gain and fd_time higher
-  //            bit(10:8)
-
-  // Function to set the Flicker detection via enabling the fden bit in 0x80
-  // register
-  // enablePower(true);
-  // enableFlickerDetect(true);
   writeRegister(byte(AS7341_ENABLE), byte(0x41));
   delay(500);
 
-  int flicker_value = getFlickerValue();
+  int flicker_value = getFlickerDetectStatus();
   Serial.print("Flicker value-");
   Serial.println(flicker_value);
 
-  // we can group this as "is valid"
-  // flicker detect valid
-  // no flicker saturation
-  // 120Hz detection valid
-  // 100 Hz Detection valid
-
-  // 120Hz flicker detected
-  // 100Hz Flicker detected
-  // 0b 10 11 00
   if (flicker_value == 44) {
     Serial.println("Unknown frequency");
     // 0b 10 11 01
@@ -625,9 +603,10 @@ void Adafruit_AS7341::flickerDetection() {
 /*##################### 1K Flicker detect
  * #######################################*/
 
-// <summary>
-// To detect the target frequency of 1kHz and further 1.2kHz Flickering
-// <summary>
+/**
+ * @brief Perform detection of a 1K Flicker
+ *
+ */
 void Adafruit_AS7341::flickerDetection1K() {
 
   // RAM_BANK 0 select which RAM bank to access in register addresses 0x00-0x7f
@@ -681,27 +660,21 @@ void Adafruit_AS7341::flickerDetection1K() {
   // fd_disable_constant_init to „1“ (FD_CFG0 register) in FD_CFG0 register -
   // 0xd7  fd_disable_constant_init=1 fd_samples=4
   writeRegister(byte(AS7341_FD_CFG0), byte(0x60));
-  // readRegisterPrint(byte(AS7341_FD_CFG0));
 
   // in FD_CFG1 register - 0xd8 fd_time(7:0) = 0x40
   writeRegister(byte(AS7341_FD_TIME1), byte(0x40));
-  // readRegisterPrint(byte(AS7341_FD_TIME1));
 
   // in FD_CFG2 register - 0xd9  fd_dcr_filter_size=1 fd_nr_data_sets(2:0)=5
   writeRegister(byte(0xD9), byte(0x25));
-  // readRegisterPrint(byte(0xD9));
 
   // in FD_CFG3 register - 0xda fd_gain=9
   writeRegister(byte(AS7341_FD_TIME2), byte(0x48));
-  // readRegisterPrint(byte(AS7341_FD_TIME2));
 
   // in CFG9 register - 0xb2 sien_fd=1
   writeRegister(byte(AS7341_CFG9), byte(0x40));
-  // readRegisterPrint(byte(AS7341_CFG9));
 
   // in ENABLE - 0x80  fden=1 and pon=1 are enabled
   writeRegister(byte(AS7341_ENABLE), byte(0x41));
-  // readRegisterPrint(byte(AS7341_ENABLE));
 }
 
 /*#####################  END 1K Flicker detect
@@ -710,9 +683,13 @@ void Adafruit_AS7341::flickerDetection1K() {
 /*----- Function defined to read out channels with SMUX configration 1 -----*/
 
 //<summary>
-// Executing raw data measurement cycle for 6 channels F1,F2,F3,F4,NIR,Clear
+// Executing raw data measurement cycle for 6 channels
 //<summary>
 
+/**
+ * @brief Reads the raw values from sensors F1, F2, F3, F4, NIR, and Clear
+ *
+ */
 void Adafruit_AS7341::readRawValuesMode1() {
 
   // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
@@ -736,7 +713,7 @@ void Adafruit_AS7341::readRawValuesMode1() {
   while (!getIsDataReady()) {
     delay(1);
   }
-  // Steps defined to print out 6 channels F1,F2,F3,F4,NIR,Clear
+  // Steps defined to print out 6 channels F1, F2,F3,F4,NIR,Clear
 
   Serial.print("ADC0/F1-");
   Serial.println(readChannel(AS7341_CHANNEL_0));
@@ -752,12 +729,10 @@ void Adafruit_AS7341::readRawValuesMode1() {
   Serial.println(readChannel(AS7341_CHANNEL_5));
 }
 
-/*----- Function defined to read out channels with SMUX configration 2 -----*/
-
-//<summary>
-// Executing raw data measurement cycle for 6 channels F1,F2,F3,F4,NIR,Clear
-//<summary>
-
+/**
+ * @brief Reads the raw values from sensors F5, F6, F7, F8, NIR, and Clear
+ *
+ */
 void Adafruit_AS7341::readRawValuesMode2() {
   // Disable SP_EN bit while  making config changes
   enableSpectralMeasurement(false);
@@ -796,49 +771,6 @@ void Adafruit_AS7341::readRawValuesMode2() {
   Serial.print("ADC5/NIR-");
   Serial.println(readChannel(AS7341_CHANNEL_5));
   Serial.println("");
-}
-
-void Adafruit_AS7341::readRegisterPrint(byte addr) {
-  Wire.beginTransmission(AS7341_I2CADDR_DEFAULT);
-  Wire.write(addr);
-  Wire.endTransmission();
-
-  Wire.requestFrom(AS7341_I2CADDR_DEFAULT, 1);
-
-  if (Wire.available()) {
-    Serial.println(Wire.read());
-    // return (Wire.read());
-  }
-
-  else {
-    Serial.println("I2C Error");
-    // return (0xFF); //Error
-  }
-}
-/* ----- Read/Write to i2c register ----- */
-
-// <summary>
-// Read a single i2c register
-// <summary>
-// param name = "addr">Register address of the the register to be read
-// param name = "AS7341_I2CADDR_DEFAULT">Device address 0x39
-
-byte Adafruit_AS7341::readRegister(byte addr) {
-  Wire.beginTransmission(AS7341_I2CADDR_DEFAULT);
-  Wire.write(addr);
-  Wire.endTransmission();
-
-  Wire.requestFrom(AS7341_I2CADDR_DEFAULT, 1);
-
-  if (Wire.available()) {
-    // Serial.println(Wire.read());
-    return (Wire.read());
-  }
-
-  else {
-    Serial.println("I2C Error");
-    return (0xFF); // Error
-  }
 }
 
 // ///////////////// MORE DEMO CODE//////////////
@@ -907,8 +839,8 @@ byte Adafruit_AS7341::readRegister(byte addr) {
 //   // register
 //   // Analog saturation - Indicates that the intensity of ambient light has
 //   // exceeded the maximum integration level for the spectral analog circuit
-//   Serial.print("Status2-");
-//   readRegisterPrint(0xA3);
+//   //Serial.print("Status2-");
+//   // readRegisterPrint(0xA3);
 
 //   // reg_bank bit(4) is set to '1' for setting the 0x00-0x7f regiater to
 //   // reg_bank register (0xA9)

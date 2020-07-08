@@ -43,7 +43,7 @@ void loop() {
   // FD_STATUS(fd_measurement_valid=1 fd_1200Hz_flicker_valid=1
   // fd_1000Hz_flicker_valid=1 fd_1200Hz_flicker)
 
-  int flicker_value = as7341.getFlickerValue();
+  int flicker_value = as7341.getFlickerDetectStatus();
                Serial.print("Flicker Status-");
                Serial.println(flicker_value);
 

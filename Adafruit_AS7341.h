@@ -169,6 +169,10 @@ typedef enum {
   AS7341_GAIN_512X,
 } as7341_gain_t;
 
+/**
+ * @brief ADC Channel specifiers for configuration
+ *
+ */
 typedef enum {
   AS7341_CHANNEL_0,
   AS7341_CHANNEL_1,
@@ -178,6 +182,11 @@ typedef enum {
   AS7341_CHANNEL_5,
 } as7341_channel_t;
 
+/**
+ * @brief The number of measurement cycles with spectral data outside of a
+ * threshold required to trigger an interrupt
+ *
+ */
 typedef enum {
   AS7341_INT_COUNT_ALL, ///< 0
   AS7341_INT_COUNT_1,   ///< 1
@@ -198,37 +207,6 @@ typedef enum {
 } as7341_int_cycle_count_t;
 
 class Adafruit_AS7341;
-
-// /** Adafruit Unified Sensor interface for temperature component of AS7341 */
-// class Adafruit_AS7341_Temp : public Adafruit_Sensor {
-// public:
-//   /** @brief Create an Adafruit_Sensor compatible object for the temp sensor
-//       @param parent A pointer to the AS7341 class */
-//   Adafruit_AS7341_Temp(Adafruit_AS7341 *parent) { _theAS7341 = parent; }
-//   bool getEvent(sensors_event_t *);
-//   void getSensor(sensor_t *);
-
-// private:
-//   int _sensorID = as7341;
-//   Adafruit_AS7341 *_theAS7341 = NULL;
-// };
-
-// /** Adafruit Unified Sensor interface for the pressure sensor component of
-//  * AS7341
-//  */
-// class Adafruit_AS7341_Pressure : public Adafruit_Sensor {
-// public:
-//   /** @brief Create an Adafruit_Sensor compatible object for the pressure
-//   sensor
-//       @param parent A pointer to the AS7341 class */
-//   Adafruit_AS7341_Pressure(Adafruit_AS7341 *parent) { _theAS7341 = parent; }
-//   bool getEvent(sensors_event_t *);
-//   void getSensor(sensor_t *);
-
-// private:
-//   int _sensorID = as7341 + 1;
-//   Adafruit_AS7341 *_theAS7341 = NULL;
-// };
 
 /*!
  *    @brief  Class that stores state and functions for interacting with
@@ -255,9 +233,8 @@ public:
   void flickerDetection1K(void);
 
   void FDConfig(void);
-  bool getFdMeasReady();
 
-  int8_t getFlickerValue(void);
+  int8_t getFlickerDetectStatus(void);
 
   void F1F4_Clear_NIR(void);
   void F5F8_Clear_NIR(void);
@@ -265,13 +242,6 @@ public:
   void powerEnable(bool enable_power);
   bool enableSpectralMeasurement(bool enable_measurement);
 
-  void writeRegister(byte addr, byte val);
-  byte readRegister(byte addr);
-  uint16_t readTwoRegister1(byte addr);
-  void readRegisterPrint(byte addr);
-
-  void enableSMUX(void);
-  void SmuxConfigRAM(void);
   bool setHighThreshold(int16_t high_threshold);
   bool setLowThreshold(int16_t low_threshold);
 
@@ -290,49 +260,25 @@ public:
   bool spectralLowTriggered(void);
   bool spectralHighTriggered(void);
 
-  bool enableGPIO(bool enable_gpio);
   bool enableLED(bool enable_led);
 
   bool setLEDCurrent(uint8_t led_current);
 
   bool getIsDataReady();
   bool setBank(bool low); // low true gives access to 0x60 to 0x74
-  bool getBank(void);
-
-  bool getEvent(sensors_event_t *pressure, sensors_event_t *temp);
-  // void interruptsActiveLow(bool active_low);
-  // as7341_rate_t getDataRate(void);
-  // void setDataRate(as7341_rate_t data_rate);
-
-  // Adafruit_Sensor *getTemperatureSensor(void);
-  // Adafruit_Sensor *getPressureSensor(void);
 
 protected:
-  void _read(void);
   virtual bool _init(int32_t sensor_id);
-  uint8_t last_spectral_int_source = 0;
+  uint8_t last_spectral_int_source =
+      0; ///< The value of the last reading of the spectral interrupt source
+         ///< register
 
   Adafruit_I2CDevice *i2c_dev = NULL; ///< Pointer to I2C bus interface
-  // float unscaled_temp,   ///< Last reading's temperature (C) before scaling
-  // unscaled_pressure; ///< Last reading's pressure (hPa) before scaling
-
-  // uint16_t _sensorid_pressure, ///< ID number for pressure
-  // _sensorid_temp;          ///< ID number for temperature
-
-  // Adafruit_AS7341_Temp *temp_sensor = NULL; ///< Temp sensor data object
-  // Adafruit_AS7341_Pressure *pressure_sensor =
-  // NULL; ///< Pressure sensor data object
 
 private:
-  // friend class Adafruit_AS7341_Temp;     ///< Gives access to private members
-  // to
-  //                                        ///< Temp data object
-  // friend class Adafruit_AS7341_Pressure; ///< Gives access to private
-  //                                        ///< members to Pressure data
-  //                                        ///< object
-
-  // void fillPressureEvent(sensors_event_t *pressure, uint32_t timestamp);
-  // void fillTempEvent(sensors_event_t *temp, uint32_t timestamp);
+  void enableSMUX(void);
+  void SmuxConfigRAM(void);
+  void writeRegister(byte addr, byte val);
 };
 
 #endif
