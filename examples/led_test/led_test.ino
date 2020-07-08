@@ -35,13 +35,13 @@ void loop() {
   // 20 = 40+4 = 44mA
   Serial.println("Setting LED Current to 10/24mA");
 //  as7341.setLEDCurrent(10); // 24mA
-  as7341.setLEDCurrent(18); // 40mA
+  as7341.setLEDCurrent(0); // 40mA
 //  as7341.setLEDCurrent(48); // 100mA 
   Serial.println("Enabling LED");
   as7341.enableLED(true);
-  delay(5000);
+  delay(10);
   Serial.println("Disabling LED");
   as7341.enableLED(false);
-  delay(5000);
+  delay(2000);
   Serial.println("Done; end loop");
 }
