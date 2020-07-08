@@ -22,6 +22,12 @@ void setup() {
   as7341.setATIME(100);
   as7341.setASTEP(999);
   as7341.setGain(AS7341_GAIN_256X);
+  as7341.enableSpectralMeasurement(false);
+  as7341.setLowThreshold(1000);
+  as7341.enableSpectralINT(true);
+  as7341.enableSpectralMeasurement(true);
+
+  // check default APERS and Channel
 
 }
 
@@ -29,7 +35,10 @@ void loop() {
   // Function defined to read out channels with SMUX configration 1- F1-F4,
   // Clear, NIR
   as7341.readRawValuesMode1();
-
-
+  uint8_t int_status = as7341.getInterruptStatus();
+  bool spectral_int_status = spectralInterruptTriggered();
+  Serial.print("Int status byte: 0b"); Serial.println(int_status, BIN);
+  Serial.println("");
+  Serial.print("spectral INT triggered: ");Serial.println(spectral_int_status);
   delay(500);
 }

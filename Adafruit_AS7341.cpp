@@ -187,6 +187,28 @@ bool Adafruit_AS7341::enableSpectralMeasurement(bool enable_measurement) {
   return spec_enable_bit.write(enable_measurement);
 }
 
+uint8_t Adafruit_AS7341::getInterruptStatus(void){
+  Adafruit_BusIO_Register int_status_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_STATUS);
+  return (uint8_t)int_status_reg.read();
+}
+bool Adafruit_AS7341::spectralInterruptTriggered(void){
+  Adafruit_BusIO_Register int_status_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_STATUS);
+  Adafruit_BusIO_RegisterBits aint_bit = Adafruit_BusIO_RegisterBits(&int_status_reg, 1, 3);
+
+  Serial.println("Reading aint_bit status");
+  bool aint_status = aint_bit.read();
+  // clears the bit if set. Writing 1 will clear any bit so this will likely
+  // clear **all** interrupt status bits because RegisterBits is trying to write back the existing status
+  // we will need to set a mask with just this bit
+  Serial.print("Clearing spectral int bit");
+  aint_bit.write(1);
+  return aint_status;
+}
+
+
+
 void Adafruit_AS7341::enableSMUX(void) {
   Adafruit_BusIO_Register enable_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_ENABLE);

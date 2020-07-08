@@ -245,6 +245,9 @@ public:
   bool setAPERS(as7341_int_cycle_count_t cycle_count);
   bool setSpectralThresholdChannel(as7341_channel_t channel);
 
+  uint8_t getInterruptStatus(void);
+  bool spectralInterruptTriggered(void);
+
   bool enableGPIO(bool enable_gpio);
   bool enableLED(bool enable_led);
 
