@@ -2,3 +2,5 @@ html/
 Doxyfile
 .vscode/
 .idea/
+*.hex
+*.elf

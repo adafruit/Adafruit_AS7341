@@ -102,7 +102,7 @@
 #define AS7341_CFG10 0xB3        ///<
 #define AS7341_CFG12 0xB5        ///<
 #define AS7341_PERS 0xBD         ///<
-#define AS7341_GPIO2 0xBE       ///<
+#define AS7341_GPIO2 0xBE        ///<
 #define AS7341_ASTEP_L 0xCA      ///<
 #define AS7341_ASTEP_H 0xCB      ///<
 #define AS7341_AGC_GAIN_MAX 0xCF ///<
@@ -227,6 +227,7 @@ public:
   bool setLEDCurrent(uint8_t led_current);
 
   bool getIsDataReady();
+  bool setBank(bool low); // low true gives access to 0x60 to 0x74
 
   bool getEvent(sensors_event_t *pressure, sensors_event_t *temp);
   // void interruptsActiveLow(bool active_low);

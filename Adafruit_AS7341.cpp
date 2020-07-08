@@ -141,10 +141,12 @@ uint16_t Adafruit_AS7341::readTwoRegister1(byte addr) {
 // "AS7341_I2CADDR_DEFAULT">Device address 0x39
 
 void Adafruit_AS7341::writeRegister(byte addr, byte val) {
-  Wire.beginTransmission(AS7341_I2CADDR_DEFAULT);
-  Wire.write(addr);
-  Wire.write(val);
-  Wire.endTransmission();
+  Adafruit_BusIO_Register reg = Adafruit_BusIO_Register(i2c_dev, addr);
+  reg.write(val);
+  // Wire.beginTransmission(AS7341_I2CADDR_DEFAULT);
+  // Wire.write(addr);
+  // Wire.write(val);
+  // Wire.endTransmission();
 }
 
 uint16_t Adafruit_AS7341::readChannel(as7341_channel_t channel) {
@@ -197,20 +199,21 @@ void Adafruit_AS7341::enableSMUX(void) {
 }
 
 // LDR/LED setup
-bool Adafruit_AS7341::enableLED(bool enable_led){
+bool Adafruit_AS7341::enableLED(bool enable_led) {
   Adafruit_BusIO_Register config_reg =
-    Adafruit_BusIO_Register(i2c_dev, AS7341_CONFIG);
+      Adafruit_BusIO_Register(i2c_dev, AS7341_CONFIG);
   // Enables control of the LED via the LDR pin
   // 1=control enabled 0 = control disabled
   Adafruit_BusIO_RegisterBits led_sel_bit =
-    Adafruit_BusIO_RegisterBits(&config_reg, 1, 3);
+      Adafruit_BusIO_RegisterBits(&config_reg, 1, 3);
 
   Adafruit_BusIO_Register led_reg =
-    Adafruit_BusIO_Register(i2c_dev, AS7341_LED);
+      Adafruit_BusIO_Register(i2c_dev, AS7341_LED);
   // turns the LED on or off
   Adafruit_BusIO_RegisterBits led_act_bit =
-    Adafruit_BusIO_RegisterBits(&led_reg, 1, 7);
+      Adafruit_BusIO_RegisterBits(&led_reg, 1, 7);
 
+  setBank(true); // Access 0x60-0x74
   led_sel_bit.write(enable_led);
   led_act_bit.write(enable_led);
   return true; // TODO return && of above writes
@@ -226,11 +229,12 @@ bool Adafruit_AS7341::enableLED(bool enable_led){
  * @return true: success false: failure
  */
 // TODO: make it take mA and do the math ourselves
-bool Adafruit_AS7341::setLEDCurrent(uint8_t led_current){
+bool Adafruit_AS7341::setLEDCurrent(uint8_t led_current) {
   // check within permissible range
-  if (led_current > 127){
+  if (led_current > 127) {
     return false;
   }
+  setBank(true); // Access 0x60 0x74
 
   /*
   EAHC2835WD6  LED included on breakout has an absolute max 180mA current
@@ -243,19 +247,20 @@ bool Adafruit_AS7341::setLEDCurrent(uint8_t led_current){
   180 = 90-2 = 88
   */
   Adafruit_BusIO_Register led_reg =
-    Adafruit_BusIO_Register(i2c_dev, AS7341_LED);
+      Adafruit_BusIO_Register(i2c_dev, AS7341_LED);
 
   // true = led on , false = off
   Adafruit_BusIO_RegisterBits led_current_bits =
-    Adafruit_BusIO_RegisterBits(&led_reg, 7, 0);
+      Adafruit_BusIO_RegisterBits(&led_reg, 7, 0);
 
   return led_current_bits.write(led_current);
 }
-                          // 1,       0
+// 1,       0
 // 0x73	GPIO							PD_GPIO	PD_INT
 //                        3             2       1        0
-// 0xBE	GPIO 2					GPIO_INV	GPIO_IN	GPIO_OUT	GPIO_IN
-bool Adafruit_AS7341::enableGPIO(bool enable_gpio){
+// 0xBE	GPIO 2					GPIO_INV	GPIO_IN	GPIO_OUT
+// GPIO_IN
+bool Adafruit_AS7341::enableGPIO(bool enable_gpio) {
   Adafruit_BusIO_Register gpio_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_GPIO);
   Adafruit_BusIO_Register gpio2_reg =
@@ -267,6 +272,24 @@ bool Adafruit_AS7341::enableGPIO(bool enable_gpio){
   // GPIO talks to MUX so we'll have to set that up
   return true;
 }
+
+bool Adafruit_AS7341::setBank(bool low) {
+  Adafruit_BusIO_Register cfg0_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_CFG0);
+  // register map says shift 3, 0xA9 description says shift 4 with 3 being
+  // reserved
+  Adafruit_BusIO_RegisterBits bank_bit =
+      Adafruit_BusIO_RegisterBits(&cfg0_reg, 1, 4);
+
+  bank_bit.write(low);
+  // Register Bank Access
+  // 0: Register access to register 0x80 and above
+  // 1: Register access to register 0x60 to 0x74
+  // Note: Bit needs to be set to access registers 0x60 to
+  // 0x74. If registers 0x80 and above needs to be
+  // accessed bit needs to be set to “0”.
+}
+
 // <summary>
 // Reading and Polling the the AVALID bit in Status 2 Register 0xA3,if the
 // spectral measurement is ready or busy. True indicates that a cycle is

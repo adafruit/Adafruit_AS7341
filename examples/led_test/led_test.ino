@@ -39,8 +39,9 @@ void loop() {
 //  as7341.setLEDCurrent(48); // 100mA 
   Serial.println("Enabling LED");
   as7341.enableLED(true);
-  delay(10000);
+  delay(5000);
   Serial.println("Disabling LED");
   as7341.enableLED(false);
+  delay(5000);
   Serial.println("Done; end loop");
 }
