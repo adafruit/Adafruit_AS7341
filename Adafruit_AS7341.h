@@ -145,6 +145,25 @@ typedef enum {
   AS7341_CHANNEL_5,
 } as7341_channel_t;
 
+typedef enum {
+  AS7341_INT_COUNT_ALL, ///< 0
+  AS7341_INT_COUNT_1,   ///< 1
+  AS7341_INT_COUNT_2,   ///< 2
+  AS7341_INT_COUNT_3,   ///< 3
+  AS7341_INT_COUNT_5,   ///< 4
+  AS7341_INT_COUNT_10,  ///< 5
+  AS7341_INT_COUNT_15,  ///< 6
+  AS7341_INT_COUNT_20,  ///< 7
+  AS7341_INT_COUNT_25,  ///< 8
+  AS7341_INT_COUNT_30,  ///< 9
+  AS7341_INT_COUNT_35,  ///< 10
+  AS7341_INT_COUNT_40,  ///< 11
+  AS7341_INT_COUNT_45,  ///< 12
+  AS7341_INT_COUNT_50,  ///< 13
+  AS7341_INT_COUNT_55,  ///< 14
+  AS7341_INT_COUNT_60,  ///< 15
+} as7341_int_cycle_count_t;
+
 class Adafruit_AS7341;
 
 // /** Adafruit Unified Sensor interface for temperature component of AS7341 */
@@ -220,6 +239,11 @@ public:
 
   void enableSMUX(void);
   void SmuxConfigRAM(void);
+  bool setHighThreshold(int16_t high_threshold);
+  bool setLowThreshold(int16_t low_threshold);
+  bool enableSpectralINT(bool enable_int);
+  bool setAPERS(as7341_int_cycle_count_t cycle_count);
+  bool setSpectralThresholdChannel(as7341_channel_t channel);
 
   bool enableGPIO(bool enable_gpio);
   bool enableLED(bool enable_led);
