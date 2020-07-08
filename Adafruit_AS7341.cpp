@@ -1,10 +1,6 @@
 /*!
  *  @file Adafruit_AS7341.cpp
  *
- *  @mainpage Adafruit AS7341 11-Channel Spectral Sensor
- *
- *  @section intro_sec Introduction
- *
  * 	I2C Driver for the Library for the AS7341 11-Channel Spectral Sensor
  *
  * 	This is a library for the Adafruit AS7341 breakout:
@@ -14,22 +10,9 @@
  *  please support Adafruit and open-source hardware by purchasing products from
  * 	Adafruit!
  *
- *  @section dependencies Dependencies
- *  This library depends on the Adafruit BusIO library
- *
- *  This library depends on the Adafruit Unified Sensor library
- *
- *  @section author Author
- *
- *  Bryan Siepert for Adafruit Industries
- *
- * 	@section license License
+ *  Copyright 2020 Bryan Siepert for Adafruit Industries
  *
  * 	BSD (see license.txt)
- *
- * 	@section  HISTORY
- *
- *     v1.0 - First release
  */
 
 #include "Arduino.h"
@@ -187,28 +170,6 @@ bool Adafruit_AS7341::enableSpectralMeasurement(bool enable_measurement) {
   return spec_enable_bit.write(enable_measurement);
 }
 
-uint8_t Adafruit_AS7341::getInterruptStatus(void){
-  Adafruit_BusIO_Register int_status_reg =
-      Adafruit_BusIO_Register(i2c_dev, AS7341_STATUS);
-  return (uint8_t)int_status_reg.read();
-}
-bool Adafruit_AS7341::spectralInterruptTriggered(void){
-  Adafruit_BusIO_Register int_status_reg =
-      Adafruit_BusIO_Register(i2c_dev, AS7341_STATUS);
-  Adafruit_BusIO_RegisterBits aint_bit = Adafruit_BusIO_RegisterBits(&int_status_reg, 1, 3);
-
-  Serial.println("Reading aint_bit status");
-  bool aint_status = aint_bit.read();
-  // clears the bit if set. Writing 1 will clear any bit so this will likely
-  // clear **all** interrupt status bits because RegisterBits is trying to write back the existing status
-  // we will need to set a mask with just this bit
-  Serial.print("Clearing spectral int bit");
-  aint_bit.write(1);
-  return aint_status;
-}
-
-
-
 void Adafruit_AS7341::enableSMUX(void) {
   Adafruit_BusIO_Register enable_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_ENABLE);
@@ -312,22 +273,89 @@ bool Adafruit_AS7341::setBank(bool low) {
   // accessed bit needs to be set to “0”.
 }
 
+/**************** Interrupt Configuration ***********/
+// CFG9 Register (Address 0xB2)
+// Figure 84:
+// CFG 9 Register
+// Addr: 0xB2 CFG9
+// Bit Bit Name Default Access Bit Description
+// 7 reserved 0 reserved
+// 6 SIEN_FD 0 RW
+// System Interrupt Flicker Detection.
+// Enables system interrupt when flicker detection
+// status change has occurred.
+// 5 reserved reserved
+// 4 SIEN_SMUX 0 RW
+// System Interrupt SMUX Operation.
+// Enables system interrupt when SMUX command has
+// finished
+// 3:0 reserved reserved
+
+// STATUS 5 Register (Address 0xA6)
+// Figure 65:
+// STATUS 5 Register
+// Addr: 0xA6 STATUS 5
+// Bit Bit Name Default Access Bit Description
+// 7:4 reserved 0 reserved
+// Document Feedback AS7341
+// Register Description
+// Datasheet • CONFIDENTIAL
+// DS000504 • v1-00 • 2018-Oct-17 67 │ 46
+// Addr: 0xA6 STATUS 5
+// Bit Bit Name Default Access Bit Description
+// 3 SINT_FD 0 R
+// Flicker Detect interrupt.
+// If SIEN_FD is set, indicates that the FD_STATUS
+// register status has changed
+// 2 SINT_SMUX 0 R
+// SMUX operation interrupt.
+// Indicates that SMUX command execution has
+// finished.
+// 1:0 reserved 0 reserved
+
+// STATUS 3 Register (Address 0xA4)
+// Figure 64:
+// STATUS 3 Register
+// Addr: 0xA4 STATUS 3
+// Bit Bit Name Default Access Bit Description
+// 7:6 reserved 0 reserved
+// 5 INT_SP_H 0 R
+// Spectral interrupt high.
+// Indicates that a spectral interrupt occurred because
+// the data exceeded the high threshold.
+// 4 INT_SP_L 0 R
+// Spectral interrupt low.
+// Indicates that a spectral interrupt occurred because
+// the data is below the low threshold.
+// 3:0 reserved 0 reserved
+
 // The spectral interrupt threshold registers provide 16-bit values to be used
 // as the high and low thresholds for comparison to the 16-bit CH0_DATA values
 // (ADC CH0). If SP_IEN (register 0xF9) is enabled and CH0_DATA is not between
 // the two thresholds for the number of consecutive measurements specified in
 // APERS (register 0xBD) an interrupt is set.
-bool Adafruit_AS7341::setHighThreshold(int16_t high_threshold) {
-  Adafruit_BusIO_Register sp_high_threshold_reg =
-      Adafruit_BusIO_Register(i2c_dev, AS7341_SP_HIGH_TH_H, 2, LSBFIRST);
-  return sp_high_threshold_reg.write(high_threshold);
-}
 bool Adafruit_AS7341::setLowThreshold(int16_t low_threshold) {
   Adafruit_BusIO_Register sp_low_threshold_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_SP_LOW_TH_L, 2, LSBFIRST);
   return sp_low_threshold_reg.write(low_threshold);
 }
 
+int16_t Adafruit_AS7341::getLowThreshold(void) {
+  Adafruit_BusIO_Register sp_low_threshold_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_SP_LOW_TH_L, 2, LSBFIRST);
+  return sp_low_threshold_reg.read();
+}
+
+bool Adafruit_AS7341::setHighThreshold(int16_t high_threshold) {
+  Adafruit_BusIO_Register sp_high_threshold_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_SP_HIGH_TH_L, 2, LSBFIRST);
+  return sp_high_threshold_reg.write(high_threshold);
+}
+int16_t Adafruit_AS7341::getHighThreshold(void) {
+  Adafruit_BusIO_Register sp_high_threshold_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_SP_HIGH_TH_L, 2, LSBFIRST);
+  return sp_high_threshold_reg.read();
+}
 /**
  * @brief Enable Interrupts based on spectral measurements
  *
@@ -385,6 +413,46 @@ bool Adafruit_AS7341::setSpectralThresholdChannel(as7341_channel_t channel) {
   return spectral_threshold_ch_bits.write(channel);
 }
 
+uint8_t Adafruit_AS7341::getInterruptStatus(void) {
+  Adafruit_BusIO_Register int_status_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_STATUS);
+  return (uint8_t)int_status_reg.read();
+}
+bool Adafruit_AS7341::spectralInterruptTriggered(void) {
+  Adafruit_BusIO_Register int_status_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_STATUS);
+  Adafruit_BusIO_RegisterBits aint_bit =
+      Adafruit_BusIO_RegisterBits(&int_status_reg, 1, 3);
+
+  return aint_bit.read();
+}
+
+/**
+ * @brief Clear the interrupt status register
+ *
+ * @return true: success false: failure
+ */
+bool Adafruit_AS7341::clearInterruptStatus(void) {
+  Adafruit_BusIO_Register int_status_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_STATUS);
+
+  return int_status_reg.write(0xFF);
+}
+
+uint8_t Adafruit_AS7341::spectralINTSource(void) {
+  Adafruit_BusIO_Register status3_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_STATUS3);
+
+  uint8_t spectral_int_source = status3_reg.read();
+  last_spectral_int_source = spectral_int_source;
+  return spectral_int_source;
+}
+bool Adafruit_AS7341::spectralLowTriggered(void) {
+  return (last_spectral_int_source & AS7341_SPECTRAL_INT_LOW_MSK > 0);
+}
+bool Adafruit_AS7341::spectralHighTriggered(void) {
+  return (last_spectral_int_source & AS7341_SPECTRAL_INT_HIGH_MSK > 0);
+}
 // <summary>
 // Reading and Polling the the AVALID bit in Status 2 Register 0xA3,if the
 // spectral measurement is ready or busy. True indicates that a cycle is
@@ -934,95 +1002,6 @@ byte Adafruit_AS7341::readRegister(byte addr) {
 //   readSynDRegisters();
 // }
 
-// /*----- Register configuration  -----*/
-
-// // <summary>
-// // Setting the PON (Power on) bit on the chip (bit0 at register ENABLE 0x80)
-// // Attention: This function clears only the PON bit in ENABLE register and
-// keeps
-// // the other bits <summary>
-// void PON() {
-
-//   byte regVal = readRegister(byte(0x80));
-//   byte temp = regVal;
-//   regVal = regVal & 0xFE;
-//   regVal = regVal | 0x01;
-//   writeRegister(byte(0x80), byte(regVal));
-// }
-
-// // <summary>
-// // Setting the SP_EN (spectral measurement enabled) bit on the chip (bit 1 in
-// // register ENABLE) <summary> <param name="isEnable">Enabling (true) or
-// // disabling (false) the SP_EN bit</param>
-// void SpEn(bool isEnable) {
-
-//   byte regVal = readRegister(byte(0x80));
-//   byte temp = regVal;
-//   regVal = regVal & 0xFD;
-
-//   if (isEnable == true) {
-//     regVal = regVal | 0x02;
-//   } else {
-//     regVal = temp & 0xFD;
-//   }
-
-//   writeRegister(byte(0x80), byte(regVal));
-// }
-
-// // <summary>
-// // Write SMUX configration from RAM to set SMUX chain in CFG6 register 0xAF
-// // <summary>
-// void SmuxConfigRAM() { writeRegister(byte(0xAF), byte(0x10)); }
-
-// // <summary>
-// // Starting the SMUX command via enabling the SMUXEN bit (bit 4) in register
-// // ENABLE 0x80 The SMUXEN bit gets cleared automatically as soon as SMUX
-// // operation is finished <summary>
-// void SMUXEN() {
-
-//   byte regVal = readRegister(byte(0x80));
-//   byte temp = regVal;
-//   regVal = regVal & 0xEF;
-//   regVal = regVal | 0x10;
-//   writeRegister(byte(0x80), byte(regVal));
-// }
-
-// // <summary>
-// // Reading and Polling the the SMUX Enable bit in Enable Register 0x80
-// // The SMUXEN bit gets cleared automatically as soon as SMUX operation is
-// // finished <summary>
-// bool getSmuxEnabled() {
-
-//   bool isEnabled = false;
-//   byte regVal = readRegister(byte(0x80));
-
-//   if ((regVal & 0x10) == 0x10) {
-//     return isEnabled = true;
-//   }
-
-//   else {
-//     return isEnabled = false;
-//   }
-// }
-
-// // <summary>
-// // Reading and Polling the the AVALID bit in Status 2 Register 0xA3,if the
-// // spectral measurement is ready or busy. True indicates that a cycle is
-// // completed since the last readout of the Raw Data register <summary>
-// bool getIsDataReady() {
-//   bool isDataReady = false;
-//   byte regVal = readRegister(byte(0xA3));
-
-//   if ((regVal & 0x40) == 0x40) {
-
-//     return isDataReady = true;
-//   }
-
-//   else {
-//     return isDataReady = false;
-//   }
-// }
-
 // // <summary>
 // // Enabling the gpio_in_en (Bit 2) and gpio_out(Bit 1) in GPIO register 0xBE
 // // <summary>
@@ -1035,44 +1014,6 @@ byte Adafruit_AS7341::readRegister(byte addr) {
 //   writeRegister(byte(0xBE), byte(regVal));
 // }
 
-// // <summary>
-// // CONFIG (0x70) is used to set the INT_MODE (Bit 1:0) SYNSis set by writing
-// // 0x01 and SYND by  writing 0x03
-// // <summary>
-// void INT_MODE(byte mode) {
-
-//   byte regVal = readRegister(byte(0x70));
-//   byte temp = regVal;
-//   regVal = regVal & 0xFC;
-//   regVal = regVal | mode;
-//   writeRegister(byte(0x70), byte(regVal));
-// }
-
-// // <summary>
-// // select which Register bank to address in registers 0x00-0x7f has priority
-// // over ram_bank
-// // reg_bank bit(4) is set to '1' for setting the 0x00-0x7f regiater to
-// reg_bank
-// // register. by default it is RAM register
-// // <summary>
-// void RegBankConfig() {
-
-//   byte regVal = readRegister(byte(0xA9));
-//   byte temp = regVal;
-//   regVal = regVal & 0xEF;
-//   regVal = regVal | 0x10;
-//   writeRegister(byte(0xA9), byte(regVal));
-// }
-
-// /*----- Set Gain and integration time = iTime * 2.78µS -----*/
-
-// //<summary>
-// // Sets the Spectral Gain in CFG1 Register (0xAA) in [4:0] bit
-// //<summary>
-// // param name = "value"> integer value from 0 to 10 written to AGAIN register
-// // 0xAA
-// void setGAIN(byte value) { writeRegister(byte(0xAA), value); }
-
 // //<summary>
 // // Number of falling SYNC-edges between start and stop integration in SynD
 // mode
@@ -1080,69 +1021,6 @@ byte Adafruit_AS7341::readRegister(byte addr) {
 // // integration_time = (syn_edge+1) * sync period
 // //<summary>
 // void setSynEdge(byte value) { writeRegister(byte(0x72), value); }
-
-// /*----- SMUX Configuration for F1,F2,F3,F4,CLEAR,NIR -----*/
-
-// //<summary>
-// // Mapping the individual Photo diodes to dedicated ADCs using SMUX
-// // Configuration for F1-F4,Clear,NIR
-// //<summary>
-// void F1F4_Clear_NIR() {
-//   // SMUX Config for F1,F2,F3,F4,NIR,Clear
-//   writeRegister(byte(0x00), byte(0x30)); // F3 left set to ADC2
-//   writeRegister(byte(0x01), byte(0x01)); // F1 left set to ADC0
-//   writeRegister(byte(0x02), byte(0x00)); // Reserved or disabled
-//   writeRegister(byte(0x03), byte(0x00)); // F8 left disabled
-//   writeRegister(byte(0x04), byte(0x00)); // F6 left disabled
-//   writeRegister(
-//       byte(0x05),
-//       byte(0x42)); // F4 left connected to ADC3/f2 left connected to ADC1
-//   writeRegister(byte(0x06), byte(0x00)); // F5 left disbled
-//   writeRegister(byte(0x07), byte(0x00)); // F7 left disbled
-//   writeRegister(byte(0x08), byte(0x50)); // CLEAR connected to ADC4
-//   writeRegister(byte(0x09), byte(0x00)); // F5 right disabled
-//   writeRegister(byte(0x0A), byte(0x00)); // F7 right disabled
-//   writeRegister(byte(0x0B), byte(0x00)); // Reserved or disabled
-//   writeRegister(byte(0x0C), byte(0x20)); // F2 right connected to ADC1
-//   writeRegister(byte(0x0D), byte(0x04)); // F4 right connected to ADC3
-//   writeRegister(byte(0x0E), byte(0x00)); // F6/F7 right disabled
-//   writeRegister(byte(0x0F), byte(0x30)); // F3 right connected to AD2
-//   writeRegister(byte(0x10), byte(0x01)); // F1 right connected to AD0
-//   writeRegister(byte(0x11), byte(0x50)); // CLEAR right connected to AD4
-//   writeRegister(byte(0x12), byte(0x00)); // Reserved or disabled
-//   writeRegister(byte(0x13), byte(0x06)); // NIR connected to ADC5
-// }
-
-// /*----- SMUX Configuration for F5,F6,F7,F8,CLEAR,NIR -----*/
-
-// //<summary>
-// // Mapping the individual Photo diodes to dedicated ADCs using SMUX
-// // Configuration for F5-F8,Clear,NIR
-// //<summary>
-// void F5F8_Clear_NIR() {
-//   // SMUX Config for F5,F6,F7,F8,NIR,Clear
-//   writeRegister(byte(0x00), byte(0x00)); // F3 left disable
-//   writeRegister(byte(0x01), byte(0x00)); // F1 left disable
-//   writeRegister(byte(0x02), byte(0x00)); // reserved/disable
-//   writeRegister(byte(0x03), byte(0x40)); // F8 left connected to ADC3
-//   writeRegister(byte(0x04), byte(0x02)); // F6 left connected to ADC1
-//   writeRegister(byte(0x05), byte(0x00)); // F4/ F2 disabled
-//   writeRegister(byte(0x06), byte(0x10)); // F5 left connected to ADC0
-//   writeRegister(byte(0x07), byte(0x03)); // F7 left connected to ADC2
-//   writeRegister(byte(0x08), byte(0x50)); // CLEAR Connected to ADC4
-//   writeRegister(byte(0x09), byte(0x10)); // F5 right connected to ADC0
-//   writeRegister(byte(0x0A), byte(0x03)); // F7 right connected to ADC2
-//   writeRegister(byte(0x0B), byte(0x00)); // Reserved or disabled
-//   writeRegister(byte(0x0C), byte(0x00)); // F2 right disabled
-//   writeRegister(byte(0x0D), byte(0x00)); // F4 right disabled
-//   writeRegister(byte(0x0E),
-//                 byte(0x24)); // F7 connected to ADC2/ F6 connected to ADC1
-//   writeRegister(byte(0x0F), byte(0x00)); // F3 right disabled
-//   writeRegister(byte(0x10), byte(0x00)); // F1 right disabled
-//   writeRegister(byte(0x11), byte(0x50)); // CLEAR right connected to AD4
-//   writeRegister(byte(0x12), byte(0x00)); // Reserved or disabled
-//   writeRegister(byte(0x13), byte(0x06)); // NIR connected to ADC5
-// }
 
 // //<summary>
 // // Read all the registers from 0x60 to 0x6F in SYND MODE
@@ -1216,337 +1094,4 @@ byte Adafruit_AS7341::readRegister(byte addr) {
 //   Serial.print("Channel5-");
 //   Serial.println(Channel5);
 //   Serial.println("");
-// }
-
-// /* ----- Read/Write to i2c register ----- */
-
-// // <summary>
-// // Read a single i2c register
-// // <summary>
-// // param name = "addr">Register address of the the register to be read
-// // param name = "_i2cAddr">Device address 0x39
-
-// byte readRegister(byte addr) {
-//   Wire.beginTransmission(_i2cAddr);
-//   Wire.write(addr);
-//   Wire.endTransmission();
-
-//   Wire.requestFrom(_i2cAddr, 1);
-
-//   if (Wire.available()) {
-//     // Serial.println(Wire.read());
-//     return (Wire.read());
-//   }
-
-//   else {
-//     Serial.println("I2C Error");
-//     return (0xFF); // Error
-//   }
-// }
-
-// // <summary>
-// // Print out a single i2c register
-// // <summary>
-// // param name = "addr">Register address of the the register to be read
-// // param name = "_i2cAddr">Device address 0x39
-
-// void readRegisterPrint(byte addr) {
-//   Wire.beginTransmission(_i2cAddr);
-//   Wire.write(addr);
-//   Wire.endTransmission();
-
-//   Wire.requestFrom(_i2cAddr, 1);
-
-//   if (Wire.available()) {
-//     Serial.println(Wire.read());
-
-//   }
-
-//   else {
-//     Serial.println("I2C Error");
-//   }
-// }
-
-// // <summary>
-// // Read two consecutive i2c registers
-// // <summary>
-// // param name = "addr">First register address of two consecutive registers to
-// be
-// // read param name = "_i2cAddr">Device address 0x39
-
-// uint16_t readTwoRegister1(byte addr) {
-//   uint8_t readingL;
-//   uint16_t readingH;
-//   uint16_t reading = 0;
-//   Wire.beginTransmission(_i2cAddr);
-//   Wire.write(addr);
-//   Wire.endTransmission();
-
-//   Wire.requestFrom(_i2cAddr, 2);
-
-//   if (2 <= Wire.available()) {
-//     readingL = Wire.read();
-//     readingH = Wire.read();
-//     readingH = readingH << 8;
-//     reading = (readingH | readingL);
-//     return (reading);
-//   } else {
-//     Serial.println("I2C Error");
-//     return (0xFFFF); // Error
-//   }
-// }
-
-// // <summary>
-// // Write a value to a single i2c register
-// // <summary>
-// // param name = "addr">Register address of the the register to the value to
-// be
-// // written param name = "val">The value written to the Register param name =
-// // "_i2cAddr">Device address 0x39
-
-// void writeRegister(byte addr, byte val) {
-//   Wire.beginTransmission(_i2cAddr);
-//   Wire.write(addr);
-//   Wire.write(val);
-//   Wire.endTransmission();
-// }
-
-// /**
-//  * @brief Gets the current rate at which pressure and temperature
-//  measurements
-//  * are taken
-//  *
-//  * @return as7341_rate_t The current data rate
-//  */
-// as7341_rate_t Adafruit_AS7341::getDataRate(void) {
-//   Adafruit_BusIO_Register ctrl1 = Adafruit_BusIO_Register(
-//       i2c_dev, spi_dev, ADDRBIT8_HIGH_TOREAD, AS7341_CTRL_REG1, 1);
-//   Adafruit_BusIO_RegisterBits data_rate =
-//       Adafruit_BusIO_RegisterBits(&ctrl1, 3, 4);
-
-//   return (as7341_rate_t)data_rate.read();
-// }
-// /**
-//  * @brief Sets the rate at which pressure and temperature measurements
-//  *
-//  * @param new_data_rate The data rate to set. Must be a `as7341_rate_t`
-//  */
-// void Adafruit_AS7341::Adafruit_AS7341::setDataRate(as7341_rate_t
-// new_data_rate) {
-//   Adafruit_BusIO_Register ctrl1 = Adafruit_BusIO_Register(
-//       i2c_dev, spi_dev, ADDRBIT8_HIGH_TOREAD, AS7341_CTRL_REG1, 1);
-//   Adafruit_BusIO_RegisterBits data_rate =
-//       Adafruit_BusIO_RegisterBits(&ctrl1, 3, 4);
-
-//   data_rate.write((uint8_t)new_data_rate);
-// }
-
-// /******************* Adafruit_Sensor functions *****************/
-// /*!
-//  *     @brief  Updates the measurement data for all sensors simultaneously
-//  */
-// /**************************************************************************/
-// void Adafruit_AS7341::Adafruit_AS7341::_read(void) {
-//   // get raw readings
-
-//   // TODO: Update for sensor types and enable multi-byte read if needed
-//   // uint8_t pressure_addr = AS7341_PRESS_OUT_XL;
-//   // uint8_t temp_addr = AS7341_TEMP_OUT_L;
-//   // if (spi_dev) {
-//   //   // for AS7341 SPI, addr[7] is r/w, addr[6] is auto increment
-//   //   pressure_addr |= 0x40;
-//   //   temp_addr |= 0x40;
-//   // }
-
-//   // TODO: use this block to manually pack bytes and fix sign
-//   // Adafruit_BusIO_Register pressure_data = Adafruit_BusIO_Register(
-//   //     i2c_dev, spi_dev, ADDRBIT8_HIGH_TOREAD, pressure_addr, 3);
-
-//   // Adafruit_BusIO_Register temp_data = Adafruit_BusIO_Register(
-//   //     i2c_dev, spi_dev, ADDRBIT8_HIGH_TOREAD, temp_addr, 2);
-
-//   // uint8_t buffer[3];
-
-//   // temp_data.read(buffer, 2);
-//   // int16_t raw_temp;
-
-//   // raw_temp |= (int16_t)(buffer[1]);
-//   // raw_temp <<= 8;
-//   // raw_temp |= (int16_t)(buffer[0]);
-
-//   // pressure_data.read(buffer, 3);
-//   // int32_t raw_pressure;
-
-//   // raw_pressure = (int32_t)buffer[2];
-//   // raw_pressure <<= 8;
-//   // raw_pressure |= (int32_t)(buffer[1]);
-//   // raw_pressure <<= 8;
-//   // raw_pressure |= (int32_t)(buffer[0]);
-
-//   // // TODO: This can be done by casting to signed type
-//   // if (raw_temp & 0x8000) {
-//   //   raw_temp = raw_temp - 0xFFFF;
-//   // }
-//   // unscaled_temp = raw_temp;
-
-//   // if (raw_pressure & 0x800000) {
-//   //   raw_pressure = raw_pressure - 0xFFFFFF;
-//   // }
-
-//   Adafruit_BusIO_Register to_out =
-//       Adafruit_BusIO_Register(i2c_dev, spi_dev, ADDRBIT8_HIGH_TOREAD,
-//                               (HTS221_T0_OUT | multi_byte_address_mask), 2);
-//   Adafruit_BusIO_Register t1_out =
-//       Adafruit_BusIO_Register(i2c_dev, spi_dev, ADDRBIT8_HIGH_TOREAD,
-//                               (HTS221_T1_OUT | multi_byte_address_mask), 2);
-
-//   to_out.read(&T0_OUT);
-//   t1_out.read(&T1_OUT);
-
-//   unscaled_pressure = raw_pressure;
-// }
-
-// /*!
-//     @brief  Gets an Adafruit Unified Sensor object for the presure sensor
-//    component
-//     @return Adafruit_Sensor pointer to pressure sensor
-//  */
-// Adafruit_Sensor *Adafruit_AS7341::getPressureSensor(void) {
-//   return pressure_sensor;
-// }
-
-// /*!
-//     @brief  Gets an Adafruit Unified Sensor object for the temp sensor
-//     component
-//     @return Adafruit_Sensor pointer to temperature sensor
-//  */
-// Adafruit_Sensor *Adafruit_AS7341::getTemperatureSensor(void) {
-//   return temp_sensor;
-// }
-
-// /**************************************************************************/
-// /*!
-//     @brief  Gets the pressure sensor and temperature values as sensor events
-//     @param  pressure Sensor event object that will be populated with pressure
-//    data
-//     @param  temp Sensor event object that will be populated with temp data
-//     @returns True
-// */
-// /**************************************************************************/
-// bool Adafruit_AS7341::getEvent(sensors_event_t *pressure,
-//                                sensors_event_t *temp) {
-//   uint32_t t = millis();
-//   _read();
-
-//   // use helpers to fill in the events
-//   fillPressureEvent(pressure, t);
-//   fillTempEvent(temp, t);
-//   return true;
-// }
-
-// void Adafruit_AS7341::Adafruit_AS7341::fillPressureEvent(sensors_event_t
-// *pressure,
-//                                         uint32_t timestamp) {
-//   memset(pressure, 0, sizeof(sensors_event_t));
-//   pressure->version = sizeof(sensors_event_t);
-//   pressure->sensor_id = _sensorid_pressure;
-//   pressure->type = SENSOR_TYPE_PRESSURE;
-//   pressure->timestamp = timestamp;
-//   pressure->pressure = (unscaled_pressure / 4096.0);
-// }
-
-// void Adafruit_AS7341::Adafruit_AS7341::fillTempEvent(sensors_event_t *temp,
-// uint32_t timestamp) {
-//   memset(temp, 0, sizeof(sensors_event_t));
-//   temp->version = sizeof(sensors_event_t);
-//   temp->sensor_id = _sensorid_temp;
-//   temp->type = SENSOR_TYPE_AMBIENT_TEMPERATURE;
-//   temp->timestamp = timestamp;
-//   temp->temperature = (unscaled_temp / 480) + 42.5;
-// }
-
-// /**************************************************************************/
-// /*!
-//     @brief  Gets the sensor_t data for the AS7341's tenperature
-// */
-// /**************************************************************************/
-// void Adafruit_AS7341::Adafruit_AS7341_Pressure::getSensor(sensor_t *sensor) {
-//   /* Clear the sensor_t object */
-//   memset(sensor, 0, sizeof(sensor_t));
-
-//   /* Insert the sensor name in the fixed length char array */
-//   strncpy(sensor->name, "AS7341_P", sizeof(sensor->name) - 1);
-//   sensor->name[sizeof(sensor->name) - 1] = 0;
-//   sensor->version = 1;
-//   sensor->sensor_id = _sensorID;
-//   sensor->type = SENSOR_TYPE_PRESSURE;
-//   sensor->min_delay = 0;
-//   sensor->min_value = 260;
-//   sensor->max_value = 1260;
-//   // 4096 LSB = 1 hPa >>  1 LSB = 1/4096 hPa >> 1 LSB =  2.441e-4 hPa
-//   sensor->resolution = 2.441e-4;
-// }
-
-// /**************************************************************************/
-// /*!
-//     @brief  Gets the pressure as a standard sensor event
-//     @param  event Sensor event object that will be populated
-//     @returns True
-// */
-// /**************************************************************************/
-// bool Adafruit_AS7341_Pressure::getEvent(sensors_event_t *event) {
-//   _theAS7341->_read();
-//   _theAS7341->fillPressureEvent(event, millis());
-
-//   return true;
-// }
-
-// /**************************************************************************/
-// /*!
-//     @brief  Gets the sensor_t data for the AS7341's tenperature
-// */
-// /**************************************************************************/
-// void Adafruit_AS7341::Adafruit_AS7341_Temp::getSensor(sensor_t *sensor) {
-//   /* Clear the sensor_t object */
-//   memset(sensor, 0, sizeof(sensor_t));
-
-//   /* Insert the sensor name in the fixed length char array */
-//   strncpy(sensor->name, "AS7341_T", sizeof(sensor->name) - 1);
-//   sensor->name[sizeof(sensor->name) - 1] = 0;
-//   sensor->version = 1;
-//   sensor->sensor_id = _sensorID;
-//   sensor->type = SENSOR_TYPE_AMBIENT_TEMPERATURE;
-//   sensor->min_delay = 0;
-//   sensor->min_value = -30;
-//   sensor->max_value = 105;
-//   // 480 LSB = 1°C >> 1 LSB = 1/480°C >> 1 LSB =  0.00208 °C
-//   sensor->resolution = 0.00208;
-// }
-
-// /**************************************************************************/
-// /*!
-//     @brief  Gets the temperature as a standard sensor event
-//     @param  event Sensor event object that will be populated
-//     @returns True
-// */
-// /**************************************************************************/
-// bool Adafruit_AS7341_Temp::getEvent(sensors_event_t *event) {
-//   _theAS7341->_read();
-//   _theAS7341->fillTempEvent(event, millis());
-
-//   return true;
-// }
-
-// /**
-//  * @brief Sets the polarity of the INT pin.
-//  *
-//  * @param active_low Set to true to make the pin active low
-//  */
-// void Adafruit_AS7341::Adafruit_AS7341::interruptsActiveLow(bool active_low) {
-//   Adafruit_BusIO_Register ctrl3 = Adafruit_BusIO_Register(
-//       i2c_dev, spi_dev, ADDRBIT8_HIGH_TOREAD, AS7341_CTRL_REG3, 1);
-
-//   Adafruit_BusIO_RegisterBits active_low_bit =
-//       Adafruit_BusIO_RegisterBits(&ctrl3, 1, 7);
-//   active_low_bit.write(active_low);
 // }

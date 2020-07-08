@@ -1,20 +1,40 @@
 /*!
  *  @file Adafruit_AS7341.h
+
+ *  @mainpage Adafruit AS7341 11-Channel Spectral Sensor
  *
- * 	I2C Driver for the Adafruit AS7341 11-Channel Spectral Sensor
+ *  @section intro_sec Introduction
+ *
+ * 	I2C Driver for the Library for the AS7341 11-Channel Spectral Sensor
  *
  * 	This is a library for the Adafruit AS7341 breakout:
- * 	https://www.adafruit.com/products/45XX
+ * 	https://www.adafruit.com/product/45XX
  *
  * 	Adafruit invests time and resources providing this open source code,
  *  please support Adafruit and open-source hardware by purchasing products from
  * 	Adafruit!
  *
+ *  @section dependencies Dependencies
+ *  This library depends on the Adafruit BusIO library
  *
- *	BSD license (see license.txt)
+ *  This library depends on the Adafruit Unified Sensor library
+ *
+ *  @section author Author
+ *
+ *  Bryan Siepert for Adafruit Industries
+ *
+ * 	@section license License
+ *
+ * 	BSD (see license.txt)
+ *
+ * 	@section  HISTORY
+ *
+ *     v1.0 - First release
  */
 
 /*
+  This library is adapted from an example with the following Copyright and
+  Warranty:
 
   This is a Hello world example code written for the AS7241 XWing Spectral
   Sensor I2C interface with Arduino µC. The main idea is to get fimilar with the
@@ -117,6 +137,9 @@
 #define AS7341_FIFO_LVL 0xFD     ///<
 #define AS7341_FDATA_L 0xFE      ///<
 #define AS7341_FDATA_H 0xFF      ///<
+
+#define AS7341_SPECTRAL_INT_HIGH_MSK 0b00100000
+#define AS7341_SPECTRAL_INT_LOW_MSK 0b00010000
 
 /**
  * @brief Allowable gain multipliers for `setGain`
@@ -241,12 +264,21 @@ public:
   void SmuxConfigRAM(void);
   bool setHighThreshold(int16_t high_threshold);
   bool setLowThreshold(int16_t low_threshold);
+
+  int16_t getHighThreshold(void);
+  int16_t getLowThreshold(void);
+
   bool enableSpectralINT(bool enable_int);
   bool setAPERS(as7341_int_cycle_count_t cycle_count);
   bool setSpectralThresholdChannel(as7341_channel_t channel);
 
   uint8_t getInterruptStatus(void);
+  bool clearInterruptStatus(void);
+
   bool spectralInterruptTriggered(void);
+  uint8_t spectralINTSource(void);
+  bool spectralLowTriggered(void);
+  bool spectralHighTriggered(void);
 
   bool enableGPIO(bool enable_gpio);
   bool enableLED(bool enable_led);
@@ -255,6 +287,7 @@ public:
 
   bool getIsDataReady();
   bool setBank(bool low); // low true gives access to 0x60 to 0x74
+  bool getBank(void);
 
   bool getEvent(sensors_event_t *pressure, sensors_event_t *temp);
   // void interruptsActiveLow(bool active_low);
@@ -267,6 +300,7 @@ public:
 protected:
   void _read(void);
   virtual bool _init(int32_t sensor_id);
+  uint8_t last_spectral_int_source = 0;
 
   Adafruit_I2CDevice *i2c_dev = NULL; ///< Pointer to I2C bus interface
   // float unscaled_temp,   ///< Last reading's temperature (C) before scaling
