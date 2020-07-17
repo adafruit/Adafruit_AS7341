@@ -123,19 +123,67 @@ uint16_t Adafruit_AS7341::readChannel(as7341_channel_t channel) {
  * @return true: success false: failure
  */
 bool Adafruit_AS7341::readAllChannels(uint16_t *readings_buffer) {
-  // each channel has two bytes, so offset by two for each next channel
-  Adafruit_BusIO_Register all_channels_reg = Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L, 12, LSBFIRST);
+
+  enableSpectralMeasurement(false);
   SmuxConfigRAM();
-
   setup_F1F4_Clear_NIR();
-
   enableSMUX();
   enableSpectralMeasurement(true);
   while (!getIsDataReady()) {
     delay(1);
   }
 
-  return all_channels_reg.read((uint8_t *)readings_buffer, 12);
+  Serial.print("ADC0/F1-");
+  Serial.println(readChannel(AS7341_CHANNEL_0));
+  Serial.print("ADC1/F2-");
+  Serial.println(readChannel(AS7341_CHANNEL_1));
+  Serial.print("ADC2/F3-");
+  Serial.println(readChannel(AS7341_CHANNEL_2));
+  Serial.print("ADC3/F4-");
+  Serial.println(readChannel(AS7341_CHANNEL_3));
+  Serial.print("ADC4/Clear-");
+  Serial.println(readChannel(AS7341_CHANNEL_4));
+  Serial.print("ADC5/NIR-");
+  Serial.println(readChannel(AS7341_CHANNEL_5));
+ // Disable SP_EN bit while  making config changes
+  enableSpectralMeasurement(false);
+
+  // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
+  // to CFG6)
+  SmuxConfigRAM();
+
+  // Write new configuration to all the 20 registers for reading channels from
+  // F5-F8, Clear and NIR
+  setup_F5F8_Clear_NIR();
+  // Start SMUX command
+  enableSMUX();
+
+  // Enable SP_EN bit
+  enableSpectralMeasurement(true);
+
+  // Reading and Polling the the AVALID bit in Status 2 Register 0xA3
+
+  while (!getIsDataReady()) {
+    delay(1);
+  }
+
+  // Steps defined to printout 6 channels F5,F6,F7,F8,NIR,Clear
+
+  Serial.print("ADC0/F5-");
+  Serial.println(readChannel(AS7341_CHANNEL_0));
+  Serial.print("ADC1/F6-");
+  Serial.println(readChannel(AS7341_CHANNEL_1));
+  Serial.print("ADC2/F7-");
+  Serial.println(readChannel(AS7341_CHANNEL_2));
+  Serial.print("ADC3/F8-");
+  Serial.println(readChannel(AS7341_CHANNEL_3));
+  Serial.print("ADC4/Clear-");
+  Serial.println(readChannel(AS7341_CHANNEL_4));
+  Serial.print("ADC5/NIR-");
+  Serial.println(readChannel(AS7341_CHANNEL_5));
+  Serial.println("");
+return true;
+
 }
 
 /**

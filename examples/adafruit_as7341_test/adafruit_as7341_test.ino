@@ -25,17 +25,18 @@ void loop() {
     Serial.println("Error reading all channels!");
     return;
   }
+  delay(500);
+  // // delay(1000);
+  // Serial.print("F1- "); Serial.print(readings[0], HEX); Serial.print(" ");Serial.println(readings[0]);
+  // Serial.print("F2- "); Serial.print(readings[1], HEX); Serial.print(" ");Serial.println(readings[1]);
+  // Serial.print("F3- "); Serial.print(readings[2], HEX); Serial.print(" ");Serial.println(readings[2]);
+  // Serial.print("F4- "); Serial.print(readings[3], HEX); Serial.print(" ");Serial.println(readings[3]);
+  // Serial.print("Clear - "); Serial.print(readings[4], HEX); Serial.print(" ");Serial.println(readings[4]);
+  // Serial.print("NIR - "); Serial.print(readings[5], HEX); Serial.print(" ");Serial.println(readings[5]);
 
-  // delay(1000);
-  Serial.print("F1- "); Serial.print(readings[0], HEX); Serial.print(" ");Serial.println(readings[0]);
-  Serial.print("F2- "); Serial.print(readings[1], HEX); Serial.print(" ");Serial.println(readings[1]);
-  Serial.print("F3- "); Serial.print(readings[2], HEX); Serial.print(" ");Serial.println(readings[2]);
-  Serial.print("F4- "); Serial.print(readings[3], HEX); Serial.print(" ");Serial.println(readings[3]);
-  Serial.print("Clear - "); Serial.print(readings[4], HEX); Serial.print(" ");Serial.println(readings[4]);
-  Serial.print("NIR - "); Serial.print(readings[5], HEX); Serial.print(" ");Serial.println(readings[5]);
-
-  Serial.println("********************* ORIG **********");
+  // Serial.println("********************* ORIG **********");
   as7341.readRawValuesMode1();
+  as7341.readRawValuesMode2();
 
   delay(500);
 }
