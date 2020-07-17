@@ -116,6 +116,27 @@ uint16_t Adafruit_AS7341::readChannel(as7341_channel_t channel) {
 
   return channel_data_reg.read();
 }
+/**
+ * @brief fills the provided buffer with the current measurements for Spectral channels F1-8, Clear and NIR
+ *
+ * @param readings_buffer Pointer to a buffer of length 10 or more to fill with sensor data
+ * @return true: success false: failure
+ */
+bool Adafruit_AS7341::readAllChannels(uint16_t *readings_buffer) {
+  // each channel has two bytes, so offset by two for each next channel
+  Adafruit_BusIO_Register all_channels_reg = Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L, 12, LSBFIRST);
+  SmuxConfigRAM();
+
+  setup_F1F4_Clear_NIR();
+
+  enableSMUX();
+  enableSpectralMeasurement(true);
+  while (!getIsDataReady()) {
+    delay(1);
+  }
+
+  return all_channels_reg.read((uint8_t *)readings_buffer, 12);
+}
 
 /**
  * @brief Sets the power state of the sensor
@@ -134,7 +155,7 @@ void Adafruit_AS7341::powerEnable(bool enable_power) {
 // Write SMUX configration from RAM to set SMUX chain in CFG6 register 0xAF
 // <summary>
 
-void Adafruit_AS7341::SmuxConfigRAM() { writeRegister(byte(0xAF), byte(0x10)); }
+void Adafruit_AS7341::SmuxConfigRAM() { writeRegister(byte(AS7341_CFG6), byte(0x10)); }
 
 /**
  * @brief Enables measurement of spectral data
@@ -413,17 +434,17 @@ bool Adafruit_AS7341::spectralHighTriggered(void) {
 bool Adafruit_AS7341::getIsDataReady() {
   Adafruit_BusIO_Register status2_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_STATUS2);
-  Adafruit_BusIO_RegisterBits fd_data_ready_bit =
+  Adafruit_BusIO_RegisterBits avalid_bit =
       Adafruit_BusIO_RegisterBits(&status2_reg, 1, 6);
 
-  return fd_data_ready_bit.read();
+  return avalid_bit.read();
 }
 
 /**
  * @brief Configure SMUX for sensors F1-4, Clear and NIR
  *
  */
-void Adafruit_AS7341::F1F4_Clear_NIR() {
+void Adafruit_AS7341::setup_F1F4_Clear_NIR() {
   // SMUX Config for F1,F2,F3,F4,NIR,Clear
   writeRegister(byte(0x00), byte(0x30)); // F3 left set to ADC2
   writeRegister(byte(0x01), byte(0x01)); // F1 left set to ADC0
@@ -441,7 +462,7 @@ void Adafruit_AS7341::F1F4_Clear_NIR() {
   writeRegister(byte(0x0B), byte(0x00)); // Reserved or disabled
   writeRegister(byte(0x0C), byte(0x20)); // F2 right connected to ADC1
   writeRegister(byte(0x0D), byte(0x04)); // F4 right connected to ADC3
-  writeRegister(byte(0x0E), byte(0x00)); // F6/F7 right disabled
+  writeRegister(byte(0x0E), byte(0x00)); // F6/F8 right disabled
   writeRegister(byte(0x0F), byte(0x30)); // F3 right connected to AD2
   writeRegister(byte(0x10), byte(0x01)); // F1 right connected to AD0
   writeRegister(byte(0x11), byte(0x50)); // CLEAR right connected to AD4
@@ -453,7 +474,7 @@ void Adafruit_AS7341::F1F4_Clear_NIR() {
  * @brief Configure SMUX for sensors F5-8, Clear and NIR
  *
  */
-void Adafruit_AS7341::F5F8_Clear_NIR() {
+void Adafruit_AS7341::setup_F5F8_Clear_NIR() {
   // SMUX Config for F5,F6,F7,F8,NIR,Clear
   writeRegister(byte(0x00), byte(0x00)); // F3 left disable
   writeRegister(byte(0x01), byte(0x00)); // F1 left disable
@@ -470,7 +491,7 @@ void Adafruit_AS7341::F5F8_Clear_NIR() {
   writeRegister(byte(0x0C), byte(0x00)); // F2 right disabled
   writeRegister(byte(0x0D), byte(0x00)); // F4 right disabled
   writeRegister(byte(0x0E),
-                byte(0x24)); // F7 connected to ADC2/ F6 connected to ADC1
+                byte(0x24)); // F8 right connected to ADC2/ F6 right connected to ADC1
   writeRegister(byte(0x0F), byte(0x00)); // F3 right disabled
   writeRegister(byte(0x10), byte(0x00)); // F1 right disabled
   writeRegister(byte(0x11), byte(0x50)); // CLEAR right connected to AD4
@@ -699,7 +720,7 @@ void Adafruit_AS7341::readRawValuesMode1() {
 
   // Write new configuration to all the 20 registers
 
-  F1F4_Clear_NIR();
+  setup_F1F4_Clear_NIR();
 
   // Start SMUX command
   enableSMUX();
@@ -743,7 +764,7 @@ void Adafruit_AS7341::readRawValuesMode2() {
 
   // Write new configuration to all the 20 registers for reading channels from
   // F5-F8, Clear and NIR
-  F5F8_Clear_NIR();
+  setup_F5F8_Clear_NIR();
   // Start SMUX command
   enableSMUX();
 

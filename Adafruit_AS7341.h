@@ -115,7 +115,7 @@
   0xA9 ///< Sets Low power mode, Register bank, and Trigger lengthening
 #define AS7341_CFG1 0xAA ///< Controls ADC Gain
 #define AS7341_CFG3 0xAC ///< AS7341_CFG3 (unused)
-#define AS7341_CFG6 0xAF ///< AS7341_CFG6 (unused)
+#define AS7341_CFG6 0xAF ///< Used to configure Smux
 #define AS7341_CFG8 0xB1 ///< AS7341_CFG8 (unused)
 #define AS7341_CFG9                                                            \
   0xB2 ///< Enables flicker detection and smux command completion system
@@ -228,7 +228,8 @@ public:
 
   void readRawValuesMode1(void);
   void readRawValuesMode2(void);
-
+  bool readAllChannels(void);
+  bool readAllChannels(uint16_t *readings_buffer);
   void flickerDetection(void); // merge with 1k
   void flickerDetection1K(void);
 
@@ -236,8 +237,8 @@ public:
 
   int8_t getFlickerDetectStatus(void);
 
-  void F1F4_Clear_NIR(void);
-  void F5F8_Clear_NIR(void);
+  void setup_F1F4_Clear_NIR(void);
+  void setup_F5F8_Clear_NIR(void);
 
   void powerEnable(bool enable_power);
   bool enableSpectralMeasurement(bool enable_measurement);
@@ -279,6 +280,7 @@ private:
   void enableSMUX(void);
   void SmuxConfigRAM(void);
   void writeRegister(byte addr, byte val);
+  uint16_t _channel_readings[10];
 };
 
 #endif
