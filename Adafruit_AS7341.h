@@ -239,6 +239,7 @@ public:
 
   void setup_F1F4_Clear_NIR(void);
   void setup_F5F8_Clear_NIR(void);
+  void configure_smux(bool f1_f4);
 
   void powerEnable(bool enable_power);
   bool enableSpectralMeasurement(bool enable_measurement);

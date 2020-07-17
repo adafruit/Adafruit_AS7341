@@ -117,22 +117,16 @@ uint16_t Adafruit_AS7341::readChannel(as7341_channel_t channel) {
   return channel_data_reg.read();
 }
 /**
- * @brief fills the provided buffer with the current measurements for Spectral channels F1-8, Clear and NIR
+ * @brief fills the provided buffer with the current measurements for Spectral
+ * channels F1-8, Clear and NIR
  *
- * @param readings_buffer Pointer to a buffer of length 10 or more to fill with sensor data
+ * @param readings_buffer Pointer to a buffer of length 10 or more to fill with
+ * sensor data
  * @return true: success false: failure
  */
 bool Adafruit_AS7341::readAllChannels(uint16_t *readings_buffer) {
 
-  enableSpectralMeasurement(false);
-  SmuxConfigRAM();
-  setup_F1F4_Clear_NIR();
-  enableSMUX();
-  enableSpectralMeasurement(true);
-  while (!getIsDataReady()) {
-    delay(1);
-  }
-
+  configure_smux(true);
   Serial.print("ADC0/F1-");
   Serial.println(readChannel(AS7341_CHANNEL_0));
   Serial.print("ADC1/F2-");
@@ -145,29 +139,8 @@ bool Adafruit_AS7341::readAllChannels(uint16_t *readings_buffer) {
   Serial.println(readChannel(AS7341_CHANNEL_4));
   Serial.print("ADC5/NIR-");
   Serial.println(readChannel(AS7341_CHANNEL_5));
- // Disable SP_EN bit while  making config changes
-  enableSpectralMeasurement(false);
 
-  // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
-  // to CFG6)
-  SmuxConfigRAM();
-
-  // Write new configuration to all the 20 registers for reading channels from
-  // F5-F8, Clear and NIR
-  setup_F5F8_Clear_NIR();
-  // Start SMUX command
-  enableSMUX();
-
-  // Enable SP_EN bit
-  enableSpectralMeasurement(true);
-
-  // Reading and Polling the the AVALID bit in Status 2 Register 0xA3
-
-  while (!getIsDataReady()) {
-    delay(1);
-  }
-
-  // Steps defined to printout 6 channels F5,F6,F7,F8,NIR,Clear
+  configure_smux(false);
 
   Serial.print("ADC0/F5-");
   Serial.println(readChannel(AS7341_CHANNEL_0));
@@ -182,8 +155,21 @@ bool Adafruit_AS7341::readAllChannels(uint16_t *readings_buffer) {
   Serial.print("ADC5/NIR-");
   Serial.println(readChannel(AS7341_CHANNEL_5));
   Serial.println("");
-return true;
-
+  return true;
+}
+void Adafruit_AS7341::configure_smux(bool f1_f4) {
+  enableSpectralMeasurement(false);
+  SmuxConfigRAM();
+  if (f1_f4) {
+    setup_F1F4_Clear_NIR();
+  } else {
+    setup_F5F8_Clear_NIR();
+  }
+  enableSMUX();
+  enableSpectralMeasurement(true);
+  while (!getIsDataReady()) {
+    delay(1);
+  }
 }
 
 /**
@@ -203,7 +189,9 @@ void Adafruit_AS7341::powerEnable(bool enable_power) {
 // Write SMUX configration from RAM to set SMUX chain in CFG6 register 0xAF
 // <summary>
 
-void Adafruit_AS7341::SmuxConfigRAM() { writeRegister(byte(AS7341_CFG6), byte(0x10)); }
+void Adafruit_AS7341::SmuxConfigRAM() {
+  writeRegister(byte(AS7341_CFG6), byte(0x10));
+}
 
 /**
  * @brief Enables measurement of spectral data
@@ -538,8 +526,9 @@ void Adafruit_AS7341::setup_F5F8_Clear_NIR() {
   writeRegister(byte(0x0B), byte(0x00)); // Reserved or disabled
   writeRegister(byte(0x0C), byte(0x00)); // F2 right disabled
   writeRegister(byte(0x0D), byte(0x00)); // F4 right disabled
-  writeRegister(byte(0x0E),
-                byte(0x24)); // F8 right connected to ADC2/ F6 right connected to ADC1
+  writeRegister(
+      byte(0x0E),
+      byte(0x24)); // F8 right connected to ADC2/ F6 right connected to ADC1
   writeRegister(byte(0x0F), byte(0x00)); // F3 right disabled
   writeRegister(byte(0x10), byte(0x00)); // F1 right disabled
   writeRegister(byte(0x11), byte(0x50)); // CLEAR right connected to AD4
@@ -763,6 +752,7 @@ void Adafruit_AS7341::readRawValuesMode1() {
 
   // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
   // to CFG6)
+  enableSpectralMeasurement(false);
 
   SmuxConfigRAM();
 

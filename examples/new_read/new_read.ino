@@ -18,12 +18,13 @@ void setup() {
 }
 
 void loop() {
+  uint16_t readings[6];
 
 
-
-
-  as7341.readRawValuesMode1();
-  as7341.readRawValuesMode2();
+  if (!as7341.readAllChannels(readings)){
+    Serial.println("Error reading all channels!");
+    // return;
+  }
 
   delay(2000);
 }
