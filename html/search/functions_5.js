@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['fdconfig',['FDConfig',['../class_adafruit___a_s7341.html#ae31a6dc71af4b754604f71cdd640a5e3',1,'Adafruit_AS7341']]],
-  ['flickerdetection',['flickerDetection',['../class_adafruit___a_s7341.html#aaaafc5d6e411344fb6963d65914e7f17',1,'Adafruit_AS7341']]],
-  ['flickerdetection1k',['flickerDetection1K',['../class_adafruit___a_s7341.html#a8bf9dfde5fc9b2d1dec94d1e59e79a24',1,'Adafruit_AS7341']]]
+  ['enableled',['enableLED',['../class_adafruit___a_s7341.html#a911f919954c728fcd213922825888e51',1,'Adafruit_AS7341']]],
+  ['enablespectralint',['enableSpectralINT',['../class_adafruit___a_s7341.html#a4b8e99f37449358fa662c2d8076b230e',1,'Adafruit_AS7341']]],
+  ['enablespectralmeasurement',['enableSpectralMeasurement',['../class_adafruit___a_s7341.html#a545d170860b2934d776de73df4c8ab09',1,'Adafruit_AS7341']]]
 ];
