@@ -47,10 +47,10 @@ void setup() {
 void loop() {
   // Function defined to read out channels with SMUX configration 1- F1-F4,
   // Clear, NIR
-  as7341.readRawValuesMode1();
+  as7341.readAllChannels();
   uint8_t int_status = as7341.getInterruptStatus();
   uint8_t int_source = as7341.spectralINTSource();
-  Serial.print("Thresh int source: "); Serial.println(int_source); 
+  Serial.print("Thresh int source: "); Serial.println(int_source);
   bool spectral_int_status = as7341.spectralInterruptTriggered();
   Serial.print("INT LOW THRESH: "); Serial.println(as7341.spectralLowTriggered());
   Serial.print("INT HIGH THRESH: "); Serial.println(as7341.spectralHighTriggered());

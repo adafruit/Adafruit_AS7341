@@ -49,7 +49,7 @@ void loop() {
   Serial.print("Near IR - ");
 
   Serial.println(as7341.getChannel(AS7341_CHANNEL_NIR));
-  Serial.println("")
+  Serial.println("");
 
   delay(2000);
 }
