@@ -174,13 +174,29 @@ typedef enum {
  *
  */
 typedef enum {
-  AS7341_CHANNEL_0,
-  AS7341_CHANNEL_1,
-  AS7341_CHANNEL_2,
-  AS7341_CHANNEL_3,
-  AS7341_CHANNEL_4,
-  AS7341_CHANNEL_5,
-} as7341_channel_t;
+  AS7341_ADC_CHANNEL_0,
+  AS7341_ADC_CHANNEL_1,
+  AS7341_ADC_CHANNEL_2,
+  AS7341_ADC_CHANNEL_3,
+  AS7341_ADC_CHANNEL_4,
+  AS7341_ADC_CHANNEL_5,
+} as7341_adc_channel_t;
+/**
+ * @brief Spectral Channel specifiers for configuration and reading
+ *
+ */
+typedef enum {
+  AS7341_CHANNEL_415nm_F1,
+  AS7341_CHANNEL_445nm_F2,
+  AS7341_CHANNEL_480nm_F3,
+  AS7341_CHANNEL_515nm_F4,
+  AS7341_CHANNEL_555nm_F5,
+  AS7341_CHANNEL_590nm_F6,
+  AS7341_CHANNEL_630nm_F7,
+  AS7341_CHANNEL_680nm_F8,
+  AS7341_CHANNEL_CLEAR,
+  AS7341_CHANNEL_NIR,
+} as7341_color_channel_t;
 
 /**
  * @brief The number of measurement cycles with spectral data outside of a
@@ -224,12 +240,11 @@ public:
   bool setATIME(uint8_t atime_value);
   bool setGain(as7341_gain_t gain_value);
 
-  uint16_t readChannel(as7341_channel_t channel);
-
-  void readRawValuesMode1(void);
-  void readRawValuesMode2(void);
   bool readAllChannels(void);
   bool readAllChannels(uint16_t *readings_buffer);
+  uint16_t readChannel(as7341_adc_channel_t channel);
+  uint16_t getChannel(as7341_color_channel_t channel);
+
   void flickerDetection(void); // merge with 1k
   void flickerDetection1K(void);
 
@@ -239,7 +254,6 @@ public:
 
   void setup_F1F4_Clear_NIR(void);
   void setup_F5F8_Clear_NIR(void);
-  void configure_smux(bool f1_f4);
 
   void powerEnable(bool enable_power);
   bool enableSpectralMeasurement(bool enable_measurement);
@@ -252,7 +266,7 @@ public:
 
   bool enableSpectralINT(bool enable_int);
   bool setAPERS(as7341_int_cycle_count_t cycle_count);
-  bool setSpectralThresholdChannel(as7341_channel_t channel);
+  bool setSpectralThresholdChannel(as7341_adc_channel_t channel);
 
   uint8_t getInterruptStatus(void);
   bool clearInterruptStatus(void);
@@ -263,7 +277,6 @@ public:
   bool spectralHighTriggered(void);
 
   bool enableLED(bool enable_led);
-
   bool setLEDCurrent(uint8_t led_current);
 
   bool getIsDataReady();
@@ -281,6 +294,7 @@ private:
   void enableSMUX(void);
   void SmuxConfigRAM(void);
   void writeRegister(byte addr, byte val);
+  void setSMUXLowChannels(bool f1_f4);
   uint16_t _channel_readings[10];
 };
 

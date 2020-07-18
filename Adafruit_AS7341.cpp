@@ -94,27 +94,28 @@ int8_t Adafruit_AS7341::getFlickerDetectStatus(void) {
 }
 
 /**
- * @brief Write a byte to the given register
- *
- * @param addr Register address
- * @param val The value to set the register to
- */
-void Adafruit_AS7341::writeRegister(byte addr, byte val) {
-  Adafruit_BusIO_Register reg = Adafruit_BusIO_Register(i2c_dev, addr);
-  reg.write(val);
-}
-/**
  * @brief Returns the ADC data for a given channel
  *
  * @param channel The ADC channel to read
  * @return uint16_t The measured data for the currently configured sensor
  */
-uint16_t Adafruit_AS7341::readChannel(as7341_channel_t channel) {
+uint16_t Adafruit_AS7341::readChannel(as7341_adc_channel_t channel) {
   // each channel has two bytes, so offset by two for each next channel
   Adafruit_BusIO_Register channel_data_reg = Adafruit_BusIO_Register(
       i2c_dev, (AS7341_CH0_DATA_L + 2 * channel), 2, LSBFIRST);
 
   return channel_data_reg.read();
+}
+/**
+ * @brief Returns the reading data for the specified color channel
+ *
+ *  call `readAllChannels` before reading to update the stored readings
+ *
+ * @param channel The color sensor channel to read
+ * @return uint16_t The measured data for the selected sensor channel
+ */
+uint16_t Adafruit_AS7341::getChannel(as7341_color_channel_t channel) {
+  return _channel_readings[channel];
 }
 /**
  * @brief fills the provided buffer with the current measurements for Spectral
@@ -126,24 +127,30 @@ uint16_t Adafruit_AS7341::readChannel(as7341_channel_t channel) {
  */
 bool Adafruit_AS7341::readAllChannels(uint16_t *readings_buffer) {
 
-  configure_smux(true);
+  setSMUXLowChannels(true);
 
-  Adafruit_BusIO_Register channel_data_reg = Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L,2);
+  Adafruit_BusIO_Register channel_data_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L, 2);
 
   bool low_success = channel_data_reg.read((uint8_t *)readings_buffer, 12);
-  Serial.print("low success:"); Serial.println(low_success);
 
+  setSMUXLowChannels(false);
 
-  configure_smux(false);
-
-  bool high_success = channel_data_reg.read((uint8_t *)&readings_buffer[6],12);
-  Serial.print("high success:"); Serial.println(high_success);
-
-  
-  Serial.println("");
-  return true;
+  return low_success &&
+         channel_data_reg.read((uint8_t *)&readings_buffer[6], 12);
+  ;
 }
-void Adafruit_AS7341::configure_smux(bool f1_f4) {
+
+/**
+ * @brief Take readings for F1-8, Clear and NIR and store them in a buffer
+ *
+ * @return true: success false: failure
+ */
+bool Adafruit_AS7341::readAllChannels(void) {
+  return readAllChannels(_channel_readings);
+}
+
+void Adafruit_AS7341::setSMUXLowChannels(bool f1_f4) {
   enableSpectralMeasurement(false);
   SmuxConfigRAM();
   if (f1_f4) {
@@ -367,11 +374,12 @@ bool Adafruit_AS7341::setAPERS(as7341_int_cycle_count_t cycle_count) {
  * interrupts, automatic gain control, and persistance settings
  *
  * @param channel The channel to use for spectral thresholds. Must be a
- * as7341_channel_t **other** than `AS7341_CHANNEL_5`
+ * as7341_adc_channel_t **except for** `AS7341_ADC_CHANNEL_5`
  * @return true: success false: failure
  */
-bool Adafruit_AS7341::setSpectralThresholdChannel(as7341_channel_t channel) {
-  if (channel == AS7341_CHANNEL_5) {
+bool Adafruit_AS7341::setSpectralThresholdChannel(
+    as7341_adc_channel_t channel) {
+  if (channel == AS7341_ADC_CHANNEL_5) {
     return false;
   }
   Adafruit_BusIO_Register cfg_12_reg =
@@ -724,99 +732,22 @@ void Adafruit_AS7341::flickerDetection1K() {
 /*#####################  END 1K Flicker detect
  * #######################################*/
 
+/**
+ * @brief Write a byte to the given register
+ *
+ * @param addr Register address
+ * @param val The value to set the register to
+ */
+void Adafruit_AS7341::writeRegister(byte addr, byte val) {
+  Adafruit_BusIO_Register reg = Adafruit_BusIO_Register(i2c_dev, addr);
+  reg.write(val);
+}
+
 /*----- Function defined to read out channels with SMUX configration 1 -----*/
 
 //<summary>
 // Executing raw data measurement cycle for 6 channels
 //<summary>
-
-/**
- * @brief Reads the raw values from sensors F1, F2, F3, F4, NIR, and Clear
- *
- */
-void Adafruit_AS7341::readRawValuesMode1() {
-
-  // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
-  // to CFG6)
-  enableSpectralMeasurement(false);
-
-  SmuxConfigRAM();
-
-  // Write new configuration to all the 20 registers
-
-  setup_F1F4_Clear_NIR();
-
-  // Start SMUX command
-  enableSMUX();
-
-  // Enable SP_EN bit
-
-  enableSpectralMeasurement(true);
-
-  // Reading and Polling the the AVALID bit in Status 2 Register 0xA3
-
-  while (!getIsDataReady()) {
-    delay(1);
-  }
-  // Steps defined to print out 6 channels F1, F2,F3,F4,NIR,Clear
-
-  Serial.print("ADC0/F1-");
-  Serial.println(readChannel(AS7341_CHANNEL_0));
-  Serial.print("ADC1/F2-");
-  Serial.println(readChannel(AS7341_CHANNEL_1));
-  Serial.print("ADC2/F3-");
-  Serial.println(readChannel(AS7341_CHANNEL_2));
-  Serial.print("ADC3/F4-");
-  Serial.println(readChannel(AS7341_CHANNEL_3));
-  Serial.print("ADC4/Clear-");
-  Serial.println(readChannel(AS7341_CHANNEL_4));
-  Serial.print("ADC5/NIR-");
-  Serial.println(readChannel(AS7341_CHANNEL_5));
-}
-
-/**
- * @brief Reads the raw values from sensors F5, F6, F7, F8, NIR, and Clear
- *
- */
-void Adafruit_AS7341::readRawValuesMode2() {
-  // Disable SP_EN bit while  making config changes
-  enableSpectralMeasurement(false);
-
-  // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
-  // to CFG6)
-  SmuxConfigRAM();
-
-  // Write new configuration to all the 20 registers for reading channels from
-  // F5-F8, Clear and NIR
-  setup_F5F8_Clear_NIR();
-  // Start SMUX command
-  enableSMUX();
-
-  // Enable SP_EN bit
-  enableSpectralMeasurement(true);
-
-  // Reading and Polling the the AVALID bit in Status 2 Register 0xA3
-
-  while (!getIsDataReady()) {
-    delay(1);
-  }
-
-  // Steps defined to printout 6 channels F5,F6,F7,F8,NIR,Clear
-
-  Serial.print("ADC0/F5-");
-  Serial.println(readChannel(AS7341_CHANNEL_0));
-  Serial.print("ADC1/F6-");
-  Serial.println(readChannel(AS7341_CHANNEL_1));
-  Serial.print("ADC2/F7-");
-  Serial.println(readChannel(AS7341_CHANNEL_2));
-  Serial.print("ADC3/F8-");
-  Serial.println(readChannel(AS7341_CHANNEL_3));
-  Serial.print("ADC4/Clear-");
-  Serial.println(readChannel(AS7341_CHANNEL_4));
-  Serial.print("ADC5/NIR-");
-  Serial.println(readChannel(AS7341_CHANNEL_5));
-  Serial.println("");
-}
 
 // ///////////////// MORE DEMO CODE//////////////
 
