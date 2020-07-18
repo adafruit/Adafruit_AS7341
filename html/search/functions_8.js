@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['readchannel',['readChannel',['../class_adafruit___a_s7341.html#af429a02e13bf882309f13a34e9e89d08',1,'Adafruit_AS7341']]],
-  ['readrawvaluesmode1',['readRawValuesMode1',['../class_adafruit___a_s7341.html#a1e978b0c0555da0320813515b5d86ec5',1,'Adafruit_AS7341']]],
-  ['readrawvaluesmode2',['readRawValuesMode2',['../class_adafruit___a_s7341.html#a82ff3ba31ba3d0fb5a2cd7038d0222f1',1,'Adafruit_AS7341']]]
+  ['readallchannels',['readAllChannels',['../class_adafruit___a_s7341.html#a4ca4cf415b76628f7760fda0a041cb11',1,'Adafruit_AS7341::readAllChannels(void)'],['../class_adafruit___a_s7341.html#a9a8f1cbbae4ede049ed9e5845e00cc15',1,'Adafruit_AS7341::readAllChannels(uint16_t *readings_buffer)']]],
+  ['readchannel',['readChannel',['../class_adafruit___a_s7341.html#aafc34b022476b93cd58ffe8bf837d4fb',1,'Adafruit_AS7341']]]
 ];

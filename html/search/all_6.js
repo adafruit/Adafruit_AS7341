@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['getchannel',['getChannel',['../class_adafruit___a_s7341.html#afa8a730d24616f2c0f56026d4822855c',1,'Adafruit_AS7341']]],
   ['getflickerdetectstatus',['getFlickerDetectStatus',['../class_adafruit___a_s7341.html#a1b80c54faee2376db3cce2ac14d41b0a',1,'Adafruit_AS7341']]],
   ['gethighthreshold',['getHighThreshold',['../class_adafruit___a_s7341.html#acef03dd26727a4bcd6fa304a6f90947a',1,'Adafruit_AS7341']]],
   ['getinterruptstatus',['getInterruptStatus',['../class_adafruit___a_s7341.html#a8d2d89787e090e382364c12ecc6da2eb',1,'Adafruit_AS7341']]],

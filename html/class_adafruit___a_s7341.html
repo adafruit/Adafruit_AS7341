@@ -95,17 +95,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a1606e209c8abb7afeb0a018268eef25f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a1606e209c8abb7afeb0a018268eef25f">setGain</a> (<a class="el" href="_adafruit___a_s7341_8h.html#a215e8b58e4af33c42b7bc7c0a243ccfd">as7341_gain_t</a> gain_value)</td></tr>
 <tr class="memdesc:a1606e209c8abb7afeb0a018268eef25f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the ADC gain multiplier.  <a href="#a1606e209c8abb7afeb0a018268eef25f">More...</a><br /></td></tr>
 <tr class="separator:a1606e209c8abb7afeb0a018268eef25f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af429a02e13bf882309f13a34e9e89d08"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#af429a02e13bf882309f13a34e9e89d08">readChannel</a> (<a class="el" href="_adafruit___a_s7341_8h.html#af1386371f4dac034ecd84e33d7432587">as7341_channel_t</a> channel)</td></tr>
-<tr class="memdesc:af429a02e13bf882309f13a34e9e89d08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the ADC data for a given channel.  <a href="#af429a02e13bf882309f13a34e9e89d08">More...</a><br /></td></tr>
-<tr class="separator:af429a02e13bf882309f13a34e9e89d08"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e978b0c0555da0320813515b5d86ec5"><td class="memItemLeft" align="right" valign="top"><a id="a1e978b0c0555da0320813515b5d86ec5"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a1e978b0c0555da0320813515b5d86ec5">readRawValuesMode1</a> (void)</td></tr>
-<tr class="memdesc:a1e978b0c0555da0320813515b5d86ec5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the raw values from sensors F1, F2, F3, F4, NIR, and Clear. <br /></td></tr>
-<tr class="separator:a1e978b0c0555da0320813515b5d86ec5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82ff3ba31ba3d0fb5a2cd7038d0222f1"><td class="memItemLeft" align="right" valign="top"><a id="a82ff3ba31ba3d0fb5a2cd7038d0222f1"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a82ff3ba31ba3d0fb5a2cd7038d0222f1">readRawValuesMode2</a> (void)</td></tr>
-<tr class="memdesc:a82ff3ba31ba3d0fb5a2cd7038d0222f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the raw values from sensors F5, F6, F7, F8, NIR, and Clear. <br /></td></tr>
-<tr class="separator:a82ff3ba31ba3d0fb5a2cd7038d0222f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ca4cf415b76628f7760fda0a041cb11"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a4ca4cf415b76628f7760fda0a041cb11">readAllChannels</a> (void)</td></tr>
+<tr class="memdesc:a4ca4cf415b76628f7760fda0a041cb11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Take readings for F1-8, Clear and NIR and store them in a buffer.  <a href="#a4ca4cf415b76628f7760fda0a041cb11">More...</a><br /></td></tr>
+<tr class="separator:a4ca4cf415b76628f7760fda0a041cb11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a8f1cbbae4ede049ed9e5845e00cc15"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a9a8f1cbbae4ede049ed9e5845e00cc15">readAllChannels</a> (uint16_t *readings_buffer)</td></tr>
+<tr class="memdesc:a9a8f1cbbae4ede049ed9e5845e00cc15"><td class="mdescLeft">&#160;</td><td class="mdescRight">fills the provided buffer with the current measurements for Spectral channels F1-8, Clear and NIR  <a href="#a9a8f1cbbae4ede049ed9e5845e00cc15">More...</a><br /></td></tr>
+<tr class="separator:a9a8f1cbbae4ede049ed9e5845e00cc15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aafc34b022476b93cd58ffe8bf837d4fb"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#aafc34b022476b93cd58ffe8bf837d4fb">readChannel</a> (<a class="el" href="_adafruit___a_s7341_8h.html#a38f1fe34ba50a6013cc9941db56ca2f9">as7341_adc_channel_t</a> channel)</td></tr>
+<tr class="memdesc:aafc34b022476b93cd58ffe8bf837d4fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the ADC data for a given channel.  <a href="#aafc34b022476b93cd58ffe8bf837d4fb">More...</a><br /></td></tr>
+<tr class="separator:aafc34b022476b93cd58ffe8bf837d4fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa8a730d24616f2c0f56026d4822855c"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#afa8a730d24616f2c0f56026d4822855c">getChannel</a> (<a class="el" href="_adafruit___a_s7341_8h.html#a0072d21bcae171ff1f6dcd59a0b835b5">as7341_color_channel_t</a> channel)</td></tr>
+<tr class="memdesc:afa8a730d24616f2c0f56026d4822855c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the reading data for the specified color channel.  <a href="#afa8a730d24616f2c0f56026d4822855c">More...</a><br /></td></tr>
+<tr class="separator:afa8a730d24616f2c0f56026d4822855c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaaafc5d6e411344fb6963d65914e7f17"><td class="memItemLeft" align="right" valign="top"><a id="aaaafc5d6e411344fb6963d65914e7f17"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#aaaafc5d6e411344fb6963d65914e7f17">flickerDetection</a> (void)</td></tr>
 <tr class="memdesc:aaaafc5d6e411344fb6963d65914e7f17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs flicker detection. <br /></td></tr>
@@ -121,14 +122,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a1b80c54faee2376db3cce2ac14d41b0a"><td class="memItemLeft" align="right" valign="top">int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a1b80c54faee2376db3cce2ac14d41b0a">getFlickerDetectStatus</a> (void)</td></tr>
 <tr class="memdesc:a1b80c54faee2376db3cce2ac14d41b0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the flicker detection status.  <a href="#a1b80c54faee2376db3cce2ac14d41b0a">More...</a><br /></td></tr>
 <tr class="separator:a1b80c54faee2376db3cce2ac14d41b0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c2d7b8d4a1a13661c255edbb05697d6"><td class="memItemLeft" align="right" valign="top"><a id="a5c2d7b8d4a1a13661c255edbb05697d6"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a5c2d7b8d4a1a13661c255edbb05697d6">F1F4_Clear_NIR</a> (void)</td></tr>
-<tr class="memdesc:a5c2d7b8d4a1a13661c255edbb05697d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure SMUX for sensors F1-4, Clear and NIR. <br /></td></tr>
-<tr class="separator:a5c2d7b8d4a1a13661c255edbb05697d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a651c6e4ac6384f3daf5cf24c8fa24c95"><td class="memItemLeft" align="right" valign="top"><a id="a651c6e4ac6384f3daf5cf24c8fa24c95"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a651c6e4ac6384f3daf5cf24c8fa24c95">F5F8_Clear_NIR</a> (void)</td></tr>
-<tr class="memdesc:a651c6e4ac6384f3daf5cf24c8fa24c95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure SMUX for sensors F5-8, Clear and NIR. <br /></td></tr>
-<tr class="separator:a651c6e4ac6384f3daf5cf24c8fa24c95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a586fa3a0c662c7eaa882faf393244cc6"><td class="memItemLeft" align="right" valign="top"><a id="a586fa3a0c662c7eaa882faf393244cc6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a586fa3a0c662c7eaa882faf393244cc6">setup_F1F4_Clear_NIR</a> (void)</td></tr>
+<tr class="memdesc:a586fa3a0c662c7eaa882faf393244cc6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure SMUX for sensors F1-4, Clear and NIR. <br /></td></tr>
+<tr class="separator:a586fa3a0c662c7eaa882faf393244cc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15490fd33b4064035ef874dfb216aa91"><td class="memItemLeft" align="right" valign="top"><a id="a15490fd33b4064035ef874dfb216aa91"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a15490fd33b4064035ef874dfb216aa91">setup_F5F8_Clear_NIR</a> (void)</td></tr>
+<tr class="memdesc:a15490fd33b4064035ef874dfb216aa91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure SMUX for sensors F5-8, Clear and NIR. <br /></td></tr>
+<tr class="separator:a15490fd33b4064035ef874dfb216aa91"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1dd56d3bd41bd277954492f0071077d6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a1dd56d3bd41bd277954492f0071077d6">powerEnable</a> (bool enable_power)</td></tr>
 <tr class="memdesc:a1dd56d3bd41bd277954492f0071077d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the power state of the sensor.  <a href="#a1dd56d3bd41bd277954492f0071077d6">More...</a><br /></td></tr>
 <tr class="separator:a1dd56d3bd41bd277954492f0071077d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -153,9 +154,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a4c1be0a300e2856bbb2d685a599b7c36"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a4c1be0a300e2856bbb2d685a599b7c36">setAPERS</a> (<a class="el" href="_adafruit___a_s7341_8h.html#a1972448881bae1dbd4553d5a18d99a82">as7341_int_cycle_count_t</a> cycle_count)</td></tr>
 <tr class="memdesc:a4c1be0a300e2856bbb2d685a599b7c36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the number of times an interrupt threshold must be exceeded before an interrupt is triggered.  <a href="#a4c1be0a300e2856bbb2d685a599b7c36">More...</a><br /></td></tr>
 <tr class="separator:a4c1be0a300e2856bbb2d685a599b7c36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b6783372511a5c88651f2111330dcd0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a7b6783372511a5c88651f2111330dcd0">setSpectralThresholdChannel</a> (<a class="el" href="_adafruit___a_s7341_8h.html#af1386371f4dac034ecd84e33d7432587">as7341_channel_t</a> channel)</td></tr>
-<tr class="memdesc:a7b6783372511a5c88651f2111330dcd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the ADC channel to use for spectral thresholds including interrupts, automatic gain control, and persistance settings.  <a href="#a7b6783372511a5c88651f2111330dcd0">More...</a><br /></td></tr>
-<tr class="separator:a7b6783372511a5c88651f2111330dcd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a782d41ad719f684773a95e5d5f55d6d1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a782d41ad719f684773a95e5d5f55d6d1">setSpectralThresholdChannel</a> (<a class="el" href="_adafruit___a_s7341_8h.html#a38f1fe34ba50a6013cc9941db56ca2f9">as7341_adc_channel_t</a> channel)</td></tr>
+<tr class="memdesc:a782d41ad719f684773a95e5d5f55d6d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the ADC channel to use for spectral thresholds including interrupts, automatic gain control, and persistance settings.  <a href="#a782d41ad719f684773a95e5d5f55d6d1">More...</a><br /></td></tr>
+<tr class="separator:a782d41ad719f684773a95e5d5f55d6d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d2d89787e090e382364c12ecc6da2eb"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a8d2d89787e090e382364c12ecc6da2eb">getInterruptStatus</a> (void)</td></tr>
 <tr class="memdesc:a8d2d89787e090e382364c12ecc6da2eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current value of the Interupt status register.  <a href="#a8d2d89787e090e382364c12ecc6da2eb">More...</a><br /></td></tr>
 <tr class="separator:a8d2d89787e090e382364c12ecc6da2eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -331,8 +332,56 @@ Adafruit_I2CDevice *&#160;</td><td class="memItemRight" valign="bottom"><a class
 
 </div>
 </div>
-<a id="af429a02e13bf882309f13a34e9e89d08"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af429a02e13bf882309f13a34e9e89d08">&#9670;&nbsp;</a></span>readChannel()</h2>
+<a id="a4ca4cf415b76628f7760fda0a041cb11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ca4cf415b76628f7760fda0a041cb11">&#9670;&nbsp;</a></span>readAllChannels() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_AS7341::readAllChannels </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Take readings for F1-8, Clear and NIR and store them in a buffer. </p>
+<dl class="section return"><dt>Returns</dt><dd>true: success false: failure </dd></dl>
+
+</div>
+</div>
+<a id="a9a8f1cbbae4ede049ed9e5845e00cc15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a8f1cbbae4ede049ed9e5845e00cc15">&#9670;&nbsp;</a></span>readAllChannels() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_AS7341::readAllChannels </td>
+          <td>(</td>
+          <td class="paramtype">uint16_t *&#160;</td>
+          <td class="paramname"><em>readings_buffer</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>fills the provided buffer with the current measurements for Spectral channels F1-8, Clear and NIR </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">readings_buffer</td><td>Pointer to a buffer of length 10 or more to fill with sensor data </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true: success false: failure </dd></dl>
+
+</div>
+</div>
+<a id="aafc34b022476b93cd58ffe8bf837d4fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aafc34b022476b93cd58ffe8bf837d4fb">&#9670;&nbsp;</a></span>readChannel()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -340,7 +389,7 @@ Adafruit_I2CDevice *&#160;</td><td class="memItemRight" valign="bottom"><a class
         <tr>
           <td class="memname">uint16_t Adafruit_AS7341::readChannel </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="_adafruit___a_s7341_8h.html#af1386371f4dac034ecd84e33d7432587">as7341_channel_t</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="_adafruit___a_s7341_8h.html#a38f1fe34ba50a6013cc9941db56ca2f9">as7341_adc_channel_t</a>&#160;</td>
           <td class="paramname"><em>channel</em></td><td>)</td>
           <td></td>
         </tr>
@@ -355,6 +404,34 @@ Adafruit_I2CDevice *&#160;</td><td class="memItemRight" valign="bottom"><a class
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>uint16_t The measured data for the currently configured sensor </dd></dl>
+
+</div>
+</div>
+<a id="afa8a730d24616f2c0f56026d4822855c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa8a730d24616f2c0f56026d4822855c">&#9670;&nbsp;</a></span>getChannel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t Adafruit_AS7341::getChannel </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="_adafruit___a_s7341_8h.html#a0072d21bcae171ff1f6dcd59a0b835b5">as7341_color_channel_t</a>&#160;</td>
+          <td class="paramname"><em>channel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the reading data for the specified color channel. </p>
+<p>call <code>readAllChannels</code> before reading to update the stored readings</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">channel</td><td>The color sensor channel to read </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>uint16_t The measured data for the selected sensor channel </dd></dl>
 
 </div>
 </div>
@@ -582,8 +659,8 @@ Adafruit_I2CDevice *&#160;</td><td class="memItemRight" valign="bottom"><a class
 
 </div>
 </div>
-<a id="a7b6783372511a5c88651f2111330dcd0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7b6783372511a5c88651f2111330dcd0">&#9670;&nbsp;</a></span>setSpectralThresholdChannel()</h2>
+<a id="a782d41ad719f684773a95e5d5f55d6d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a782d41ad719f684773a95e5d5f55d6d1">&#9670;&nbsp;</a></span>setSpectralThresholdChannel()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -591,7 +668,7 @@ Adafruit_I2CDevice *&#160;</td><td class="memItemRight" valign="bottom"><a class
         <tr>
           <td class="memname">bool Adafruit_AS7341::setSpectralThresholdChannel </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="_adafruit___a_s7341_8h.html#af1386371f4dac034ecd84e33d7432587">as7341_channel_t</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="_adafruit___a_s7341_8h.html#a38f1fe34ba50a6013cc9941db56ca2f9">as7341_adc_channel_t</a>&#160;</td>
           <td class="paramname"><em>channel</em></td><td>)</td>
           <td></td>
         </tr>
@@ -601,7 +678,7 @@ Adafruit_I2CDevice *&#160;</td><td class="memItemRight" valign="bottom"><a class
 <p>Set the ADC channel to use for spectral thresholds including interrupts, automatic gain control, and persistance settings. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">channel</td><td>The channel to use for spectral thresholds. Must be a as7341_channel_t <b>other</b> than <code>AS7341_CHANNEL_5</code> </td></tr>
+    <tr><td class="paramname">channel</td><td>The channel to use for spectral thresholds. Must be a as7341_adc_channel_t <b>except for</b> <code>AS7341_ADC_CHANNEL_5</code> </td></tr>
   </table>
   </dd>
 </dl>

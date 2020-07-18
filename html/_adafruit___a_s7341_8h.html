@@ -259,7 +259,7 @@ Macros</h2></td></tr>
 <tr class="separator:a90723787a8024c6257c356722682a954"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb43b66008dbc0cb7b280c72d0d8046b"><td class="memItemLeft" align="right" valign="top"><a id="adb43b66008dbc0cb7b280c72d0d8046b"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_adafruit___a_s7341_8h.html#adb43b66008dbc0cb7b280c72d0d8046b">AS7341_CFG6</a>&#160;&#160;&#160;0xAF</td></tr>
-<tr class="memdesc:adb43b66008dbc0cb7b280c72d0d8046b"><td class="mdescLeft">&#160;</td><td class="mdescRight">AS7341_CFG6 (unused) <br /></td></tr>
+<tr class="memdesc:adb43b66008dbc0cb7b280c72d0d8046b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to configure Smux. <br /></td></tr>
 <tr class="separator:adb43b66008dbc0cb7b280c72d0d8046b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae584648af21269518c02ef234cc1a2de"><td class="memItemLeft" align="right" valign="top"><a id="ae584648af21269518c02ef234cc1a2de"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_adafruit___a_s7341_8h.html#ae584648af21269518c02ef234cc1a2de">AS7341_CFG8</a>&#160;&#160;&#160;0xB1</td></tr>
@@ -366,18 +366,35 @@ Enumerations</h2></td></tr>
  }<tr class="memdesc:a215e8b58e4af33c42b7bc7c0a243ccfd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allowable gain multipliers for <code>setGain</code> <br /></td></tr>
 </td></tr>
 <tr class="separator:a215e8b58e4af33c42b7bc7c0a243ccfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1386371f4dac034ecd84e33d7432587"><td class="memItemLeft" align="right" valign="top"><a id="af1386371f4dac034ecd84e33d7432587"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_adafruit___a_s7341_8h.html#af1386371f4dac034ecd84e33d7432587">as7341_channel_t</a> { <br />
-&#160;&#160;<b>AS7341_CHANNEL_0</b>, 
-<b>AS7341_CHANNEL_1</b>, 
-<b>AS7341_CHANNEL_2</b>, 
-<b>AS7341_CHANNEL_3</b>, 
+<tr class="memitem:a38f1fe34ba50a6013cc9941db56ca2f9"><td class="memItemLeft" align="right" valign="top"><a id="a38f1fe34ba50a6013cc9941db56ca2f9"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_adafruit___a_s7341_8h.html#a38f1fe34ba50a6013cc9941db56ca2f9">as7341_adc_channel_t</a> { <br />
+&#160;&#160;<b>AS7341_ADC_CHANNEL_0</b>, 
+<b>AS7341_ADC_CHANNEL_1</b>, 
+<b>AS7341_ADC_CHANNEL_2</b>, 
+<b>AS7341_ADC_CHANNEL_3</b>, 
 <br />
-&#160;&#160;<b>AS7341_CHANNEL_4</b>, 
-<b>AS7341_CHANNEL_5</b>
+&#160;&#160;<b>AS7341_ADC_CHANNEL_4</b>, 
+<b>AS7341_ADC_CHANNEL_5</b>
 <br />
- }<tr class="memdesc:af1386371f4dac034ecd84e33d7432587"><td class="mdescLeft">&#160;</td><td class="mdescRight">ADC Channel specifiers for configuration. <br /></td></tr>
+ }<tr class="memdesc:a38f1fe34ba50a6013cc9941db56ca2f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">ADC Channel specifiers for configuration. <br /></td></tr>
 </td></tr>
-<tr class="separator:af1386371f4dac034ecd84e33d7432587"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a38f1fe34ba50a6013cc9941db56ca2f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0072d21bcae171ff1f6dcd59a0b835b5"><td class="memItemLeft" align="right" valign="top"><a id="a0072d21bcae171ff1f6dcd59a0b835b5"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_adafruit___a_s7341_8h.html#a0072d21bcae171ff1f6dcd59a0b835b5">as7341_color_channel_t</a> { <br />
+&#160;&#160;<b>AS7341_CHANNEL_415nm_F1</b>, 
+<b>AS7341_CHANNEL_445nm_F2</b>, 
+<b>AS7341_CHANNEL_480nm_F3</b>, 
+<b>AS7341_CHANNEL_515nm_F4</b>, 
+<br />
+&#160;&#160;<b>AS7341_CHANNEL_555nm_F5</b>, 
+<b>AS7341_CHANNEL_590nm_F6</b>, 
+<b>AS7341_CHANNEL_630nm_F7</b>, 
+<b>AS7341_CHANNEL_680nm_F8</b>, 
+<br />
+&#160;&#160;<b>AS7341_CHANNEL_CLEAR</b>, 
+<b>AS7341_CHANNEL_NIR</b>
+<br />
+ }<tr class="memdesc:a0072d21bcae171ff1f6dcd59a0b835b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Spectral Channel specifiers for configuration and reading. <br /></td></tr>
+</td></tr>
+<tr class="separator:a0072d21bcae171ff1f6dcd59a0b835b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1972448881bae1dbd4553d5a18d99a82"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_adafruit___a_s7341_8h.html#a1972448881bae1dbd4553d5a18d99a82">as7341_int_cycle_count_t</a> { <br />
 &#160;&#160;<a class="el" href="_adafruit___a_s7341_8h.html#a1972448881bae1dbd4553d5a18d99a82a17faeddc59d45c632bfd065730f2b528">AS7341_INT_COUNT_ALL</a>, 
 <a class="el" href="_adafruit___a_s7341_8h.html#a1972448881bae1dbd4553d5a18d99a82a30765ea0367fc3110e76c3ebfbe4bd02">AS7341_INT_COUNT_1</a>, 
