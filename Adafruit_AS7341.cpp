@@ -178,6 +178,17 @@ void Adafruit_AS7341::powerEnable(bool enable_power) {
   pon_en.write(enable_power);
 }
 
+/**
+ * @brief Disable Spectral reading, flicker detection, and power
+ *
+ * */
+void Adafruit_AS7341::disableAll(void) {
+  Adafruit_BusIO_Register enable_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_ENABLE);
+
+  enable_reg.write(0);
+}
+
 // <summary>
 // Write SMUX configration from RAM to set SMUX chain in CFG6 register 0xAF
 // <summary>
@@ -601,17 +612,17 @@ bool Adafruit_AS7341::setGain(as7341_gain_t gain_value) {
   // AGAIN bitfield is only[0:4] but the rest is empty
 }
 
-// TODO: make this an example
 /**
- * @brief Performs flicker detection
- *
+ * @brief Detect a flickering light
+ * @return The frequency of a detected flicker or 1 if a flicker of
+ * unknown frequency is detected
  */
-void Adafruit_AS7341::flickerDetection() {
+uint16_t Adafruit_AS7341::detectFlickerHz(void) {
   bool isEnabled = true;
   bool isFdmeasReady = false;
 
   // disable everything; Flicker detect, smux, wait, spectral, power
-  writeRegister(byte(AS7341_ENABLE), byte(0x00));
+  disableAll();
 
   // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
   // to CFG6)
@@ -629,27 +640,18 @@ void Adafruit_AS7341::flickerDetection() {
   writeRegister(byte(AS7341_ENABLE), byte(0x41));
   delay(500);
 
-  int flicker_value = getFlickerDetectStatus();
-  Serial.print("Flicker value-");
-  Serial.println(flicker_value);
-
-  if (flicker_value == 44) {
-    Serial.println("Unknown frequency");
-    // 0b 10 11 01
-  } else if (flicker_value == 45) {
-    Serial.println("100 Hz detected");
-    // 0b 10 11 10
-  } else if (flicker_value == 46) {
-    Serial.println("120 Hz detected");
-  } else {
-    Serial.println("Error in reading");
+  switch (getFlickerDetectStatus()) {
+  case 44:
+    return 1;
+  case 45:
+    return 100;
+  case 46:
+    return 120;
+  default:
+    return 0;
   }
 
-  // Setting back the PON bit in the ENABLE Register
-
-  writeRegister(byte(AS7341_ENABLE), byte(0x01));
-
-  Serial.println("");
+  powerEnable(true);
 }
 
 /*##################### 1K Flicker detect

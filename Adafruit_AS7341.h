@@ -245,7 +245,7 @@ public:
   uint16_t readChannel(as7341_adc_channel_t channel);
   uint16_t getChannel(as7341_color_channel_t channel);
 
-  void flickerDetection(void); // merge with 1k
+  uint16_t detectFlickerHz(void);
   void flickerDetection1K(void);
 
   void FDConfig(void);
@@ -278,6 +278,8 @@ public:
 
   bool enableLED(bool enable_led);
   bool setLEDCurrent(uint8_t led_current);
+
+  void disableAll(void);
 
   bool getIsDataReady();
   bool setBank(bool low); // low true gives access to 0x60 to 0x74
