@@ -127,33 +127,19 @@ uint16_t Adafruit_AS7341::readChannel(as7341_channel_t channel) {
 bool Adafruit_AS7341::readAllChannels(uint16_t *readings_buffer) {
 
   configure_smux(true);
-  Serial.print("ADC0/F1-");
-  Serial.println(readChannel(AS7341_CHANNEL_0));
-  Serial.print("ADC1/F2-");
-  Serial.println(readChannel(AS7341_CHANNEL_1));
-  Serial.print("ADC2/F3-");
-  Serial.println(readChannel(AS7341_CHANNEL_2));
-  Serial.print("ADC3/F4-");
-  Serial.println(readChannel(AS7341_CHANNEL_3));
-  Serial.print("ADC4/Clear-");
-  Serial.println(readChannel(AS7341_CHANNEL_4));
-  Serial.print("ADC5/NIR-");
-  Serial.println(readChannel(AS7341_CHANNEL_5));
+
+  Adafruit_BusIO_Register channel_data_reg = Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L,2);
+
+  bool low_success = channel_data_reg.read((uint8_t *)readings_buffer, 12);
+  Serial.print("low success:"); Serial.println(low_success);
+
 
   configure_smux(false);
 
-  Serial.print("ADC0/F5-");
-  Serial.println(readChannel(AS7341_CHANNEL_0));
-  Serial.print("ADC1/F6-");
-  Serial.println(readChannel(AS7341_CHANNEL_1));
-  Serial.print("ADC2/F7-");
-  Serial.println(readChannel(AS7341_CHANNEL_2));
-  Serial.print("ADC3/F8-");
-  Serial.println(readChannel(AS7341_CHANNEL_3));
-  Serial.print("ADC4/Clear-");
-  Serial.println(readChannel(AS7341_CHANNEL_4));
-  Serial.print("ADC5/NIR-");
-  Serial.println(readChannel(AS7341_CHANNEL_5));
+  bool high_success = channel_data_reg.read((uint8_t *)&readings_buffer[6],12);
+  Serial.print("high success:"); Serial.println(high_success);
+
+  
   Serial.println("");
   return true;
 }
