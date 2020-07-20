@@ -220,9 +220,11 @@ bool Adafruit_AS7341::enableSMUX(void) {
   Adafruit_BusIO_RegisterBits smux_enable_bit =
       Adafruit_BusIO_RegisterBits(&enable_reg, 1, 4);
   bool success = smux_enable_bit.write(true);
+
   while (smux_enable_bit.read()) {
     delay(1);
   }
+
   return success;
 }
 
@@ -625,6 +627,7 @@ uint16_t Adafruit_AS7341::detectFlickerHz(void) {
 
   // disable everything; Flicker detect, smux, wait, spectral, power
   disableAll();
+  powerEnable(true);
 
   // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
   // to CFG6)
