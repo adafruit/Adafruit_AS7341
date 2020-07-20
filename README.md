@@ -10,8 +10,6 @@ Adafruit invests time and resources providing this open source code, please supp
 
 # Dependencies
 * [Adafruit_BusIO](https://github.com/adafruit/Adafruit_BusIO)
-* [Adafruit_Sensor](https://github.com/adafruit/Adafruit_Sensor)
-
 # Contributing
 
 Contributions are welcome! Please read our [Code of Conduct](https://github.com/adafruit/Adafruit_AS7341/blob/master/CODE_OF_CONDUCT.md>)

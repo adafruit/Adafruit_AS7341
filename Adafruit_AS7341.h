@@ -17,8 +17,6 @@
  *  @section dependencies Dependencies
  *  This library depends on the Adafruit BusIO library
  *
- *  This library depends on the Adafruit Unified Sensor library
- *
  *  @section author Author
  *
  *  Bryan Siepert for Adafruit Industries
@@ -58,7 +56,6 @@
 #include "Arduino.h"
 #include <Adafruit_BusIO_Register.h>
 #include <Adafruit_I2CDevice.h>
-#include <Adafruit_Sensor.h>
 #include <Wire.h>
 #define AS7341_I2CADDR_DEFAULT 0x39 ///< AS7341 default i2c address
 #define AS7341_CHIP_ID 0x09         ///< AS7341 default device id from WHOAMI
