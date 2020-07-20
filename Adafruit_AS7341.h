@@ -255,11 +255,6 @@ public:
   uint16_t getChannel(as7341_color_channel_t channel);
 
   uint16_t detectFlickerHz(void);
-  void flickerDetection1K(void);
-
-  void FDConfig(void);
-
-  int8_t getFlickerDetectStatus(void);
 
   void setup_F1F4_Clear_NIR(void);
   void setup_F5F8_Clear_NIR(void);
@@ -303,6 +298,8 @@ protected:
 
 private:
   bool enableSMUX(void);
+  void FDConfig(void);
+  int8_t getFlickerDetectStatus(void);
   bool setSMUXCommand(as7341_smux_cmd_t command);
   void writeRegister(byte addr, byte val);
   void setSMUXLowChannels(bool f1_f4);
