@@ -152,7 +152,7 @@ bool Adafruit_AS7341::readAllChannels(void) {
 
 void Adafruit_AS7341::setSMUXLowChannels(bool f1_f4) {
   enableSpectralMeasurement(false);
-  SmuxConfigRAM();
+  setSMUXCommand(AS7341_SMUX_CMD_WRITE);
   if (f1_f4) {
     setup_F1F4_Clear_NIR();
   } else {
@@ -189,14 +189,14 @@ void Adafruit_AS7341::disableAll(void) {
   enable_reg.write(0);
 }
 
-// <summary>
-// Write SMUX configration from RAM to set SMUX chain in CFG6 register 0xAF
-// <summary>
+bool Adafruit_AS7341::setSMUXCommand(as7341_smux_cmd_t command) {
+  Adafruit_BusIO_Register cfg6_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_CFG6);
+  Adafruit_BusIO_RegisterBits smux_command_bits =
+      Adafruit_BusIO_RegisterBits(&cfg6_reg, 2, 3);
 
-void Adafruit_AS7341::SmuxConfigRAM() {
-  writeRegister(byte(AS7341_CFG6), byte(0x10));
+  return smux_command_bits.write(command);
 }
-
 /**
  * @brief Enables measurement of spectral data
  *
@@ -213,15 +213,17 @@ bool Adafruit_AS7341::enableSpectralMeasurement(bool enable_measurement) {
   return spec_enable_bit.write(enable_measurement);
 }
 
-void Adafruit_AS7341::enableSMUX(void) {
+bool Adafruit_AS7341::enableSMUX(void) {
+
   Adafruit_BusIO_Register enable_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_ENABLE);
   Adafruit_BusIO_RegisterBits smux_enable_bit =
       Adafruit_BusIO_RegisterBits(&enable_reg, 1, 4);
-  smux_enable_bit.write(true);
+  bool success = smux_enable_bit.write(true);
   while (smux_enable_bit.read()) {
     delay(1);
   }
+  return success;
 }
 
 /**
@@ -626,7 +628,7 @@ uint16_t Adafruit_AS7341::detectFlickerHz(void) {
 
   // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
   // to CFG6)
-  SmuxConfigRAM();
+  setSMUXCommand(AS7341_SMUX_CMD_WRITE);
 
   // Write new configuration to all the 20 registers for detecting Flicker
   FDConfig();
@@ -744,180 +746,3 @@ void Adafruit_AS7341::writeRegister(byte addr, byte val) {
   Adafruit_BusIO_Register reg = Adafruit_BusIO_Register(i2c_dev, addr);
   reg.write(val);
 }
-
-/*----- Function defined to read out channels with SMUX configration 1 -----*/
-
-//<summary>
-// Executing raw data measurement cycle for 6 channels
-//<summary>
-
-// ///////////////// MORE DEMO CODE//////////////
-
-// void synD_Mode() {
-
-//   bool isEnabled = true;
-//   bool isDataReady = false;
-
-//   // Setting the PON bit in Enable register 0x80
-//   PON();
-
-//   // Disable SP_EN bit in Enable register 0x80
-//   SpEn(false);
-
-//   // Write SMUX configuration from RAM to set SMUX chain registers (Write
-//   0x10
-//   // to CFG6)
-//   SmuxConfigRAM();
-
-//   // Write new configuration to all the 20 registers for reading channels
-//   from
-//   // F5-F8, Clear and NIR
-//   F1F4_Clear_NIR();
-
-//   // Start SMUX command: Enable the SMUXEN bit (bit 4) in register ENABLE
-//   SMUXEN();
-
-//   // Checking on the enabled SMUXEN bit whether back to zero- Poll the SMUXEN
-//   // bit -> if it is 0 SMUX command is started
-//   while (isEnabled) {
-//     isEnabled = getSmuxEnabled();
-//   }
-
-//   // Enabling the gpio_in_en (Bit 2) and gpio_out(Bit 1) in GPIO register
-//   0xBE GPIO_MODE();
-
-//   // reg_bank bit(4) is set to '1' for setting the 0x00-0x7f regiater to
-//   // reg_bank register (0xA9)
-//   RegBankConfig();
-
-//   // CONFIG (0x70) is used to set the INT_MODE (Bit 1:0) to SYND Mpde by
-//   writing
-//   // 0x03
-//   INT_MODE(0x03);
-
-//   // Number of falling SYNC-edges between start and stop integration in SynD
-//   // mode is set to register EDGE (0x72)
-//   setSynEdge(0x40);
-
-//   // writing back the Reg_bank priorty to RAM bank select
-//   writeRegister(byte(0xA9), byte(0x00));
-
-//   SpEn(true);
-
-//   // Reading and Polling the the AVALID bit in Status 2 Register 0xA3
-//   while (!(isDataReady)) {
-
-//     isDataReady = getIsDataReady();
-//   }
-//   Serial.println("Data ready!");
-//   // analog and digital saturation are read in Status2
-//   // Digital saturation - Indicates that the maximum counter value has been
-//   // reached. Maximum counter value depends on integration time set in the
-//   ATIME
-//   // register
-//   // Analog saturation - Indicates that the intensity of ambient light has
-//   // exceeded the maximum integration level for the spectral analog circuit
-//   //Serial.print("Status2-");
-//   // readRegisterPrint(0xA3);
-
-//   // reg_bank bit(4) is set to '1' for setting the 0x00-0x7f regiater to
-//   // reg_bank register (0xA9)
-//   RegBankConfig();
-
-//   // Read all the registers from 0x60 to 0x6F in SYND MODE
-//   readSynDRegisters();
-// }
-
-// // <summary>
-// // Enabling the gpio_in_en (Bit 2) and gpio_out(Bit 1) in GPIO register 0xBE
-// // <summary>
-// void GPIO_MODE() {
-
-//   byte regVal = readRegister(byte(0xBE));
-//   byte temp = regVal;
-//   regVal = regVal & 0x0B;
-//   regVal = regVal | 0x06;
-//   writeRegister(byte(0xBE), byte(regVal));
-// }
-
-// //<summary>
-// // Number of falling SYNC-edges between start and stop integration in SynD
-// mode
-// // is set to register EDGE (0x72) integration time is determined by the
-// // integration_time = (syn_edge+1) * sync period
-// //<summary>
-// void setSynEdge(byte value) { writeRegister(byte(0x72), value); }
-
-// //<summary>
-// // Read all the registers from 0x60 to 0x6F in SYND MODE
-// //<summary>
-// void readSynDRegisters() {
-
-//   uint8_t Astatus;
-//   uint16_t Channel0;
-//   uint32_t iTime;
-//   uint16_t Channel1;
-//   uint16_t Channel2;
-//   uint16_t Channel3;
-//   uint16_t Channel4;
-//   uint16_t Channel5;
-
-//   Wire.beginTransmission(_i2cAddr);
-//   Wire.write(0x60);
-//   Wire.endTransmission(false);
-
-//   Wire.requestFrom(_i2cAddr, 16, true);
-
-//   Astatus = Wire.read(); // Reading register 0x60 for Astatus
-//   Serial.print("Astatus-");
-//   Serial.println(Astatus);
-
-//   Channel0 = Wire.read() | Wire.read()
-//                                << 8; // reading register 0x61 XWING_ADATA0L &
-//                                      // 0x62 XWING_ADATA0H channel 0 data
-//   Serial.print("Channel0-");
-//   Serial.println(Channel0);
-
-//   uint8_t iTimeL = Wire.read();  // register 0x63 XWING_ITIMEL
-//   uint16_t iTimeM = Wire.read(); // register 0x64 XWING_ITIMEM
-//   uint32_t iTimeH = Wire.read(); // register 0x65 XWING_ITIMEH
-//   iTime = (iTimeH << 16 | iTimeM << 8 |
-//            iTimeL); // iTime =  ITIME_H(bit 23:16) ITIME_M(15:8) ITIME_L(7:0)
-//   Serial.print("iTime-");
-//   Serial.println(iTime);
-
-//   float Tint = iTime * 2.78 * pow(10, -6);
-//   Serial.print("Tint-");
-//   Serial.println(Tint);
-
-//   Channel1 = Wire.read() | Wire.read()
-//                                << 8; // reading register 0x66 XWING_ADATA1L &
-//                                      // 0x67 XWING_ADATA1H channel 1 data
-//   Serial.print("Channel1-");
-//   Serial.println(Channel1);
-
-//   Channel2 = Wire.read() | Wire.read()
-//                                << 8; // reading register 0x68 XWING_ADATA2L &
-//                                      // 0x69 XWING_ADATA2H channel 2 data
-//   Serial.print("Channel2-");
-//   Serial.println(Channel2);
-
-//   Channel3 = Wire.read() | Wire.read()
-//                                << 8; // reading register 0x6A XWING_ADATA3L &
-//                                      // 0x6B XWING_ADATA3H channel 3 data
-//   Serial.print("Channel3-");
-//   Serial.println(Channel3);
-
-//   Channel4 = Wire.read() | Wire.read()
-//                                << 8; // reading register 0x6C XWING_ADATA4L &
-//                                      // 0x6D XWING_ADATA4H channel 4 data
-//   Serial.print("Channel4-");
-//   Serial.println(Channel4);
-
-//   Channel5 = Wire.read() | Wire.read()
-//                                << 8; // reading register 0x6E XWING_ADATA5L &
-//                                      // 0x6F XWING_ADATA5H channel 5 data
-//   Serial.print("Channel5-");
-//   Serial.println(Channel5);
-//   Serial.println("");
-// }

@@ -170,6 +170,15 @@ typedef enum {
 } as7341_gain_t;
 
 /**
+ * @brief Available SMUX configuration commands
+ *
+ */
+typedef enum {
+  AS7341_SMUX_CMD_ROM_RESET, ///< ROM code initialization of SMUX
+  AS7341_SMUX_CMD_READ,      ///< Read SMUX configuration to RAM from SMUX chain
+  AS7341_SMUX_CMD_WRITE, ///< Write SMUX configuration from RAM to SMUX chain
+} as7341_smux_cmd_t;
+/**
  * @brief ADC Channel specifiers for configuration
  *
  */
@@ -293,8 +302,8 @@ protected:
   Adafruit_I2CDevice *i2c_dev = NULL; ///< Pointer to I2C bus interface
 
 private:
-  void enableSMUX(void);
-  void SmuxConfigRAM(void);
+  bool enableSMUX(void);
+  bool setSMUXCommand(as7341_smux_cmd_t command);
   void writeRegister(byte addr, byte val);
   void setSMUXLowChannels(bool f1_f4);
   uint16_t _channel_readings[10];
