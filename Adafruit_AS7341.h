@@ -300,7 +300,7 @@ private:
   bool setSMUXCommand(as7341_smux_cmd_t command);
   void writeRegister(byte addr, byte val);
   void setSMUXLowChannels(bool f1_f4);
-  uint16_t _channel_readings[10];
+  uint16_t _channel_readings[12];
 };
 
 #endif
