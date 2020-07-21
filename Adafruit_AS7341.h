@@ -259,13 +259,13 @@ public:
   void powerEnable(bool enable_power);
   bool enableSpectralMeasurement(bool enable_measurement);
 
-  bool setHighThreshold(int16_t high_threshold);
-  bool setLowThreshold(int16_t low_threshold);
+  bool setHighThreshold(uint16_t high_threshold);
+  bool setLowThreshold(uint16_t low_threshold);
 
-  int16_t getHighThreshold(void);
-  int16_t getLowThreshold(void);
+  uint16_t getHighThreshold(void);
+  uint16_t getLowThreshold(void);
 
-  bool enableSpectralINT(bool enable_int);
+  bool enableSpectralInterrupt(bool enable_int);
   bool setAPERS(as7341_int_cycle_count_t cycle_count);
   bool setSpectralThresholdChannel(as7341_adc_channel_t channel);
 
@@ -273,7 +273,7 @@ public:
   bool clearInterruptStatus(void);
 
   bool spectralInterruptTriggered(void);
-  uint8_t spectralINTSource(void);
+  uint8_t spectralInterruptSource(void);
   bool spectralLowTriggered(void);
   bool spectralHighTriggered(void);
 
