@@ -6,7 +6,7 @@ var searchData=
   ['setbank',['setBank',['../class_adafruit___a_s7341.html#a96bc68cddfedfa6879545bede4158136',1,'Adafruit_AS7341']]],
   ['setgain',['setGain',['../class_adafruit___a_s7341.html#a1606e209c8abb7afeb0a018268eef25f',1,'Adafruit_AS7341']]],
   ['sethighthreshold',['setHighThreshold',['../class_adafruit___a_s7341.html#a2aff9080331206d0f07b0fab7d71c6a6',1,'Adafruit_AS7341']]],
-  ['setledcurrent',['setLEDCurrent',['../class_adafruit___a_s7341.html#a0ac1617dfa694899ec0b87084a24cc9d',1,'Adafruit_AS7341']]],
+  ['setledcurrent',['setLEDCurrent',['../class_adafruit___a_s7341.html#a6ca80c3f0b495b1cbd7d17d32e6a9974',1,'Adafruit_AS7341']]],
   ['setlowthreshold',['setLowThreshold',['../class_adafruit___a_s7341.html#a7894cc89c99bce4da67fda5fd955db53',1,'Adafruit_AS7341']]],
   ['setspectralthresholdchannel',['setSpectralThresholdChannel',['../class_adafruit___a_s7341.html#a782d41ad719f684773a95e5d5f55d6d1',1,'Adafruit_AS7341']]],
   ['setup_5ff1f4_5fclear_5fnir',['setup_F1F4_Clear_NIR',['../class_adafruit___a_s7341.html#a586fa3a0c662c7eaa882faf393244cc6',1,'Adafruit_AS7341']]],
