@@ -140,7 +140,6 @@ bool Adafruit_AS7341::readAllChannels(uint16_t *readings_buffer) {
 
   return low_success &&
          channel_data_reg.read((uint8_t *)&readings_buffer[6], 12);
-  ;
 }
 
 /**
@@ -399,7 +398,7 @@ bool Adafruit_AS7341::setBank(bool low) {
  * @param low_threshold the new threshold
  * @return true: success false: failure
  */
-bool Adafruit_AS7341::setLowThreshold(int16_t low_threshold) {
+bool Adafruit_AS7341::setLowThreshold(uint16_t low_threshold) {
   Adafruit_BusIO_Register sp_low_threshold_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_SP_LOW_TH_L, 2, LSBFIRST);
   return sp_low_threshold_reg.write(low_threshold);
@@ -410,7 +409,7 @@ bool Adafruit_AS7341::setLowThreshold(int16_t low_threshold) {
  *
  * @return int16_t The current low threshold
  */
-int16_t Adafruit_AS7341::getLowThreshold(void) {
+uint16_t Adafruit_AS7341::getLowThreshold(void) {
   Adafruit_BusIO_Register sp_low_threshold_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_SP_LOW_TH_L, 2, LSBFIRST);
   return sp_low_threshold_reg.read();
@@ -423,7 +422,7 @@ int16_t Adafruit_AS7341::getLowThreshold(void) {
  * @param high_threshold
  * @return true: success false: failure
  */
-bool Adafruit_AS7341::setHighThreshold(int16_t high_threshold) {
+bool Adafruit_AS7341::setHighThreshold(uint16_t high_threshold) {
   Adafruit_BusIO_Register sp_high_threshold_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_SP_HIGH_TH_L, 2, LSBFIRST);
   return sp_high_threshold_reg.write(high_threshold);
@@ -434,11 +433,12 @@ bool Adafruit_AS7341::setHighThreshold(int16_t high_threshold) {
  *
  * @return int16_t The current high threshold
  */
-int16_t Adafruit_AS7341::getHighThreshold(void) {
+uint16_t Adafruit_AS7341::getHighThreshold(void) {
   Adafruit_BusIO_Register sp_high_threshold_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_SP_HIGH_TH_L, 2, LSBFIRST);
   return sp_high_threshold_reg.read();
 }
+
 
 /**
  * @brief Enable Interrupts based on spectral measurements
@@ -446,14 +446,23 @@ int16_t Adafruit_AS7341::getHighThreshold(void) {
  * @param enable_int true: enable false: disable
  * @return true: success false: falure
  */
-bool Adafruit_AS7341::enableSpectralINT(bool enable_int) {
-  ;
+bool Adafruit_AS7341::enableSpectralInterrupt(bool enable_int) {
   Adafruit_BusIO_Register int_enable_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_INTENAB);
   Adafruit_BusIO_RegisterBits sp_int_bit =
       Adafruit_BusIO_RegisterBits(&int_enable_reg, 1, 3);
-  return int_enable_reg.write(enable_int);
+  return sp_int_bit.write(enable_int);
 }
+
+
+bool Adafruit_AS7341::enableSystemInterrupt(bool enable_int) {
+  Adafruit_BusIO_Register int_enable_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_INTENAB);
+  Adafruit_BusIO_RegisterBits sien_int_bit =
+      Adafruit_BusIO_RegisterBits(&int_enable_reg, 1, 0);
+  return sien_int_bit.write(enable_int);
+}
+
 
 // Spectral Interrupt Persistence.
 // Defines a filter for the number of consecutive
@@ -495,7 +504,7 @@ bool Adafruit_AS7341::setSpectralThresholdChannel(
   Adafruit_BusIO_Register cfg_12_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_CFG12);
   Adafruit_BusIO_RegisterBits spectral_threshold_ch_bits =
-      Adafruit_BusIO_RegisterBits(&cfg_12_reg, 2, 0);
+      Adafruit_BusIO_RegisterBits(&cfg_12_reg, 3, 0);
   return spectral_threshold_ch_bits.write(channel);
 }
 
@@ -542,7 +551,7 @@ bool Adafruit_AS7341::clearInterruptStatus(void) {
  *
  * @return uint8_t The current status register
  */
-uint8_t Adafruit_AS7341::spectralINTSource(void) {
+uint8_t Adafruit_AS7341::spectralInterruptSource(void) {
   Adafruit_BusIO_Register status3_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_STATUS3);
 
