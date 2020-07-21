@@ -4,7 +4,7 @@
  * 	I2C Driver for the Library for the AS7341 11-Channel Spectral Sensor
  *
  * 	This is a library for the Adafruit AS7341 breakout:
- * 	https://www.adafruit.com/product/45XX
+ * 	https://www.adafruit.com/product/4698
  *
  * 	Adafruit invests time and resources providing this open source code,
  *  please support Adafruit and open-source hardware by purchasing products from
@@ -220,6 +220,91 @@ bool Adafruit_AS7341::enableSMUX(void) {
   }
 
   return success;
+}
+/**
+ * @brief Get the GPIO pin direction setting
+ *
+ * @return `AS7341_OUTPUT` or `AS7341_INPUT`
+ */
+as7341_gpio_dir_t Adafruit_AS7341::getGPIODirection(void) {
+  Adafruit_BusIO_Register gpio2_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_GPIO2);
+  Adafruit_BusIO_RegisterBits gpio_input_enable =
+      Adafruit_BusIO_RegisterBits(&gpio2_reg, 1, 2);
+
+  return (as7341_gpio_dir_t)gpio_input_enable.read();
+}
+
+/**
+ * @brief Set the GPIO pin to be used as an input or output
+ *
+ * @param gpio_direction The IO direction to set
+ * @return true: success false: failure
+ */
+bool Adafruit_AS7341::setGPIODirection(as7341_gpio_dir_t gpio_direction) {
+  Adafruit_BusIO_Register gpio2_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_GPIO2);
+
+  Adafruit_BusIO_RegisterBits gpio_input_enable =
+      Adafruit_BusIO_RegisterBits(&gpio2_reg, 1, 2);
+  return gpio_input_enable.write(gpio_direction);
+}
+
+/**
+ * @brief Invert the logic of then GPIO pin when used as an output
+ *
+ * @param gpio_inverted **When true** setting the gpio value to **true will
+ * connect** the GPIO pin to ground. When set to **false**, setting the GPIO pin
+ * value to **true will disconnect** the GPIO pin from ground
+ * @return true: success false: failure
+ */
+bool Adafruit_AS7341::setGPIOInverted(bool gpio_inverted) {
+  Adafruit_BusIO_Register gpio2_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_GPIO2);
+  Adafruit_BusIO_RegisterBits gpio_output_inverted_bit =
+      Adafruit_BusIO_RegisterBits(&gpio2_reg, 1, 3);
+  return gpio_output_inverted_bit.write(gpio_inverted);
+}
+/**
+ * @brief Get the output inversion setting for the GPIO pin
+ *
+ * @return true: GPIO output inverted false: GPIO output normal
+ */
+bool Adafruit_AS7341::setGPIOInverted(bool gpio_inverted) {
+  Adafruit_BusIO_Register gpio2_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_GPIO2);
+  Adafruit_BusIO_RegisterBits gpio_output_inverted_bit =
+      Adafruit_BusIO_RegisterBits(&gpio2_reg, 1, 3);
+  return gpio_output_inverted_bit.write(gpio_inverted);
+}
+
+/**
+ * @brief Read the digital level of the GPIO pin, high or low
+ *
+ * @return true: GPIO pin level is high false: GPIO pin level is low
+ */
+bool Adafruit_AS7341::getGPIOValue(void) {
+  Adafruit_BusIO_Register gpio2_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_GPIO2);
+  Adafruit_BusIO_RegisterBits gpio_input_value_bit =
+      Adafruit_BusIO_RegisterBits(&gpio2_reg, 1, 0);
+  return gpio_input_value_bit.read();
+}
+
+/**
+ * @brief Set the digital level of the GPIO pin, high or low
+ *
+ * @param gpio_high The GPIO level to set. Set to true to disconnect the pin
+ * from ground. Set to false to connect the gpio pin to ground. This can be used
+ * to connect the cathode of an LED to ground to turn it on.
+ * @return true: success false: failure
+ */
+bool Adafruit_AS7341::setGPIOValue(bool gpio_high) {
+  Adafruit_BusIO_Register gpio2_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_GPIO2);
+  Adafruit_BusIO_RegisterBits gpio_output_value_bit =
+      Adafruit_BusIO_RegisterBits(&gpio2_reg, 1, 1);
+  return gpio_output_value_bit.write(gpio_high);
 }
 
 bool Adafruit_AS7341::setSMUXCommand(as7341_smux_cmd_t command) {

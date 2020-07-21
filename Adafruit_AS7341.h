@@ -228,6 +228,15 @@ typedef enum {
   AS7341_INT_COUNT_60,  ///< 15
 } as7341_int_cycle_count_t;
 
+/**
+ * @brief Pin directions to set how the GPIO pin is to be used
+ *
+ */
+typedef enum {
+  AS7341_GPIO_INPUT, ///< The GPIO Pin is set as a high-impedence input
+  AS7341_GPIO_OUTUT, ///< THhe GPIO pin is configured as an open drain output
+} as7341_gpio_dir_t;
+
 class Adafruit_AS7341;
 
 /*!
@@ -284,6 +293,12 @@ public:
 
   bool getIsDataReady();
   bool setBank(bool low); // low true gives access to 0x60 to 0x74
+
+  as7341_gpio_dir_t getGPIODirection(void);
+  bool setGPIODirection(as7341_gpio_dir_t gpio_direction);
+  bool setGPIOInverted(bool gpio_inverted);
+  bool getGPIOValue(void);
+  bool setGPIOValue(bool);
 
 protected:
   virtual bool _init(int32_t sensor_id);
