@@ -21,15 +21,15 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("40 mA LED blink");
-  as7341.setLEDCurrent(0); // 40mA
+  Serial.println("4 mA LED blink");
+  as7341.setLEDCurrent(4); // 4mA
   as7341.enableLED(true);
   delay(100);
   as7341.enableLED(false);
   delay(500);
 
   Serial.println("100 mA LED blink");
-  as7341.setLEDCurrent(48); // 100mA
+  as7341.setLEDCurrent(100); // 100mA
   as7341.enableLED(true);
   delay(100);
   as7341.enableLED(false);

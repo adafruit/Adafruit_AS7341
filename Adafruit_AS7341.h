@@ -278,7 +278,7 @@ public:
   bool spectralHighTriggered(void);
 
   bool enableLED(bool enable_led);
-  bool setLEDCurrent(uint8_t led_current);
+  bool setLEDCurrent(uint16_t led_current_ma);
 
   void disableAll(void);
 
