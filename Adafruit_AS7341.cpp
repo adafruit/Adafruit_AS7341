@@ -106,6 +106,7 @@ uint16_t Adafruit_AS7341::readChannel(as7341_adc_channel_t channel) {
 
   return channel_data_reg.read();
 }
+
 /**
  * @brief Returns the reading data for the specified color channel
  *
@@ -117,6 +118,7 @@ uint16_t Adafruit_AS7341::readChannel(as7341_adc_channel_t channel) {
 uint16_t Adafruit_AS7341::getChannel(as7341_color_channel_t channel) {
   return _channel_readings[channel];
 }
+
 /**
  * @brief fills the provided buffer with the current measurements for Spectral
  * channels F1-8, Clear and NIR
@@ -189,14 +191,6 @@ void Adafruit_AS7341::disableAll(void) {
   enable_reg.write(0);
 }
 
-bool Adafruit_AS7341::setSMUXCommand(as7341_smux_cmd_t command) {
-  Adafruit_BusIO_Register cfg6_reg =
-      Adafruit_BusIO_Register(i2c_dev, AS7341_CFG6);
-  Adafruit_BusIO_RegisterBits smux_command_bits =
-      Adafruit_BusIO_RegisterBits(&cfg6_reg, 2, 3);
-
-  return smux_command_bits.write(command);
-}
 /**
  * @brief Enables measurement of spectral data
  *
@@ -226,6 +220,15 @@ bool Adafruit_AS7341::enableSMUX(void) {
   }
 
   return success;
+}
+
+bool Adafruit_AS7341::setSMUXCommand(as7341_smux_cmd_t command) {
+  Adafruit_BusIO_Register cfg6_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_CFG6);
+  Adafruit_BusIO_RegisterBits smux_command_bits =
+      Adafruit_BusIO_RegisterBits(&cfg6_reg, 2, 3);
+
+  return smux_command_bits.write(command);
 }
 
 /**
@@ -301,6 +304,7 @@ bool Adafruit_AS7341::setBank(bool low) {
 
   bank_bit.write(low);
 }
+
 /**
  * @brief Sets the threshold below which spectral measurements will trigger
  * interrupts when the APERS count is reached
@@ -313,6 +317,7 @@ bool Adafruit_AS7341::setLowThreshold(int16_t low_threshold) {
       Adafruit_BusIO_Register(i2c_dev, AS7341_SP_LOW_TH_L, 2, LSBFIRST);
   return sp_low_threshold_reg.write(low_threshold);
 }
+
 /**
  * @brief Returns the current low thighreshold for spectral measurements
  *
@@ -336,6 +341,7 @@ bool Adafruit_AS7341::setHighThreshold(int16_t high_threshold) {
       Adafruit_BusIO_Register(i2c_dev, AS7341_SP_HIGH_TH_L, 2, LSBFIRST);
   return sp_high_threshold_reg.write(high_threshold);
 }
+
 /**
  * @brief Returns the current high thighreshold for spectral measurements
  *
@@ -346,6 +352,7 @@ int16_t Adafruit_AS7341::getHighThreshold(void) {
       Adafruit_BusIO_Register(i2c_dev, AS7341_SP_HIGH_TH_L, 2, LSBFIRST);
   return sp_high_threshold_reg.read();
 }
+
 /**
  * @brief Enable Interrupts based on spectral measurements
  *
@@ -360,6 +367,7 @@ bool Adafruit_AS7341::enableSpectralINT(bool enable_int) {
       Adafruit_BusIO_RegisterBits(&int_enable_reg, 1, 3);
   return int_enable_reg.write(enable_int);
 }
+
 // Spectral Interrupt Persistence.
 // Defines a filter for the number of consecutive
 // occurrences that spectral data must remain outside
@@ -403,6 +411,7 @@ bool Adafruit_AS7341::setSpectralThresholdChannel(
       Adafruit_BusIO_RegisterBits(&cfg_12_reg, 2, 0);
   return spectral_threshold_ch_bits.write(channel);
 }
+
 /**
  * @brief Returns the current value of the Interupt status register
  *
@@ -413,6 +422,7 @@ uint8_t Adafruit_AS7341::getInterruptStatus(void) {
       Adafruit_BusIO_Register(i2c_dev, AS7341_STATUS);
   return (uint8_t)int_status_reg.read();
 }
+
 /**
  * @brief Returns the status of the spectral measurement threshold interrupts
  *
@@ -453,6 +463,7 @@ uint8_t Adafruit_AS7341::spectralINTSource(void) {
   last_spectral_int_source = spectral_int_source;
   return spectral_int_source;
 }
+
 /**
  * @brief The status of the low threshold interrupt
  *
