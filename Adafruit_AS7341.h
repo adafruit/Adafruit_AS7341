@@ -266,6 +266,8 @@ public:
   uint16_t getLowThreshold(void);
 
   bool enableSpectralInterrupt(bool enable_int);
+  bool enableSystemInterrupt(bool enable_int);
+
   bool setAPERS(as7341_int_cycle_count_t cycle_count);
   bool setSpectralThresholdChannel(as7341_adc_channel_t channel);
 

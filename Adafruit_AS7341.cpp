@@ -140,7 +140,6 @@ bool Adafruit_AS7341::readAllChannels(uint16_t *readings_buffer) {
 
   return low_success &&
          channel_data_reg.read((uint8_t *)&readings_buffer[6], 12);
-  ;
 }
 
 /**
@@ -367,7 +366,16 @@ bool Adafruit_AS7341::enableSpectralInterrupt(bool enable_int) {
       Adafruit_BusIO_Register(i2c_dev, AS7341_INTENAB);
   Adafruit_BusIO_RegisterBits sp_int_bit =
       Adafruit_BusIO_RegisterBits(&int_enable_reg, 1, 3);
-  return int_enable_reg.write(enable_int);
+  return sp_int_bit.write(enable_int);
+}
+
+
+bool Adafruit_AS7341::enableSystemInterrupt(bool enable_int) {
+  Adafruit_BusIO_Register int_enable_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_INTENAB);
+  Adafruit_BusIO_RegisterBits sien_int_bit =
+      Adafruit_BusIO_RegisterBits(&int_enable_reg, 1, 0);
+  return sien_int_bit.write(enable_int);
 }
 
 
@@ -411,7 +419,7 @@ bool Adafruit_AS7341::setSpectralThresholdChannel(
   Adafruit_BusIO_Register cfg_12_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_CFG12);
   Adafruit_BusIO_RegisterBits spectral_threshold_ch_bits =
-      Adafruit_BusIO_RegisterBits(&cfg_12_reg, 2, 0);
+      Adafruit_BusIO_RegisterBits(&cfg_12_reg, 3, 0);
   return spectral_threshold_ch_bits.write(channel);
 }
 
