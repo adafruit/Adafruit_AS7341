@@ -258,7 +258,7 @@ bool Adafruit_AS7341::enableLED(bool enable_led) {
 /**
  * @brief Set the current limit for the LED
  *
- * @param led_current the value to set in milliamps. With a minimum of 4. Any
+ * @param led_current_ma the value to set in milliamps. With a minimum of 4. Any
  * amount under 4 will be rounded up to 4
  *
  * Range is 4mA to 258mA
@@ -268,6 +268,9 @@ bool Adafruit_AS7341::setLEDCurrent(uint16_t led_current_ma) {
   // check within permissible range
   if (led_current_ma > 258) {
     return false;
+  }
+  if (led_current_ma < 4) {
+    led_current_ma = 4;
   }
   setBank(true); // Access 0x60 0x74
 
