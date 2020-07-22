@@ -220,6 +220,7 @@ bool Adafruit_AS7341::enableSMUX(void) {
 
   return success;
 }
+
 /**
  * @brief Get the GPIO pin direction setting
  *
@@ -243,10 +244,24 @@ as7341_gpio_dir_t Adafruit_AS7341::getGPIODirection(void) {
 bool Adafruit_AS7341::setGPIODirection(as7341_gpio_dir_t gpio_direction) {
   Adafruit_BusIO_Register gpio2_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_GPIO2);
-
   Adafruit_BusIO_RegisterBits gpio_input_enable =
       Adafruit_BusIO_RegisterBits(&gpio2_reg, 1, 2);
+
   return gpio_input_enable.write(gpio_direction);
+}
+
+/**
+ * @brief Get the output inversion setting for the GPIO pin
+ *
+ * @return true: GPIO output inverted false: GPIO output normal
+ */
+bool Adafruit_AS7341::getGPIOInverted(void) {
+  Adafruit_BusIO_Register gpio2_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_GPIO2);
+  Adafruit_BusIO_RegisterBits gpio_output_inverted_bit =
+      Adafruit_BusIO_RegisterBits(&gpio2_reg, 1, 3);
+
+  return gpio_output_inverted_bit.read();
 }
 
 /**
@@ -262,18 +277,7 @@ bool Adafruit_AS7341::setGPIOInverted(bool gpio_inverted) {
       Adafruit_BusIO_Register(i2c_dev, AS7341_GPIO2);
   Adafruit_BusIO_RegisterBits gpio_output_inverted_bit =
       Adafruit_BusIO_RegisterBits(&gpio2_reg, 1, 3);
-  return gpio_output_inverted_bit.write(gpio_inverted);
-}
-/**
- * @brief Get the output inversion setting for the GPIO pin
- *
- * @return true: GPIO output inverted false: GPIO output normal
- */
-bool Adafruit_AS7341::setGPIOInverted(bool gpio_inverted) {
-  Adafruit_BusIO_Register gpio2_reg =
-      Adafruit_BusIO_Register(i2c_dev, AS7341_GPIO2);
-  Adafruit_BusIO_RegisterBits gpio_output_inverted_bit =
-      Adafruit_BusIO_RegisterBits(&gpio2_reg, 1, 3);
+
   return gpio_output_inverted_bit.write(gpio_inverted);
 }
 
@@ -287,6 +291,7 @@ bool Adafruit_AS7341::getGPIOValue(void) {
       Adafruit_BusIO_Register(i2c_dev, AS7341_GPIO2);
   Adafruit_BusIO_RegisterBits gpio_input_value_bit =
       Adafruit_BusIO_RegisterBits(&gpio2_reg, 1, 0);
+
   return gpio_input_value_bit.read();
 }
 
@@ -303,6 +308,7 @@ bool Adafruit_AS7341::setGPIOValue(bool gpio_high) {
       Adafruit_BusIO_Register(i2c_dev, AS7341_GPIO2);
   Adafruit_BusIO_RegisterBits gpio_output_value_bit =
       Adafruit_BusIO_RegisterBits(&gpio2_reg, 1, 1);
+
   return gpio_output_value_bit.write(gpio_high);
 }
 
@@ -439,7 +445,6 @@ uint16_t Adafruit_AS7341::getHighThreshold(void) {
   return sp_high_threshold_reg.read();
 }
 
-
 /**
  * @brief Enable Interrupts based on spectral measurements
  *
@@ -454,7 +459,12 @@ bool Adafruit_AS7341::enableSpectralInterrupt(bool enable_int) {
   return sp_int_bit.write(enable_int);
 }
 
-
+/**
+ * @brief Enabled system interrupts
+ *
+ * @param enable_int Set to true to enable system interrupts
+ * @return true: success false: failure
+ */
 bool Adafruit_AS7341::enableSystemInterrupt(bool enable_int) {
   Adafruit_BusIO_Register int_enable_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_INTENAB);
@@ -462,7 +472,6 @@ bool Adafruit_AS7341::enableSystemInterrupt(bool enable_int) {
       Adafruit_BusIO_RegisterBits(&int_enable_reg, 1, 0);
   return sien_int_bit.write(enable_int);
 }
-
 
 // Spectral Interrupt Persistence.
 // Defines a filter for the number of consecutive
