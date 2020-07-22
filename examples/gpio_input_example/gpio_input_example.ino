@@ -25,8 +25,7 @@ void setup() {
 
 void loop() {
   bool gpio_value = as7341.getGPIOValue();
-  Serial.print("gpio: ");Serial.println(gpio_value);
-  Serial.print("gpio direction: ");Serial.println(as7341.getGPIODirection());
+
   Serial.print("GPIO pin is ");
   if (gpio_value){
     Serial.println("high");
