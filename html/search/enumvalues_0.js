@@ -1,7 +1,7 @@
 var searchData=
 [
   ['as7341_5fgpio_5finput',['AS7341_GPIO_INPUT',['../_adafruit___a_s7341_8h.html#ad70f70bd95f22be1c7b88a315e6808efa6309e741a3e2fbeff801af57a2cb4c77',1,'Adafruit_AS7341.h']]],
-  ['as7341_5fgpio_5foutut',['AS7341_GPIO_OUTUT',['../_adafruit___a_s7341_8h.html#ad70f70bd95f22be1c7b88a315e6808eface647fd12f451e3a259c4aee8c1bf4dd',1,'Adafruit_AS7341.h']]],
+  ['as7341_5fgpio_5foutput',['AS7341_GPIO_OUTPUT',['../_adafruit___a_s7341_8h.html#ad70f70bd95f22be1c7b88a315e6808efa39f4d8304a00aac9270b71a890e38b25',1,'Adafruit_AS7341.h']]],
   ['as7341_5fint_5fcount_5f1',['AS7341_INT_COUNT_1',['../_adafruit___a_s7341_8h.html#a1972448881bae1dbd4553d5a18d99a82a30765ea0367fc3110e76c3ebfbe4bd02',1,'Adafruit_AS7341.h']]],
   ['as7341_5fint_5fcount_5f10',['AS7341_INT_COUNT_10',['../_adafruit___a_s7341_8h.html#a1972448881bae1dbd4553d5a18d99a82a5993f42de7f5ad068b4117cf80bc1f41',1,'Adafruit_AS7341.h']]],
   ['as7341_5fint_5fcount_5f15',['AS7341_INT_COUNT_15',['../_adafruit___a_s7341_8h.html#a1972448881bae1dbd4553d5a18d99a82a1f374531b93b8d5411d45d3038c6b272',1,'Adafruit_AS7341.h']]],
