@@ -18,7 +18,7 @@ void setup() {
     while (1) { delay(10); }
   }
   // set the GPIO direction to output so we can set it high or low
-  as7341.setGPIODirection(AS7341_GPIO_OUTUT);
+  as7341.setGPIODirection(AS7341_GPIO_OUTPUT);
 }
 
 void loop() {

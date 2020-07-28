@@ -233,8 +233,8 @@ typedef enum {
  *
  */
 typedef enum {
-  AS7341_GPIO_OUTUT, ///< THhe GPIO pin is configured as an open drain output
-  AS7341_GPIO_INPUT, ///< The GPIO Pin is set as a high-impedence input
+  AS7341_GPIO_OUTPUT, ///< THhe GPIO pin is configured as an open drain output
+  AS7341_GPIO_INPUT,  ///< The GPIO Pin is set as a high-impedence input
 } as7341_gpio_dir_t;
 
 class Adafruit_AS7341;

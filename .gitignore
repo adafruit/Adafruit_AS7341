@@ -4,3 +4,5 @@ Doxyfile
 .idea/
 *.hex
 *.elf
+*.log
+*.py
