@@ -221,6 +221,15 @@ bool Adafruit_AS7341::enableSMUX(void) {
   return success;
 }
 
+bool Adafruit_AS7341::enableFlickerDetection(bool enable_fd) {
+
+  Adafruit_BusIO_Register enable_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_ENABLE);
+  Adafruit_BusIO_RegisterBits fd_enable_bit =
+      Adafruit_BusIO_RegisterBits(&enable_reg, 1, 6);
+  return fd_enable_bit.write(enable_fd);
+}
+
 /**
  * @brief Get the GPIO pin direction setting
  *
@@ -394,7 +403,7 @@ bool Adafruit_AS7341::setBank(bool low) {
   Adafruit_BusIO_RegisterBits bank_bit =
       Adafruit_BusIO_RegisterBits(&cfg0_reg, 1, 4);
 
-  bank_bit.write(low);
+  return bank_bit.write(low);
 }
 
 /**
@@ -743,6 +752,7 @@ uint16_t Adafruit_AS7341::detectFlickerHz(void) {
 
   // disable everything; Flicker detect, smux, wait, spectral, power
   disableAll();
+  // re-enable power
   powerEnable(true);
 
   // Write SMUX configuration from RAM to set SMUX chain registers (Write 0x10
@@ -758,10 +768,12 @@ uint16_t Adafruit_AS7341::detectFlickerHz(void) {
   // Enable SP_EN bit
   enableSpectralMeasurement(true);
 
+  // Enable flicker detection bit
   writeRegister(byte(AS7341_ENABLE), byte(0x41));
   delay(500);
-
-  switch (getFlickerDetectStatus()) {
+  uint16_t flicker_status = getFlickerDetectStatus();
+  enableFlickerDetection(false);
+  switch (flicker_status) {
   case 44:
     return 1;
   case 45:
@@ -771,8 +783,6 @@ uint16_t Adafruit_AS7341::detectFlickerHz(void) {
   default:
     return 0;
   }
-
-  powerEnable(true);
 }
 
 /**
