@@ -129,17 +129,50 @@ uint16_t Adafruit_AS7341::getChannel(as7341_color_channel_t channel) {
  */
 bool Adafruit_AS7341::readAllChannels(uint16_t *readings_buffer) {
 
-  setSMUXLowChannels(true);
+  setSMUXLowChannels(true);		//Configure SMUX to read low channels
+  enableSpectralMeasurement(true);	//Start integration
+  delayForData(0);	//I'll wait for you for all time
 
   Adafruit_BusIO_Register channel_data_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L, 2);
 
   bool low_success = channel_data_reg.read((uint8_t *)readings_buffer, 12);
 
-  setSMUXLowChannels(false);
+  setSMUXLowChannels(false);	//Configure SMUX to read high channels
+  enableSpectralMeasurement(true);	//Start integration
+  delayForData(0);	//I'll wait for you for all time
 
   return low_success &&
          channel_data_reg.read((uint8_t *)&readings_buffer[6], 12);
+}
+
+/**
+ * @brief Delay while waiting for data, with option to time out and recover
+ *
+ * @return none
+ */
+void Adafruit_AS7341::delayForData(int waitTime) {
+  if(waitTime == 0)	//Wait forever
+  {
+	  while (!getIsDataReady()) {
+		delay(1);
+	  }  
+	  return;
+  }
+  if(waitTime > 0)	//Wait for that many milliseconds
+  {
+	  uint32_t elapsedMillis = 0;
+	  while (!getIsDataReady() && elapsedMillis < waitTime) {
+		delay(1);
+		elapsedMillis++;
+	  }  
+	  return;
+  }
+  if(waitTime < 0)
+  {
+	  //For future use?
+	  return;
+  }
 }
 
 /**
@@ -160,10 +193,6 @@ void Adafruit_AS7341::setSMUXLowChannels(bool f1_f4) {
     setup_F5F8_Clear_NIR();
   }
   enableSMUX();
-  enableSpectralMeasurement(true);
-  while (!getIsDataReady()) {
-    delay(1);
-  }
 }
 
 /**
@@ -214,11 +243,16 @@ bool Adafruit_AS7341::enableSMUX(void) {
       Adafruit_BusIO_RegisterBits(&enable_reg, 1, 4);
   bool success = smux_enable_bit.write(true);
 
-  while (smux_enable_bit.read()) {
+  int timeOut = 1000;	//Arbitrary value, but if it takes 1000 milliseconds then something is wrong
+  int count = 0;
+  while (smux_enable_bit.read() && count < timeOut) {
     delay(1);
+	count++;
   }
-
-  return success;
+  if(count >= timeOut)
+	return false;
+  else
+    return success;
 }
 
 bool Adafruit_AS7341::enableFlickerDetection(bool enable_fd) {
@@ -770,7 +804,7 @@ uint16_t Adafruit_AS7341::detectFlickerHz(void) {
 
   // Enable flicker detection bit
   writeRegister(byte(AS7341_ENABLE), byte(0x41));
-  delay(500);
+  delay(500);	//SF 2020-08-12 Does this really need to be so long?
   uint16_t flicker_status = getFlickerDetectStatus();
   enableFlickerDetection(false);
   switch (flicker_status) {

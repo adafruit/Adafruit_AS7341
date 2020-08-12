@@ -257,6 +257,7 @@ public:
 
   bool readAllChannels(void);
   bool readAllChannels(uint16_t *readings_buffer);
+  void delayForData(int waitTime=0);
   uint16_t readChannel(as7341_adc_channel_t channel);
   uint16_t getChannel(as7341_color_channel_t channel);
 
