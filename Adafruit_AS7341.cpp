@@ -167,7 +167,7 @@ bool Adafruit_AS7341::startReading(void) {
  * 
  * @return true: reading is complete false: reading is incomplete (or failed)
  */
-bool Adafruit_AS7341::checkReadingProgress() {
+bool Adafruit_AS7341::checkReadingProgress() {	
   if(_readingState == AS7341_WAITING_START)
   {
 	  setSMUXLowChannels(true);		//Configure SMUX to read low channels
@@ -179,7 +179,7 @@ bool Adafruit_AS7341::checkReadingProgress() {
   if(!getIsDataReady() || _readingState == AS7341_WAITING_DONE)
 	  return false;
   
-  if(_readingState == AS7341_WAITING_LOW)
+  if(_readingState == AS7341_WAITING_LOW)	//Check of getIsDataRead() is already done
   {
 	  Adafruit_BusIO_Register channel_data_reg = Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L, 2);  
 
@@ -192,13 +192,16 @@ bool Adafruit_AS7341::checkReadingProgress() {
 	  return false;
   }
   
-  if(_readingState == AS7341_WAITING_HIGH)
+  if(_readingState == AS7341_WAITING_HIGH)	//Check of getIsDataRead() is already done
   {
 	_readingState = AS7341_WAITING_DONE;	
 	Adafruit_BusIO_Register channel_data_reg = Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L, 2);
 	// return low_success &&			//low_success is lost since it was last call
-    return channel_data_reg.read((uint8_t *)&_channel_readings[6], 12);	
+    channel_data_reg.read((uint8_t *)&_channel_readings[6], 12);	
+	return true;
   }
+  
+  return false;
 }
 
 /**
@@ -209,7 +212,7 @@ bool Adafruit_AS7341::checkReadingProgress() {
  * @return true: success false: failure
  */
 bool Adafruit_AS7341::getAllChannels(uint16_t *readings_buffer) {
-  for(int i=0; i<11; i++)
+  for(int i=0; i<12; i++)
 	readings_buffer[i] = _channel_readings[i];
   return true;
 }
@@ -453,7 +456,9 @@ bool Adafruit_AS7341::enableLED(bool enable_led) {
       Adafruit_BusIO_RegisterBits(&led_reg, 1, 7);
 
   setBank(true); // Access 0x60-0x74
-  return (led_sel_bit.write(enable_led) && led_act_bit.write(enable_led));
+  bool result = led_sel_bit.write(enable_led) && led_act_bit.write(enable_led);
+  setBank(false);	//Access registers 0x80 and above (default)
+  return result;
 }
 
 /**
@@ -482,7 +487,9 @@ bool Adafruit_AS7341::setLEDCurrent(uint16_t led_current_ma) {
   Adafruit_BusIO_RegisterBits led_current_bits =
       Adafruit_BusIO_RegisterBits(&led_reg, 7, 0);
 
-  return led_current_bits.write((uint8_t)((led_current_ma - 4) / 2));
+  bool result = led_current_bits.write((uint8_t)((led_current_ma - 4) / 2));
+  setBank(false);	//Access registers 0x80 and above (default)
+  return result;
 }
 
 /**
