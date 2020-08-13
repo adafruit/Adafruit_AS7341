@@ -239,7 +239,7 @@ typedef enum {
 
 typedef enum {
   AS7341_WAITING_START, //
-  AS7341_WAITING_LOW, //
+  AS7341_WAITING_LOW,   //
   AS7341_WAITING_HIGH,  //
   AS7341_WAITING_DONE,  //
 } as7341_waiting_t;
@@ -264,14 +264,13 @@ public:
 
   bool readAllChannels(void);
   bool readAllChannels(uint16_t *readings_buffer);
-  void delayForData(int waitTime=0);
+  void delayForData(int waitTime = 0);
   uint16_t readChannel(as7341_adc_channel_t channel);
   uint16_t getChannel(as7341_color_channel_t channel);
-  
+
   bool startReading(void);
   bool checkReadingProgress();
   bool getAllChannels(uint16_t *readings_buffer);
-  
 
   uint16_t detectFlickerHz(void);
 
