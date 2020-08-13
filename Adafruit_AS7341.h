@@ -237,6 +237,13 @@ typedef enum {
   AS7341_GPIO_INPUT,  ///< The GPIO Pin is set as a high-impedence input
 } as7341_gpio_dir_t;
 
+typedef enum {
+  AS7341_WAITING_START, //
+  AS7341_WAITING_LOW, //
+  AS7341_WAITING_HIGH,  //
+  AS7341_WAITING_DONE,  //
+} as7341_waiting_t;
+
 class Adafruit_AS7341;
 
 /*!
@@ -260,6 +267,11 @@ public:
   void delayForData(int waitTime=0);
   uint16_t readChannel(as7341_adc_channel_t channel);
   uint16_t getChannel(as7341_color_channel_t channel);
+  
+  bool startReading(void);
+  bool checkReadingProgress();
+  bool getAllChannels(uint16_t *readings_buffer);
+  
 
   uint16_t detectFlickerHz(void);
 
@@ -321,6 +333,7 @@ private:
   void writeRegister(byte addr, byte val);
   void setSMUXLowChannels(bool f1_f4);
   uint16_t _channel_readings[12];
+  as7341_waiting_t _readingState;
 };
 
 #endif

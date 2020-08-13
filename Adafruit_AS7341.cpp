@@ -147,6 +147,74 @@ bool Adafruit_AS7341::readAllChannels(uint16_t *readings_buffer) {
 }
 
 /**
+ * @brief starts the process of getting readings from all channels without using delays
+ *
+ * @param none
+ *
+ * @return true: success false: failure (a bit arbitrary)
+ */
+bool Adafruit_AS7341::startReading(void) {
+	_readingState = AS7341_WAITING_START;	//Start the measurement please
+	checkReadingProgress();					//Call the check function to start it
+	return true;
+}
+
+/**
+ * @brief runs the process of getting readings from all channels without using delays.  Should be called regularly (ie. in loop())
+ * Need to call startReading() to initialise the process
+ * Need to call getAllChannels() to transfer the data into an external buffer
+ * @param none
+ * 
+ * @return true: reading is complete false: reading is incomplete (or failed)
+ */
+bool Adafruit_AS7341::checkReadingProgress() {
+  if(_readingState == AS7341_WAITING_START)
+  {
+	  setSMUXLowChannels(true);		//Configure SMUX to read low channels
+	  enableSpectralMeasurement(true);	//Start integration
+	  _readingState = AS7341_WAITING_LOW;
+	  return false;
+  }
+  
+  if(!getIsDataReady() || _readingState == AS7341_WAITING_DONE)
+	  return false;
+  
+  if(_readingState == AS7341_WAITING_LOW)
+  {
+	  Adafruit_BusIO_Register channel_data_reg = Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L, 2);  
+
+	  // bool low_success = channel_data_reg.read((uint8_t *)_channel_readings, 12);
+	  channel_data_reg.read((uint8_t *)_channel_readings, 12);
+
+	  setSMUXLowChannels(false);	//Configure SMUX to read high channels
+	  enableSpectralMeasurement(true);	//Start integration
+	  _readingState = AS7341_WAITING_HIGH;
+	  return false;
+  }
+  
+  if(_readingState == AS7341_WAITING_HIGH)
+  {
+	_readingState = AS7341_WAITING_DONE;	
+	Adafruit_BusIO_Register channel_data_reg = Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L, 2);
+	// return low_success &&			//low_success is lost since it was last call
+    return channel_data_reg.read((uint8_t *)&_channel_readings[6], 12);	
+  }
+}
+
+/**
+ * @brief transfer all the values from the private result buffer into one nominated
+ *
+ * @param readings_buffer Pointer to a buffer of length 12 (THERE IS NO ERROR CHECKING, YE BE WARNED!)
+ *
+ * @return true: success false: failure
+ */
+bool Adafruit_AS7341::getAllChannels(uint16_t *readings_buffer) {
+  for(int i=0; i<11; i++)
+	readings_buffer[i] = _channel_readings[i];
+  return true;
+}
+
+/**
  * @brief Delay while waiting for data, with option to time out and recover
  *
  * @return none
