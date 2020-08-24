@@ -202,8 +202,8 @@ bool Adafruit_AS7341::checkReadingProgress() {
     _readingState = AS7341_WAITING_DONE;
     Adafruit_BusIO_Register channel_data_reg =
         Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L, 2);
-    // return low_success &&			//low_success is lost since it was last
-    // call
+    // return low_success &&			//low_success is lost since it was
+    // last call
     channel_data_reg.read((uint8_t *)&_channel_readings[6], 12);
     return true;
   }
