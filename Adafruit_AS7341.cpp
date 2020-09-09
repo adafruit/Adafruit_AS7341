@@ -129,17 +129,129 @@ uint16_t Adafruit_AS7341::getChannel(as7341_color_channel_t channel) {
  */
 bool Adafruit_AS7341::readAllChannels(uint16_t *readings_buffer) {
 
-  setSMUXLowChannels(true);
+  setSMUXLowChannels(true);        // Configure SMUX to read low channels
+  enableSpectralMeasurement(true); // Start integration
+  delayForData(0);                 // I'll wait for you for all time
 
   Adafruit_BusIO_Register channel_data_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L, 2);
 
   bool low_success = channel_data_reg.read((uint8_t *)readings_buffer, 12);
 
-  setSMUXLowChannels(false);
+  setSMUXLowChannels(false);       // Configure SMUX to read high channels
+  enableSpectralMeasurement(true); // Start integration
+  delayForData(0);                 // I'll wait for you for all time
 
   return low_success &&
          channel_data_reg.read((uint8_t *)&readings_buffer[6], 12);
+}
+
+/**
+ * @brief starts the process of getting readings from all channels without using
+ * delays
+ *
+ * @param none
+ *
+ * @return true: success false: failure (a bit arbitrary)
+ */
+bool Adafruit_AS7341::startReading(void) {
+  _readingState = AS7341_WAITING_START; // Start the measurement please
+  checkReadingProgress();               // Call the check function to start it
+  return true;
+}
+
+/**
+ * @brief runs the process of getting readings from all channels without using
+ * delays.  Should be called regularly (ie. in loop()) Need to call
+ * startReading() to initialise the process Need to call getAllChannels() to
+ * transfer the data into an external buffer
+ * @param none
+ *
+ * @return true: reading is complete false: reading is incomplete (or failed)
+ */
+bool Adafruit_AS7341::checkReadingProgress() {
+  if (_readingState == AS7341_WAITING_START) {
+    setSMUXLowChannels(true);        // Configure SMUX to read low channels
+    enableSpectralMeasurement(true); // Start integration
+    _readingState = AS7341_WAITING_LOW;
+    return false;
+  }
+
+  if (!getIsDataReady() || _readingState == AS7341_WAITING_DONE)
+    return false;
+
+  if (_readingState ==
+      AS7341_WAITING_LOW) // Check of getIsDataRead() is already done
+  {
+    Adafruit_BusIO_Register channel_data_reg =
+        Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L, 2);
+
+    // bool low_success = channel_data_reg.read((uint8_t *)_channel_readings,
+    // 12);
+    channel_data_reg.read((uint8_t *)_channel_readings, 12);
+
+    setSMUXLowChannels(false);       // Configure SMUX to read high channels
+    enableSpectralMeasurement(true); // Start integration
+    _readingState = AS7341_WAITING_HIGH;
+    return false;
+  }
+
+  if (_readingState ==
+      AS7341_WAITING_HIGH) // Check of getIsDataRead() is already done
+  {
+    _readingState = AS7341_WAITING_DONE;
+    Adafruit_BusIO_Register channel_data_reg =
+        Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L, 2);
+    // return low_success &&			//low_success is lost since it was
+    // last call
+    channel_data_reg.read((uint8_t *)&_channel_readings[6], 12);
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * @brief transfer all the values from the private result buffer into one
+ * nominated
+ *
+ * @param readings_buffer Pointer to a buffer of length 12 (THERE IS NO ERROR
+ * CHECKING, YE BE WARNED!)
+ *
+ * @return true: success false: failure
+ */
+bool Adafruit_AS7341::getAllChannels(uint16_t *readings_buffer) {
+  for (int i = 0; i < 12; i++)
+    readings_buffer[i] = _channel_readings[i];
+  return true;
+}
+
+/**
+ * @brief Delay while waiting for data, with option to time out and recover
+ *
+ * @return none
+ */
+void Adafruit_AS7341::delayForData(int waitTime) {
+  if (waitTime == 0) // Wait forever
+  {
+    while (!getIsDataReady()) {
+      delay(1);
+    }
+    return;
+  }
+  if (waitTime > 0) // Wait for that many milliseconds
+  {
+    uint32_t elapsedMillis = 0;
+    while (!getIsDataReady() && elapsedMillis < waitTime) {
+      delay(1);
+      elapsedMillis++;
+    }
+    return;
+  }
+  if (waitTime < 0) {
+    // For future use?
+    return;
+  }
 }
 
 /**
@@ -160,10 +272,6 @@ void Adafruit_AS7341::setSMUXLowChannels(bool f1_f4) {
     setup_F5F8_Clear_NIR();
   }
   enableSMUX();
-  enableSpectralMeasurement(true);
-  while (!getIsDataReady()) {
-    delay(1);
-  }
 }
 
 /**
@@ -214,11 +322,17 @@ bool Adafruit_AS7341::enableSMUX(void) {
       Adafruit_BusIO_RegisterBits(&enable_reg, 1, 4);
   bool success = smux_enable_bit.write(true);
 
-  while (smux_enable_bit.read()) {
+  int timeOut = 1000; // Arbitrary value, but if it takes 1000 milliseconds then
+                      // something is wrong
+  int count = 0;
+  while (smux_enable_bit.read() && count < timeOut) {
     delay(1);
+    count++;
   }
-
-  return success;
+  if (count >= timeOut)
+    return false;
+  else
+    return success;
 }
 
 bool Adafruit_AS7341::enableFlickerDetection(bool enable_fd) {
@@ -351,7 +465,9 @@ bool Adafruit_AS7341::enableLED(bool enable_led) {
       Adafruit_BusIO_RegisterBits(&led_reg, 1, 7);
 
   setBank(true); // Access 0x60-0x74
-  return (led_sel_bit.write(enable_led) && led_act_bit.write(enable_led));
+  bool result = led_sel_bit.write(enable_led) && led_act_bit.write(enable_led);
+  setBank(false); // Access registers 0x80 and above (default)
+  return result;
 }
 
 /**
@@ -380,7 +496,9 @@ bool Adafruit_AS7341::setLEDCurrent(uint16_t led_current_ma) {
   Adafruit_BusIO_RegisterBits led_current_bits =
       Adafruit_BusIO_RegisterBits(&led_reg, 7, 0);
 
-  return led_current_bits.write((uint8_t)((led_current_ma - 4) / 2));
+  bool result = led_current_bits.write((uint8_t)((led_current_ma - 4) / 2));
+  setBank(false); // Access registers 0x80 and above (default)
+  return result;
 }
 
 /**
@@ -770,7 +888,7 @@ uint16_t Adafruit_AS7341::detectFlickerHz(void) {
 
   // Enable flicker detection bit
   writeRegister(byte(AS7341_ENABLE), byte(0x41));
-  delay(500);
+  delay(500); // SF 2020-08-12 Does this really need to be so long?
   uint16_t flicker_status = getFlickerDetectStatus();
   enableFlickerDetection(false);
   switch (flicker_status) {
