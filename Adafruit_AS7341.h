@@ -255,6 +255,13 @@ public:
   bool setATIME(uint8_t atime_value);
   bool setGain(as7341_gain_t gain_value);
 
+  uint16_t getASTEP();
+  uint8_t getATIME();
+  as7341_gain_t getGain();
+
+  long getTINT();
+  float toBasicCounts(uint16_t raw);
+
   bool readAllChannels(void);
   bool readAllChannels(uint16_t *readings_buffer);
   uint16_t readChannel(as7341_adc_channel_t channel);
