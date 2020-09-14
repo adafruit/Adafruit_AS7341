@@ -797,6 +797,8 @@ long Adafruit_AS7341::getTINT() {
  *
  * The basic counts are `RAW/(GAIN * TINT)`
  *
+ * @param raw The raw ADC values to convert
+ *
  * @return float The basic counts
  */
 float Adafruit_AS7341::toBasicCounts(uint16_t raw) {
