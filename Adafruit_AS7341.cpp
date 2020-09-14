@@ -715,7 +715,6 @@ bool Adafruit_AS7341::setATIME(uint8_t atime_value) {
   return atime_reg.write(atime_value);
 }
 
-
 /**
  * @brief Returns the integration time step count
  *
@@ -768,7 +767,6 @@ bool Adafruit_AS7341::setGain(as7341_gain_t gain_value) {
   // AGAIN bitfield is only[0:4] but the rest is empty
 }
 
-
 /**
  * @brief Returns the ADC gain multiplier
  *
@@ -777,17 +775,16 @@ bool Adafruit_AS7341::setGain(as7341_gain_t gain_value) {
 as7341_gain_t Adafruit_AS7341::getGain() {
   Adafruit_BusIO_Register cfg1_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_CFG1);
-  return (as7341_gain_t) cfg1_reg.read();
+  return (as7341_gain_t)cfg1_reg.read();
 }
 
-
 /**
-  * @brief Returns the integration time
-  *
-  * The integration time is `(ATIME + 1) * (ASTEP + 1) * 2.78µS`
-  *
-  * @return long The current integration time in ms
-  */
+ * @brief Returns the integration time
+ *
+ * The integration time is `(ATIME + 1) * (ASTEP + 1) * 2.78µS`
+ *
+ * @return long The current integration time in ms
+ */
 long Adafruit_AS7341::getTINT() {
   uint16_t astep = getASTEP();
   uint8_t atime = getATIME();
@@ -796,51 +793,51 @@ long Adafruit_AS7341::getTINT() {
 }
 
 /**
-  * @brief Converts raw ADC values to basic counts
-  *
-  * The basic counts are `RAW/(GAIN * TINT)`
-  *
-  * @return float The basic counts
-  */
+ * @brief Converts raw ADC values to basic counts
+ *
+ * The basic counts are `RAW/(GAIN * TINT)`
+ *
+ * @return float The basic counts
+ */
 float Adafruit_AS7341::toBasicCounts(uint16_t raw) {
   float gain_val = 0;
   as7341_gain_t gain = getGain();
   switch (gain) {
-    case AS7341_GAIN_0_5X:
-      gain_val = 0.5;
-      break;
-    case AS7341_GAIN_1X:
-      gain_val = 1;
-      break;
-    case AS7341_GAIN_2X:
-      gain_val = 2;
-      break;
-    case AS7341_GAIN_4X:
-      gain_val = 4;
-      break;
-    case AS7341_GAIN_8X:
-      gain_val = 8;
-      break;
-    case AS7341_GAIN_16X:
-      gain_val = 16;
-      break;
-    case AS7341_GAIN_32X:
-      gain_val = 32;
-      break;
-    case AS7341_GAIN_64X:
-      gain_val = 64;
-      break;
-    case AS7341_GAIN_128X:
-      gain_val = 128;
-      break;
-    case AS7341_GAIN_256X:
-      gain_val = 256;
-      break;
-    case AS7341_GAIN_512X:
-      gain_val = 512;
-      break;
+  case AS7341_GAIN_0_5X:
+    gain_val = 0.5;
+    break;
+  case AS7341_GAIN_1X:
+    gain_val = 1;
+    break;
+  case AS7341_GAIN_2X:
+    gain_val = 2;
+    break;
+  case AS7341_GAIN_4X:
+    gain_val = 4;
+    break;
+  case AS7341_GAIN_8X:
+    gain_val = 8;
+    break;
+  case AS7341_GAIN_16X:
+    gain_val = 16;
+    break;
+  case AS7341_GAIN_32X:
+    gain_val = 32;
+    break;
+  case AS7341_GAIN_64X:
+    gain_val = 64;
+    break;
+  case AS7341_GAIN_128X:
+    gain_val = 128;
+    break;
+  case AS7341_GAIN_256X:
+    gain_val = 256;
+    break;
+  case AS7341_GAIN_512X:
+    gain_val = 512;
+    break;
   }
-  return raw/(gain_val * (getATIME()+1) * (getASTEP()+1) * 2.78 / 1000);
+  return raw / (gain_val * (getATIME() + 1) * (getASTEP() + 1) * 2.78 / 1000);
 }
 
 /**
