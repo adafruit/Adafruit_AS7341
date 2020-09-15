@@ -93,6 +93,7 @@ var searchData=
   ['as7341_5fstatus3',['AS7341_STATUS3',['../_adafruit___a_s7341_8h.html#a53a414810ca30bd1c2f6f197adf06635',1,'Adafruit_AS7341.h']]],
   ['as7341_5fstatus5',['AS7341_STATUS5',['../_adafruit___a_s7341_8h.html#a24b444a10e6ed3c114848e7831f13ad1',1,'Adafruit_AS7341.h']]],
   ['as7341_5fstatus6',['AS7341_STATUS6',['../_adafruit___a_s7341_8h.html#a5634404c721a7b35a03d8698329c08e8',1,'Adafruit_AS7341.h']]],
+  ['as7341_5fwaiting_5ft',['as7341_waiting_t',['../_adafruit___a_s7341_8h.html#add6b9e93342e0d927754df146494e379',1,'Adafruit_AS7341.h']]],
   ['as7341_5fwhoami',['AS7341_WHOAMI',['../_adafruit___a_s7341_8h.html#a3797f2ee99ca57f1d1c4f3fb6c852168',1,'Adafruit_AS7341.h']]],
   ['as7341_5fwtime',['AS7341_WTIME',['../_adafruit___a_s7341_8h.html#af0c8764437d3895c6c3092595980f73e',1,'Adafruit_AS7341.h']]],
   ['adafruit_20as7341_2011_2dchannel_20spectral_20sensor',['Adafruit AS7341 11-Channel Spectral Sensor',['../index.html',1,'']]]

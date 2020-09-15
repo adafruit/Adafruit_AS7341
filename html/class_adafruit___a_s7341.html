@@ -101,12 +101,24 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9a8f1cbbae4ede049ed9e5845e00cc15"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a9a8f1cbbae4ede049ed9e5845e00cc15">readAllChannels</a> (uint16_t *readings_buffer)</td></tr>
 <tr class="memdesc:a9a8f1cbbae4ede049ed9e5845e00cc15"><td class="mdescLeft">&#160;</td><td class="mdescRight">fills the provided buffer with the current measurements for Spectral channels F1-8, Clear and NIR  <a href="#a9a8f1cbbae4ede049ed9e5845e00cc15">More...</a><br /></td></tr>
 <tr class="separator:a9a8f1cbbae4ede049ed9e5845e00cc15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36149903cf20f0249d9c2133f36670af"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a36149903cf20f0249d9c2133f36670af">delayForData</a> (int waitTime=0)</td></tr>
+<tr class="memdesc:a36149903cf20f0249d9c2133f36670af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delay while waiting for data, with option to time out and recover.  <a href="#a36149903cf20f0249d9c2133f36670af">More...</a><br /></td></tr>
+<tr class="separator:a36149903cf20f0249d9c2133f36670af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aafc34b022476b93cd58ffe8bf837d4fb"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#aafc34b022476b93cd58ffe8bf837d4fb">readChannel</a> (<a class="el" href="_adafruit___a_s7341_8h.html#a38f1fe34ba50a6013cc9941db56ca2f9">as7341_adc_channel_t</a> channel)</td></tr>
 <tr class="memdesc:aafc34b022476b93cd58ffe8bf837d4fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the ADC data for a given channel.  <a href="#aafc34b022476b93cd58ffe8bf837d4fb">More...</a><br /></td></tr>
 <tr class="separator:aafc34b022476b93cd58ffe8bf837d4fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa8a730d24616f2c0f56026d4822855c"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#afa8a730d24616f2c0f56026d4822855c">getChannel</a> (<a class="el" href="_adafruit___a_s7341_8h.html#a0072d21bcae171ff1f6dcd59a0b835b5">as7341_color_channel_t</a> channel)</td></tr>
 <tr class="memdesc:afa8a730d24616f2c0f56026d4822855c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the reading data for the specified color channel.  <a href="#afa8a730d24616f2c0f56026d4822855c">More...</a><br /></td></tr>
 <tr class="separator:afa8a730d24616f2c0f56026d4822855c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48aa889a1ffa09e5c60de491edb3b73f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a48aa889a1ffa09e5c60de491edb3b73f">startReading</a> (void)</td></tr>
+<tr class="memdesc:a48aa889a1ffa09e5c60de491edb3b73f"><td class="mdescLeft">&#160;</td><td class="mdescRight">starts the process of getting readings from all channels without using delays  <a href="#a48aa889a1ffa09e5c60de491edb3b73f">More...</a><br /></td></tr>
+<tr class="separator:a48aa889a1ffa09e5c60de491edb3b73f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9150d66d74ff752996cf3107aacd100"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#ab9150d66d74ff752996cf3107aacd100">checkReadingProgress</a> ()</td></tr>
+<tr class="memdesc:ab9150d66d74ff752996cf3107aacd100"><td class="mdescLeft">&#160;</td><td class="mdescRight">runs the process of getting readings from all channels without using delays. Should be called regularly (ie. in loop()) Need to call <a class="el" href="class_adafruit___a_s7341.html#a48aa889a1ffa09e5c60de491edb3b73f" title="starts the process of getting readings from all channels without using delays ">startReading()</a> to initialise the process Need to call <a class="el" href="class_adafruit___a_s7341.html#a3fe7c24bb16063684d6106eff32438ac" title="transfer all the values from the private result buffer into one nominated ">getAllChannels()</a> to transfer the data into an external buffer  <a href="#ab9150d66d74ff752996cf3107aacd100">More...</a><br /></td></tr>
+<tr class="separator:ab9150d66d74ff752996cf3107aacd100"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fe7c24bb16063684d6106eff32438ac"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a3fe7c24bb16063684d6106eff32438ac">getAllChannels</a> (uint16_t *readings_buffer)</td></tr>
+<tr class="memdesc:a3fe7c24bb16063684d6106eff32438ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">transfer all the values from the private result buffer into one nominated  <a href="#a3fe7c24bb16063684d6106eff32438ac">More...</a><br /></td></tr>
+<tr class="separator:a3fe7c24bb16063684d6106eff32438ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4f29264491d83d8a22a68700b738749a"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a4f29264491d83d8a22a68700b738749a">detectFlickerHz</a> (void)</td></tr>
 <tr class="memdesc:a4f29264491d83d8a22a68700b738749a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Detect a flickering light.  <a href="#a4f29264491d83d8a22a68700b738749a">More...</a><br /></td></tr>
 <tr class="separator:a4f29264491d83d8a22a68700b738749a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -393,6 +405,33 @@ Adafruit_I2CDevice *&#160;</td><td class="memItemRight" valign="bottom"><a class
 
 </div>
 </div>
+<a id="a36149903cf20f0249d9c2133f36670af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36149903cf20f0249d9c2133f36670af">&#9670;&nbsp;</a></span>delayForData()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Adafruit_AS7341::delayForData </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>waitTime</em> = <code>0</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Delay while waiting for data, with option to time out and recover. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">waitTime</td><td>the maximum amount of time to wait </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>none </dd></dl>
+
+</div>
+</div>
 <a id="aafc34b022476b93cd58ffe8bf837d4fb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aafc34b022476b93cd58ffe8bf837d4fb">&#9670;&nbsp;</a></span>readChannel()</h2>
 
@@ -445,6 +484,74 @@ Adafruit_I2CDevice *&#160;</td><td class="memItemRight" valign="bottom"><a class
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>uint16_t The measured data for the selected sensor channel </dd></dl>
+
+</div>
+</div>
+<a id="a48aa889a1ffa09e5c60de491edb3b73f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a48aa889a1ffa09e5c60de491edb3b73f">&#9670;&nbsp;</a></span>startReading()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_AS7341::startReading </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>starts the process of getting readings from all channels without using delays </p>
+<dl class="section return"><dt>Returns</dt><dd>true: success false: failure (a bit arbitrary) </dd></dl>
+
+</div>
+</div>
+<a id="ab9150d66d74ff752996cf3107aacd100"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9150d66d74ff752996cf3107aacd100">&#9670;&nbsp;</a></span>checkReadingProgress()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_AS7341::checkReadingProgress </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>runs the process of getting readings from all channels without using delays. Should be called regularly (ie. in loop()) Need to call <a class="el" href="class_adafruit___a_s7341.html#a48aa889a1ffa09e5c60de491edb3b73f" title="starts the process of getting readings from all channels without using delays ">startReading()</a> to initialise the process Need to call <a class="el" href="class_adafruit___a_s7341.html#a3fe7c24bb16063684d6106eff32438ac" title="transfer all the values from the private result buffer into one nominated ">getAllChannels()</a> to transfer the data into an external buffer </p>
+<dl class="section return"><dt>Returns</dt><dd>true: reading is complete false: reading is incomplete (or failed) </dd></dl>
+
+</div>
+</div>
+<a id="a3fe7c24bb16063684d6106eff32438ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3fe7c24bb16063684d6106eff32438ac">&#9670;&nbsp;</a></span>getAllChannels()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_AS7341::getAllChannels </td>
+          <td>(</td>
+          <td class="paramtype">uint16_t *&#160;</td>
+          <td class="paramname"><em>readings_buffer</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>transfer all the values from the private result buffer into one nominated </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">readings_buffer</td><td>Pointer to a buffer of length 12 (THERE IS NO ERROR CHECKING, YE BE WARNED!)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true: success false: failure </dd></dl>
 
 </div>
 </div>

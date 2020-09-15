@@ -17,5 +17,6 @@ var searchData=
   ['spectralhightriggered',['spectralHighTriggered',['../class_adafruit___a_s7341.html#a8f1c04e8254443a1a7c74cd5dfd43fc3',1,'Adafruit_AS7341']]],
   ['spectralinterruptsource',['spectralInterruptSource',['../class_adafruit___a_s7341.html#a9f223de2c3bedd96da13d18240c49d92',1,'Adafruit_AS7341']]],
   ['spectralinterrupttriggered',['spectralInterruptTriggered',['../class_adafruit___a_s7341.html#a75855c792d95432ed994ca45ae94b718',1,'Adafruit_AS7341']]],
-  ['spectrallowtriggered',['spectralLowTriggered',['../class_adafruit___a_s7341.html#a1195ad51523fa054f6ce71db3a1fcfde',1,'Adafruit_AS7341']]]
+  ['spectrallowtriggered',['spectralLowTriggered',['../class_adafruit___a_s7341.html#a1195ad51523fa054f6ce71db3a1fcfde',1,'Adafruit_AS7341']]],
+  ['startreading',['startReading',['../class_adafruit___a_s7341.html#a48aa889a1ffa09e5c60de491edb3b73f',1,'Adafruit_AS7341']]]
 ];
