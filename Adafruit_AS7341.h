@@ -239,6 +239,7 @@ typedef enum {
 
 /**
  * @brief Wait states for async reading
+ */
 typedef enum {
   AS7341_WAITING_START, //
   AS7341_WAITING_LOW,   //
