@@ -8,7 +8,7 @@
  * 	I2C Driver for the Library for the AS7341 11-Channel Spectral Sensor
  *
  * 	This is a library for the Adafruit AS7341 breakout:
- * 	https://www.adafruit.com/product/45XX
+ * 	https://www.adafruit.com/product/4698
  *
  * 	Adafruit invests time and resources providing this open source code,
  *  please support Adafruit and open-source hardware by purchasing products from
@@ -237,6 +237,16 @@ typedef enum {
   AS7341_GPIO_INPUT,  ///< The GPIO Pin is set as a high-impedence input
 } as7341_gpio_dir_t;
 
+/**
+ * @brief Wait states for async reading
+ */
+typedef enum {
+  AS7341_WAITING_START, //
+  AS7341_WAITING_LOW,   //
+  AS7341_WAITING_HIGH,  //
+  AS7341_WAITING_DONE,  //
+} as7341_waiting_t;
+
 class Adafruit_AS7341;
 
 /*!
@@ -264,8 +274,13 @@ public:
 
   bool readAllChannels(void);
   bool readAllChannels(uint16_t *readings_buffer);
+  void delayForData(int waitTime = 0);
   uint16_t readChannel(as7341_adc_channel_t channel);
   uint16_t getChannel(as7341_color_channel_t channel);
+
+  bool startReading(void);
+  bool checkReadingProgress();
+  bool getAllChannels(uint16_t *readings_buffer);
 
   uint16_t detectFlickerHz(void);
 
@@ -327,6 +342,7 @@ private:
   void writeRegister(byte addr, byte val);
   void setSMUXLowChannels(bool f1_f4);
   uint16_t _channel_readings[12];
+  as7341_waiting_t _readingState;
 };
 
 #endif
