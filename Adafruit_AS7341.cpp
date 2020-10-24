@@ -150,8 +150,6 @@ bool Adafruit_AS7341::readAllChannels(uint16_t *readings_buffer) {
  * @brief starts the process of getting readings from all channels without using
  * delays
  *
- * @param none
- *
  * @return true: success false: failure (a bit arbitrary)
  */
 bool Adafruit_AS7341::startReading(void) {
@@ -165,7 +163,6 @@ bool Adafruit_AS7341::startReading(void) {
  * delays.  Should be called regularly (ie. in loop()) Need to call
  * startReading() to initialise the process Need to call getAllChannels() to
  * transfer the data into an external buffer
- * @param none
  *
  * @return true: reading is complete false: reading is incomplete (or failed)
  */
@@ -202,8 +199,8 @@ bool Adafruit_AS7341::checkReadingProgress() {
     _readingState = AS7341_WAITING_DONE;
     Adafruit_BusIO_Register channel_data_reg =
         Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L, 2);
-    // return low_success &&			//low_success is lost since it was last
-    // call
+    // return low_success &&			//low_success is lost since it
+    // was last call
     channel_data_reg.read((uint8_t *)&_channel_readings[6], 12);
     return true;
   }
@@ -229,6 +226,7 @@ bool Adafruit_AS7341::getAllChannels(uint16_t *readings_buffer) {
 /**
  * @brief Delay while waiting for data, with option to time out and recover
  *
+ * @param waitTime the maximum amount of time to wait
  * @return none
  */
 void Adafruit_AS7341::delayForData(int waitTime) {
