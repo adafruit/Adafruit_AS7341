@@ -152,8 +152,9 @@ bool Adafruit_AS7341::readAllChannels(uint16_t *readings_buffer) {
  *
  * @return true: success false: failure (a bit arbitrary)
  */
-bool Adafruit_AS7341::startReading(void) {
+bool Adafruit_AS7341::startReading(as7341_channel_group_t channelsOption) {
   _readingState = AS7341_WAITING_START; // Start the measurement please
+  _channelsOption = channelsOption;		// Whether to read low, high, both
   checkReadingProgress();               // Call the check function to start it
   return true;
 }
@@ -168,40 +169,60 @@ bool Adafruit_AS7341::startReading(void) {
  */
 bool Adafruit_AS7341::checkReadingProgress() {
   if (_readingState == AS7341_WAITING_START) {
-    setSMUXLowChannels(true);        // Configure SMUX to read low channels
-    enableSpectralMeasurement(true); // Start integration
-    _readingState = AS7341_WAITING_LOW;
-    return false;
+	if(_channelsOption == AS7341_CH_LOW || _channelsOption == AS7341_CH_BOTH) {
+		setSMUXLowChannels(true);        // Configure SMUX to read low channels
+		enableSpectralMeasurement(true); // Start integration
+		_readingState = AS7341_WAITING_LOW;
+		return false;
+	}
+	else if(_channelsOption == AS7341_CUSTOM_SMUX) {
+		setSMUXCustomChannels();	//Writes your pre-prepared SMUX config to device
+		enableSpectralMeasurement(true); // Start integration
+		_readingState = AS7341_WAITING_LOW;
+		return false;		
+	}
+	else {		
+		for(int i=0;i<6;i++)	//Blank the low channel results
+			_channel_readings[i] = 0;
+		_readingState = AS7341_WAITING_CONTINUE;
+	}
   }
 
-  if (!getIsDataReady() || _readingState == AS7341_WAITING_DONE)
-    return false;
-
-  if (_readingState ==
-      AS7341_WAITING_LOW) // Check of getIsDataRead() is already done
-  {
-    Adafruit_BusIO_Register channel_data_reg =
-        Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L, 2);
-
-    // bool low_success = channel_data_reg.read((uint8_t *)_channel_readings,
-    // 12);
-    channel_data_reg.read((uint8_t *)_channel_readings, 12);
-
-    setSMUXLowChannels(false);       // Configure SMUX to read high channels
-    enableSpectralMeasurement(true); // Start integration
-    _readingState = AS7341_WAITING_HIGH;
-    return false;
+  if(_readingState != AS7341_WAITING_CONTINUE) {
+	if (!getIsDataReady() || _readingState == AS7341_WAITING_DONE)
+		return false; 
   }
 
-  if (_readingState ==
-      AS7341_WAITING_HIGH) // Check of getIsDataRead() is already done
-  {
+  if (_readingState == AS7341_WAITING_LOW || _readingState == AS7341_WAITING_CONTINUE) {
+	if(_channelsOption == AS7341_CH_LOW || _channelsOption == AS7341_CH_BOTH || _channelsOption == AS7341_CUSTOM_SMUX) {
+		Adafruit_BusIO_Register channel_data_reg =
+			Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L, 2);
+		channel_data_reg.read((uint8_t *)_channel_readings, 12);
+	}
+	if(_readingState == AS7341_WAITING_CONTINUE)	//Recover from a skipped LOW
+		_readingState = AS7341_WAITING_LOW;
+	
+	if(_channelsOption == AS7341_CH_HIGH || _channelsOption == AS7341_CH_BOTH) {
+		setSMUXLowChannels(false);       // Configure SMUX to read high channels
+		enableSpectralMeasurement(true); // Start integration
+		_readingState = AS7341_WAITING_HIGH;
+		return false;
+	}
+	else {
+		for(int i=6;i<12;i++)	//Blank the high channel results
+			_channel_readings[i] = 0;
+		_readingState = AS7341_WAITING_CONTINUE;			
+	}
+  }
+
+  if (_readingState == AS7341_WAITING_HIGH 
+		|| _readingState == AS7341_WAITING_CONTINUE) {
     _readingState = AS7341_WAITING_DONE;
-    Adafruit_BusIO_Register channel_data_reg =
-        Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L, 2);
-    // return low_success &&			//low_success is lost since it
-    // was last call
-    channel_data_reg.read((uint8_t *)&_channel_readings[6], 12);
+    if(_channelsOption == AS7341_CH_HIGH || _channelsOption == AS7341_CH_BOTH) {
+		Adafruit_BusIO_Register channel_data_reg =
+			Adafruit_BusIO_Register(i2c_dev, AS7341_CH0_DATA_L, 2);
+		channel_data_reg.read((uint8_t *)&_channel_readings[6], 12);
+	}
     return true;
   }
 
@@ -756,6 +777,7 @@ void Adafruit_AS7341::setup_F1F4_Clear_NIR() {
   writeRegister(byte(0x13), byte(0x06)); // NIR connected to ADC5
 }
 
+
 /**
  * @brief Configure SMUX for sensors F5-8, Clear and NIR
  *
@@ -911,3 +933,196 @@ void Adafruit_AS7341::writeRegister(byte addr, byte val) {
   Adafruit_BusIO_Register reg = Adafruit_BusIO_Register(i2c_dev, addr);
   reg.write(val);
 }
+
+
+/**
+ * @brief Write the contents of SMUXPixelRegistersLocal[] to the device
+ * Suggest avoid calling this externally - it is called at the start of 
+ * an integration
+ */
+bool Adafruit_AS7341::setSMUXCustomChannels() {
+	enableSpectralMeasurement(false);
+	setSMUXCommand(AS7341_SMUX_CMD_WRITE);
+	
+	for(byte addr=0;addr<SMUX_PIXEL_REG_NUM;addr++)
+		writeRegister(addr,SMUXPixelRegistersLocal[addr]);	
+	
+	enableSMUX();
+	return true;
+}
+
+/**
+ * @brief Clear SMUXPixelRegistersLocal[], the copy of what will be written to the device 
+ * for a custom SMUX configuration
+ *
+ */
+bool Adafruit_AS7341::clearSMUXPixelRegistersLocal() {
+	for(byte addr=0;addr<SMUX_PIXEL_REG_NUM;addr++)
+		SMUXPixelRegistersLocal[addr] = 0;
+	return true;
+}
+
+/**
+ * @brief Add a connection to the local SMUX map
+ * Use the macros already defined in the separate header file to 
+ * connect a diode to an ADC
+ * Example call: "updateSMUXEntryLocal(F3_LEFT, ADC2);"
+ *
+ * @param diodePixel 
+ * @param numADC
+ */
+bool Adafruit_AS7341::updateSMUXEntryLocal(byte diodePixel, byte numADC) {
+	if(diodePixel >= NUM_PIXELS || numADC > 6)	//Error checking
+		return false;
+	
+	byte writeAddress = pixelAddr[diodePixel];
+	byte newBitMask = numADC;
+	byte blankingMask = 0b111;
+	
+	newBitMask = newBitMask << (pixelPos[diodePixel] - 2);	//Shift 0 or 4 places	
+	blankingMask = blankingMask << (pixelPos[diodePixel] - 2);	//Shift 0 or 4 places
+	blankingMask = ~blankingMask;	//Invert it
+	// Serial.println(newBitMask, BIN);
+	
+	//Update the collection of values for bulk writing later
+	SMUXPixelRegistersLocal[writeAddress] &= blankingMask; 	//Blank old value bits
+	SMUXPixelRegistersLocal[writeAddress] |= newBitMask; 	//Apply new value
+	
+	return true;
+}
+
+/**
+ * @brief Use a 32-bit config word to set all the diodes connected to an ADC channel
+ * Bits in the config word correspond to indexes of the diodes per the extra header file
+ * WARNING: INDEXES ARE ARBITRARY, AND NOT THE SAME AS PIXEL NUMBERS
+ * The config word is intended to allow easy reading of a configuration from a file
+ * @param inADC
+ * @param wordIn
+ */
+bool Adafruit_AS7341::setSMUXADCFromConfigWord(byte inADC, uint32_t wordIn) {
+	if(inADC > 6)	//Error checking
+		return 0;
+		
+	// Serial.println(wordIn,BIN);	
+	uint32_t bitMask = 1;
+	for(byte i=0; i<NUM_PIXELS; i++)
+	{
+		// Serial.println(bitMask,BIN);
+		if(wordIn & bitMask)	//That's a bitwiseAND, so only the relevant bit is checked
+		{
+			updateSMUXEntryLocal(i, inADC);
+			// Serial.println(bitMask,BIN);
+		}
+		bitMask = bitMask << 1;		
+	}
+	return true;
+}
+
+/**
+ * @brief Add a diode/pixel to a config word that is being generated
+ *
+ * @param inputWord (note it's a pointer)
+ * @param inputPixel (use a macro, like "F1_LEFT" or "PIXEL3")
+ */
+bool Adafruit_AS7341::addSMUXPixelToADCword(uint32_t* inputWord, byte inputPixel) {
+	if(inputPixel >= NUM_PIXELS)
+		return false;
+	
+	uint32_t bitMask = 1 << inputPixel;
+	*inputWord |= bitMask;
+	
+	return true;
+}
+
+/**
+ * @brief Remove a diode/pixel from a config word that is being generated
+ *
+ * @param inputWord (note it's a pointer)
+ * @param inputPixel (use a macro, like "F1_LEFT" or "PIXEL3")
+ */
+bool Adafruit_AS7341::removeSMUXPixelFromADCword(uint32_t* inputWord, byte inputPixel) {
+	if(inputPixel >= NUM_PIXELS)
+		return false;
+	
+	uint32_t bitMask = 1 << inputPixel;
+	bitMask = ~bitMask;	//Invert it for removing
+	*inputWord &= bitMask;
+	
+	return true;
+}
+
+/**
+ * @brief Generate a config word from the local config for an ADC channel
+ *
+ * @param inputPixel (use a macro, like "ADC0")
+ */
+uint32_t Adafruit_AS7341::getSMUXConfigWordForADC(byte inADC) {
+	if(inADC > 6)	//Error checking
+		return 0;
+		
+	byte addr = 0;
+	byte pos = 0;
+	byte bitMask = 0;
+	byte addrContents = 0;
+	uint32_t newConfigWord = 0;
+	for(byte i=0; i<NUM_PIXELS; i++) {
+		addr = pixelAddr[i];
+		pos = pixelPos[i];
+		addrContents = SMUXPixelRegistersLocal[addr];
+		
+		bitMask = inADC;
+		// bitMask = bitMask << (pixelPos[i] - 2);	//Shift 0 or 4 places	
+		
+		if(pixelPos[i] == 2) {
+			addrContents = addrContents << 4;	//Remove other value, if present
+			bitMask = bitMask << 4;				//Align with new addrContents
+		}
+		if(pixelPos[i] == 6) {
+			addrContents = addrContents >> 4;	//Remove other value, if present
+			// bitMask = bitMask  4;
+		}
+		if(addrContents == bitMask)
+			addSMUXPixelToADCword(&newConfigWord,i);		
+	}
+	return newConfigWord;	
+}
+
+/**
+ * @brief Debugging function, prints the local custom SMUX configuration
+ *
+ * @param inputPixel (use a macro, like "ADC0")
+ */
+void Adafruit_AS7341::printLocalSMUXConfig() {
+	Serial.println("Local SMUX Config:");
+	for(byte addr=0;addr<SMUX_PIXEL_REG_NUM;addr++) {
+		Serial.print("Address 0x");
+		Serial.print(addr, HEX);
+		Serial.print(":\t");
+		printBits(SMUXPixelRegistersLocal[addr],8);	
+		Serial.print(" (0x");
+		Serial.print(SMUXPixelRegistersLocal[addr],HEX);	
+		Serial.println(")");		
+	}
+}
+
+
+/**
+ * @brief Helper function
+ *
+ * Adapted from here: http://engineeringnotes.blogspot.com/2016/10/printbits-routine.html
+ * prints N-bit integer in this form: 0000000000000000
+ * works for 4 - 32 bits
+ * @param inputPixel (use a macro, like "ADC0")
+*/
+void Adafruit_AS7341::printBits(long int n, int numBits) {
+//  byte numBits = 32;  // 2^numBits must be big enough to include the number n
+  char b;
+  char c = ' ';   // delimiter character
+  for (byte i = 0; i < numBits; i++) {
+    // shift 1 and mask to identify each bit value
+    b = (n & (1 << (numBits - 1 - i))) > 0 ? '1' : '0'; // slightly faster to print chars than ints (saves conversion)
+    Serial.print(b);
+//    if (i < (numBits - 1) && ((numBits-i - 1) % 4 == 0 )) Serial.print(c); // print a separator at every 4 bits
+  }
+}
+	

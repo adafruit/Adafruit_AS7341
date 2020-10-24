@@ -53,6 +53,7 @@
 #ifndef _ADAFRUIT_AS7341_H
 #define _ADAFRUIT_AS7341_H
 
+#include <Adafruit_AS7341_SMUX.h>
 #include "Arduino.h"
 #include <Adafruit_BusIO_Register.h>
 #include <Adafruit_I2CDevice.h>
@@ -242,10 +243,23 @@ typedef enum {
  */
 typedef enum {
   AS7341_WAITING_START, //
+  AS7341_WAITING_CONTINUE, //
   AS7341_WAITING_LOW,   //
   AS7341_WAITING_HIGH,  //
   AS7341_WAITING_DONE,  //
 } as7341_waiting_t;
+
+/**
+ * @brief Channel groups
+ */
+typedef enum {
+  AS7341_CH_NONE, //
+  AS7341_CH_LOW,   //
+  AS7341_CH_HIGH,  //
+  AS7341_CH_BOTH,  //
+  AS7341_CUSTOM_SMUX,  //
+} as7341_channel_group_t;
+
 
 class Adafruit_AS7341;
 
@@ -271,7 +285,7 @@ public:
   uint16_t readChannel(as7341_adc_channel_t channel);
   uint16_t getChannel(as7341_color_channel_t channel);
 
-  bool startReading(void);
+  bool startReading(as7341_channel_group_t channelsOption = AS7341_CH_BOTH);
   bool checkReadingProgress();
   bool getAllChannels(uint16_t *readings_buffer);
 
@@ -279,6 +293,7 @@ public:
 
   void setup_F1F4_Clear_NIR(void);
   void setup_F5F8_Clear_NIR(void);
+  bool setSMUXCustomChannels();	
 
   void powerEnable(bool enable_power);
   bool enableSpectralMeasurement(bool enable_measurement);
@@ -317,6 +332,15 @@ public:
   bool setGPIOInverted(bool gpio_inverted);
   bool getGPIOValue(void);
   bool setGPIOValue(bool);
+  
+  bool clearSMUXPixelRegistersLocal();
+  bool updateSMUXEntryLocal(byte diodePixel, byte numADC);
+  bool setSMUXADCFromConfigWord(byte inADC, uint32_t wordIn);
+  bool addSMUXPixelToADCword(uint32_t* inputWord, byte inputPixel);
+  bool removeSMUXPixelFromADCword(uint32_t* inputWord, byte inputPixel);
+  uint32_t getSMUXConfigWordForADC(byte inADC);
+  void printLocalSMUXConfig();
+  void printBits(long int n, int numBits);
 
 protected:
   virtual bool _init(int32_t sensor_id);
@@ -335,7 +359,11 @@ private:
   void writeRegister(byte addr, byte val);
   void setSMUXLowChannels(bool f1_f4);
   uint16_t _channel_readings[12];
-  as7341_waiting_t _readingState;
+  as7341_waiting_t _readingState = AS7341_WAITING_DONE;
+  as7341_channel_group_t _channelsOption = AS7341_CH_BOTH;
+  byte SMUXPixelRegistersLocal[SMUX_PIXEL_REG_NUM];
 };
+
+
 
 #endif
