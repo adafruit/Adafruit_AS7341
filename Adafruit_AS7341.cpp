@@ -832,6 +832,19 @@ bool Adafruit_AS7341::setATIME(uint8_t atime_value) {
 }
 
 /**
+ * @brief Returns the integration time step count
+ *
+ * Total integration time will be `(ATIME + 1) * (ASTEP + 1) * 2.78µS`
+ *
+ * @return uint8_t The current integration time step count
+ */
+uint8_t Adafruit_AS7341::getATIME() {
+  Adafruit_BusIO_Register atime_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_ATIME);
+  return atime_reg.read();
+}
+
+/**
  * @brief Sets the integration time step size
  *
  * @param astep_value Integration time step size in 2.78 microsecon increments
@@ -845,7 +858,20 @@ bool Adafruit_AS7341::setASTEP(uint16_t astep_value) {
 }
 
 /**
- * @brief Set the ADC gain multiplier
+ * @brief Returns the integration time step size
+ *
+ * Step size is `(astep_value+1) * 2.78 uS`
+ *
+ * @return uint16_t The current integration time step size
+ */
+uint16_t Adafruit_AS7341::getASTEP() {
+  Adafruit_BusIO_Register astep_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_ASTEP_L, 2, LSBFIRST);
+  return astep_reg.read();
+}
+
+/**
+ * @brief Sets the ADC gain multiplier
  *
  * @param gain_value The gain amount. must be an `as7341_gain_t`
  * @return true: success false: failure
@@ -855,6 +881,81 @@ bool Adafruit_AS7341::setGain(as7341_gain_t gain_value) {
       Adafruit_BusIO_Register(i2c_dev, AS7341_CFG1);
   return cfg1_reg.write(gain_value);
   // AGAIN bitfield is only[0:4] but the rest is empty
+}
+
+/**
+ * @brief Returns the ADC gain multiplier
+ *
+ * @return as7341_gain_t The current ADC gain multiplier
+ */
+as7341_gain_t Adafruit_AS7341::getGain() {
+  Adafruit_BusIO_Register cfg1_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_CFG1);
+  return (as7341_gain_t)cfg1_reg.read();
+}
+
+/**
+ * @brief Returns the integration time
+ *
+ * The integration time is `(ATIME + 1) * (ASTEP + 1) * 2.78µS`
+ *
+ * @return long The current integration time in ms
+ */
+long Adafruit_AS7341::getTINT() {
+  uint16_t astep = getASTEP();
+  uint8_t atime = getATIME();
+
+  return (atime + 1) * (astep + 1) * 2.78 / 1000;
+}
+
+/**
+ * @brief Converts raw ADC values to basic counts
+ *
+ * The basic counts are `RAW/(GAIN * TINT)`
+ *
+ * @param raw The raw ADC values to convert
+ *
+ * @return float The basic counts
+ */
+float Adafruit_AS7341::toBasicCounts(uint16_t raw) {
+  float gain_val = 0;
+  as7341_gain_t gain = getGain();
+  switch (gain) {
+  case AS7341_GAIN_0_5X:
+    gain_val = 0.5;
+    break;
+  case AS7341_GAIN_1X:
+    gain_val = 1;
+    break;
+  case AS7341_GAIN_2X:
+    gain_val = 2;
+    break;
+  case AS7341_GAIN_4X:
+    gain_val = 4;
+    break;
+  case AS7341_GAIN_8X:
+    gain_val = 8;
+    break;
+  case AS7341_GAIN_16X:
+    gain_val = 16;
+    break;
+  case AS7341_GAIN_32X:
+    gain_val = 32;
+    break;
+  case AS7341_GAIN_64X:
+    gain_val = 64;
+    break;
+  case AS7341_GAIN_128X:
+    gain_val = 128;
+    break;
+  case AS7341_GAIN_256X:
+    gain_val = 256;
+    break;
+  case AS7341_GAIN_512X:
+    gain_val = 512;
+    break;
+  }
+  return raw / (gain_val * (getATIME() + 1) * (getASTEP() + 1) * 2.78 / 1000);
 }
 
 /**

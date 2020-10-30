@@ -265,6 +265,13 @@ public:
   bool setATIME(uint8_t atime_value);
   bool setGain(as7341_gain_t gain_value);
 
+  uint16_t getASTEP();
+  uint8_t getATIME();
+  as7341_gain_t getGain();
+
+  long getTINT();
+  float toBasicCounts(uint16_t raw);
+
   bool readAllChannels(void);
   bool readAllChannels(uint16_t *readings_buffer);
   void delayForData(int waitTime = 0);
