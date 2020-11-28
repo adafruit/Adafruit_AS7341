@@ -324,6 +324,8 @@ public:
   bool setGPIOInverted(bool gpio_inverted);
   bool getGPIOValue(void);
   bool setGPIOValue(bool);
+  
+  uint16_t sampleFicker(uint16_t *wbuf,uint16_t wlen, uint16_t freq_hz, uint8_t fd_gain);
 
 protected:
   virtual bool _init(int32_t sensor_id);
