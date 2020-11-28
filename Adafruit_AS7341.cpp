@@ -1012,3 +1012,108 @@ void Adafruit_AS7341::writeRegister(byte addr, byte val) {
   Adafruit_BusIO_Register reg = Adafruit_BusIO_Register(i2c_dev, addr);
   reg.write(val);
 }
+
+/**
+ * @brief Sample flickering light
+ *
+ * @param wbuf Buffer for samples
+ * @param wlen Number of samples
+ * @param freq_hz Sample frequency in Hz
+ * @param fd_gain Gain 0=0.5x, 1=1x, 2=2x, ..., 10=512x
+ *
+ * @return The overflow sample value
+ */
+uint16_t Adafruit_AS7341::sampleFicker(uint16_t *wbuf,uint16_t wlen, uint16_t freq_hz, uint8_t fd_gain) {
+  //buf & len in bytes
+  uint8_t *buf = (uint8_t*)wbuf;;
+  uint16_t len = wlen * 2;
+  uint16_t pos = 0; //pos in bytes
+
+  //maximum number of bytes to read in one i2c transaction
+  const uint16_t maxreadlen = 64; 
+
+  //PON
+  writeRegister(byte(0x80), byte(0x01));
+  
+  //Write SMUX configuration for flicker detection
+  setSMUXCommand(AS7341_SMUX_CMD_WRITE);
+  FDConfig();
+  enableSMUX();
+
+  /*FD_TIME and FD_GAIN
+  FD_TIME = 360000 / Freq_Hz - 1
+
+  FD_TIME Register (Address 0xD8, 0xDA)
+  The register FD Time 1 and FD Time 2 can be used to configure the integration time and gain (ADC 5)
+  of the flicker detection independently from the other ADCs. The FD_TIME register is an 11-bit register
+  with the MSB in register 0xDA (bit 10:8) and the LSB in register 0xD8 (bit 7:0). The bit FDEN (register
+  0x80) must be set to “1” in order to use the FD_TIME registers. If the bit FDEN is not set, ADC5 runs
+  automatically with the same gain and integration time as ADC0 to ADC4.
+  Equation 4: Calculating the flicker detection integration time
+  TINT_FD = (FD_TIME + 1) * 2000 / 720 us
+  Addr: 0xD8 FD_TIME_1
+    7:0 FD_TIME[7:0] 0 RW LSB of flicker detection integration time Note: must not be changed during FDEN = 1 and PON = 1.
+  Addr: 0xDA FD_TIME_2
+    7:3 FD_GAIN 9 RW
+    2:0 FD_TIME[10:8] 0 RW  MSB of flicker detection integration time Note: must not be changed during FDEN = 1 and PON = 1.
+  */
+  uint16_t fd_time = 360000 / freq_hz - 1; 
+  if(fd_gain > 10) fd_gain = 10;
+  writeRegister(byte(0xD8), byte(fd_time & 0xff)); 
+  writeRegister(byte(0xDA), byte( ((fd_time >> 8) & 0x07) | fd_gain<<3)); 
+
+  /*Enable FIFO write flicker
+  FIFO_CFG0 Register (Address 0xD7)
+  Addr: 0xD7 FIFO_CFG0
+    7 FIFO_WRITE_FD 0 R/W FIFO write Flicker Detection If set flicker raw data is written into FIFO (two bytes per sample) Note: This bit is ignored if flicker detection is disabled. Refer to register 0xFC for FDEN=”0”.
+    6:0 reserved 0100001 Reserved, do not change
+  
+    Enable: 0xA1 
+    Disable: 0x21 
+  */
+  writeRegister(byte(0xD7), byte(0xA1)); //0xA1 = Enable
+  
+  //CFG8: disable flicker AGC
+  //NOTE: very important, otherwise device locks up on bright light conditions, and needs a power cycle to recover!!!
+  writeRegister(byte(0xB1), byte(0x00)); //0x00 = disable
+
+  //FIFO_MAP off (map is only for spectrometer)
+  writeRegister(byte(0xFC), byte(0x00));
+
+  //clear FIFO 
+  writeRegister(byte(0xFA), byte(0x02)); //0x02 = FIFO_CLR
+
+  //Enable flicker detection
+  writeRegister(byte(0x80), byte(0x43)); //0x41 = FDEN | PON
+
+  //collect samples
+  //NOTE: sample value on overflow is FD_TIME+1 !!!
+  while(pos<len) {
+    Adafruit_BusIO_Register fifo_lvl_io = Adafruit_BusIO_Register(i2c_dev, 0xFD);
+    uint8_t fifo_lvl = fifo_lvl_io.read();
+    if(fifo_lvl > 0) {
+      uint16_t readlen = fifo_lvl * 2; 
+      if(readlen > maxreadlen) readlen = maxreadlen;
+      if(readlen > len - pos) readlen = len - pos;
+      Adafruit_BusIO_Register bus = Adafruit_BusIO_Register(i2c_dev, 0xFE);
+      bus.read(buf + pos, readlen);
+      pos += readlen;
+    }
+  }
+  
+  //Disable flicker detection
+  writeRegister(byte(0x80), byte(0x01)); //0x01 = PON
+
+  //Disable FIFO write flicker 
+  writeRegister(byte(0xD7), byte(0x21)); //0x21 = Disable
+
+  //clear FIFO 
+  writeRegister(byte(0xFA), byte(0x02)); //0x02 = FIFO_CLR
+
+  //correct samples for machine byte order
+  for(uint16_t i=0;i<wlen;i++) {
+    wbuf[i] = buf[2*i] | (((uint16_t)buf[2*i+1]) << 8);
+  }
+
+  return fd_time + 1;
+}
