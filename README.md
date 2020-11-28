@@ -1,3 +1,5 @@
+==> Added sampleFlicker() <==
+
 # Adafruit AS7341 [![Build Status](https://github.com/adafruit/Adafruit_AS7341/workflows/Arduino%20Library%20CI/badge.svg)](https://github.com/adafruit/Adafruit_AS7341/actions)
 
 This is the Adafruit AS7341 11-Channel Spectral Sensor for Arduino
