@@ -1,4 +1,7 @@
-/* This example will use the GPIO pin to blink an led */
+/*
+ * This example uses the GPIO pin to read a digital
+ * logic level from an external source and print the result.
+ */
 
 #include <Adafruit_AS7341.h>
 
