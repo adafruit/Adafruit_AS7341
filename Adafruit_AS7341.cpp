@@ -720,11 +720,34 @@ bool Adafruit_AS7341::spectralHighTriggered(void) {
 bool Adafruit_AS7341::getIsDataReady() {
   Adafruit_BusIO_Register status2_reg =
       Adafruit_BusIO_Register(i2c_dev, AS7341_STATUS2);
-  Adafruit_BusIO_RegisterBits avalid_bit =
-      Adafruit_BusIO_RegisterBits(&status2_reg, 1, 6);
+  uint8_t sreg2 = status2_reg.read();
+  _saturationState = 
+    sreg2 & (AS7341_DIGITAL_SATURATION_MSK | AS7341_ANALOG_SATURATION_MSK);
 
-  return avalid_bit.read();
+  return sreg2 & 0x01<<6;
 }
+
+/**
+ * @brief Retruns true if the analog sensor is saturated. This may happen if
+ * the gain is too high.  Result is valid for the most recent completed read.
+ *
+ * @return true: analog sensor has saturated false: has not saturated
+ */
+bool Adafruit_AS7341::getIsAnalogSaturated() {
+  return _saturationState & AS7341_ANALOG_SATURATION_MSK;
+}
+
+/**
+ * @brief Returns true if the digital count has saturated.  This may happen if
+ * the integration time too high.  Result is valid for the most recent 
+ * completed read.
+ *
+ * @return true: Digital count has saturated false: has not saturated
+ */
+bool Adafruit_AS7341::getIsDigitalSaturated() {
+  return _saturationState & AS7341_DIGITAL_SATURATION_MSK;
+}
+
 
 /**
  * @brief Configure SMUX for sensors F1-4, Clear and NIR
