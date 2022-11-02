@@ -62,12 +62,12 @@
 
 #define AS7341_WHOAMI 0x92 ///< Chip ID register
 
-#define AS7341_ASTATUS 0x60    ///< AS7341_ASTATUS (unused)
-#define AS7341_CH0_DATA_L 0x61 ///< AS7341_CH0_DATA_L (unused)
-#define AS7341_CH0_DATA_H 0x62 ///< AS7341_CH0_DATA_H (unused)
-#define AS7341_ITIME_L 0x63    ///< AS7341_ITIME_L (unused)
-#define AS7341_ITIME_M 0x64    ///< AS7341_ITIME_M (unused)
-#define AS7341_ITIME_H 0x65    ///< AS7341_ITIME_H (unused)
+#define AS7341_ASTATUS 0x60     ///< AS7341_ASTATUS (unused)
+#define AS7341_CH0_DATA_L_ 0x61 ///< AS7341_CH0_DATA_L (unused)
+#define AS7341_CH0_DATA_H_ 0x62 ///< AS7341_CH0_DATA_H (unused)
+#define AS7341_ITIME_L 0x63     ///< AS7341_ITIME_L (unused)
+#define AS7341_ITIME_M 0x64     ///< AS7341_ITIME_M (unused)
+#define AS7341_ITIME_H 0x65     ///< AS7341_ITIME_H (unused)
 #define AS7341_CONFIG 0x70 ///< Enables LED control and sets light sensing mode
 #define AS7341_STAT 0x71   ///< AS7341_STAT (unused)
 #define AS7341_EDGE 0x72   ///< AS7341_EDGE (unused)
@@ -90,7 +90,7 @@
 #define AS7341_ID 0x92    ///< AS7341_ID (unused)
 #define AS7341_STATUS                                                          \
   0x93 ///< Interrupt status registers. Indicates the occourance of an interrupt
-#define AS7341_ASTATUS 0x94    ///< AS7341_ASTATUS (unused)
+#define AS7341_ASTATUS_ 0x94   ///< AS7341_ASTATUS, same as 0x60 (unused)
 #define AS7341_CH0_DATA_L 0x95 ///< ADC Channel Data
 #define AS7341_CH0_DATA_H 0x96 ///< ADC Channel Data
 #define AS7341_CH1_DATA_L 0x97 ///< ADC Channel Data

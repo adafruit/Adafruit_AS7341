@@ -72,7 +72,7 @@ bool Adafruit_AS7341::_init(int32_t sensor_id) {
       Adafruit_BusIO_Register(i2c_dev, AS7341_WHOAMI);
 
   // make sure we're talking to the right chip
-  if (chip_id.read() & 0xFC != AS7341_CHIP_ID << 2) {
+  if ((chip_id.read() & 0xFC) != (AS7341_CHIP_ID << 2)) {
     return false;
   }
 
@@ -700,7 +700,7 @@ uint8_t Adafruit_AS7341::spectralInterruptSource(void) {
  * @return true: low interrupt triggered false: interrupt not triggered
  */
 bool Adafruit_AS7341::spectralLowTriggered(void) {
-  return (last_spectral_int_source & AS7341_SPECTRAL_INT_LOW_MSK > 0);
+  return (last_spectral_int_source & AS7341_SPECTRAL_INT_LOW_MSK) > 0;
 }
 
 /**
@@ -709,7 +709,7 @@ bool Adafruit_AS7341::spectralLowTriggered(void) {
  * @return true: high interrupt triggered false: interrupt not triggered
  */
 bool Adafruit_AS7341::spectralHighTriggered(void) {
-  return (last_spectral_int_source & AS7341_SPECTRAL_INT_HIGH_MSK > 0);
+  return (last_spectral_int_source & AS7341_SPECTRAL_INT_HIGH_MSK) > 0;
 }
 
 /**
@@ -964,8 +964,8 @@ float Adafruit_AS7341::toBasicCounts(uint16_t raw) {
  * unknown frequency is detected
  */
 uint16_t Adafruit_AS7341::detectFlickerHz(void) {
-  bool isEnabled = true;
-  bool isFdmeasReady = false;
+  // bool isEnabled = true;
+  // bool isFdmeasReady = false;
 
   // disable everything; Flicker detect, smux, wait, spectral, power
   disableAll();
