@@ -66,7 +66,7 @@ bool Adafruit_AS7341::begin(uint8_t i2c_address, TwoWire *wire,
  *   @param sensor_id Optional unique ID for the sensor set
  *   @returns True if chip identified and initialized
  */
-bool Adafruit_AS7341::_init(int32_t sensor_id) {
+bool Adafruit_AS7341::_init(__attribute__((unused))int32_t sensor_id) {
 
   Adafruit_BusIO_Register chip_id =
       Adafruit_BusIO_Register(i2c_dev, AS7341_WHOAMI);
