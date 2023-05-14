@@ -240,7 +240,7 @@ void Adafruit_AS7341::delayForData(int waitTime) {
   if (waitTime > 0) // Wait for that many milliseconds
   {
     uint32_t elapsedMillis = 0;
-    while (!getIsDataReady() && elapsedMillis < (uint32_t)waitTime) {
+    while (!getIsDataReady() && elapsedMillis < waitTime) {
       delay(1);
       elapsedMillis++;
     }
