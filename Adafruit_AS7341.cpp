@@ -68,7 +68,8 @@ bool Adafruit_AS7341::begin(uint8_t i2c_address, TwoWire *wire,
  */
 bool Adafruit_AS7341::_init(int32_t sensor_id) {
 
-  (void)sensor_id;      // may be in the future
+  // silence compiler warning - variable may be used in the future
+  (void)sensor_id;
 
   Adafruit_BusIO_Register chip_id =
       Adafruit_BusIO_Register(i2c_dev, AS7341_WHOAMI);
