@@ -68,6 +68,9 @@ bool Adafruit_AS7341::begin(uint8_t i2c_address, TwoWire *wire,
  */
 bool Adafruit_AS7341::_init(int32_t sensor_id) {
 
+  // silence compiler warning - variable may be used in the future
+  (void)sensor_id;
+
   Adafruit_BusIO_Register chip_id =
       Adafruit_BusIO_Register(i2c_dev, AS7341_WHOAMI);
 
@@ -240,7 +243,7 @@ void Adafruit_AS7341::delayForData(int waitTime) {
   if (waitTime > 0) // Wait for that many milliseconds
   {
     uint32_t elapsedMillis = 0;
-    while (!getIsDataReady() && elapsedMillis < waitTime) {
+    while (!getIsDataReady() && elapsedMillis < (uint32_t)waitTime) {
       delay(1);
       elapsedMillis++;
     }
