@@ -314,6 +314,7 @@ public:
 
   bool enableLED(bool enable_led);
   bool setLEDCurrent(uint16_t led_current_ma);
+  uint16_t getLEDCurrent(void);
 
   void disableAll(void);
 

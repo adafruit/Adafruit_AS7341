@@ -503,6 +503,31 @@ bool Adafruit_AS7341::setLEDCurrent(uint16_t led_current_ma) {
 }
 
 /**
+ * @brief Get the current limit for the LED
+ *
+ * Range is 4mA to 258mA
+ * @return current limit in mA
+ */
+uint16_t Adafruit_AS7341::getLEDCurrent(void) {
+  uint16_t led_current_ma;
+  uint32_t led_raw;
+
+  setBank(true); // Access 0x60 0x74
+
+  Adafruit_BusIO_Register led_reg =
+      Adafruit_BusIO_Register(i2c_dev, AS7341_LED);
+
+  Adafruit_BusIO_RegisterBits led_current_bits =
+      Adafruit_BusIO_RegisterBits(&led_reg, 7, 0);
+
+  led_raw = led_current_bits.read();
+
+  led_current_ma = (uint16_t)(led_raw * 2) + 4;
+  setBank(false); // Access registers 0x80 and above (default)
+  return led_current_ma;
+}
+
+/**
  * @brief Sets the active register bank
  *
  * The AS7341 uses banks to organize the register making it nescessary to set
