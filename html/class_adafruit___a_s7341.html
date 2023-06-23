@@ -199,6 +199,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a6ca80c3f0b495b1cbd7d17d32e6a9974"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a6ca80c3f0b495b1cbd7d17d32e6a9974">setLEDCurrent</a> (uint16_t led_current_ma)</td></tr>
 <tr class="memdesc:a6ca80c3f0b495b1cbd7d17d32e6a9974"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the current limit for the LED.  <a href="#a6ca80c3f0b495b1cbd7d17d32e6a9974">More...</a><br /></td></tr>
 <tr class="separator:a6ca80c3f0b495b1cbd7d17d32e6a9974"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afcbd8705a864b4eb52be41110a27a73c"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#afcbd8705a864b4eb52be41110a27a73c">getLEDCurrent</a> (void)</td></tr>
+<tr class="memdesc:afcbd8705a864b4eb52be41110a27a73c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current limit for the LED.  <a href="#afcbd8705a864b4eb52be41110a27a73c">More...</a><br /></td></tr>
+<tr class="separator:afcbd8705a864b4eb52be41110a27a73c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c3847506f7420079bf3e68c5c7f8401"><td class="memItemLeft" align="right" valign="top"><a id="a0c3847506f7420079bf3e68c5c7f8401"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___a_s7341.html#a0c3847506f7420079bf3e68c5c7f8401">disableAll</a> (void)</td></tr>
 <tr class="memdesc:a0c3847506f7420079bf3e68c5c7f8401"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable Spectral reading, flicker detection, and power. <br /></td></tr>
@@ -1136,6 +1139,27 @@ Adafruit_I2CDevice *&#160;</td><td class="memItemRight" valign="bottom"><a class
   </dd>
 </dl>
 <p>Range is 4mA to 258mA </p><dl class="section return"><dt>Returns</dt><dd>true: success false: failure </dd></dl>
+
+</div>
+</div>
+<a id="afcbd8705a864b4eb52be41110a27a73c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afcbd8705a864b4eb52be41110a27a73c">&#9670;&nbsp;</a></span>getLEDCurrent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t Adafruit_AS7341::getLEDCurrent </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the current limit for the LED. </p>
+<p>Range is 4mA to 258mA </p><dl class="section return"><dt>Returns</dt><dd>current limit in mA </dd></dl>
 
 </div>
 </div>

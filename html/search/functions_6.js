@@ -11,6 +11,7 @@ var searchData=
   ['gethighthreshold',['getHighThreshold',['../class_adafruit___a_s7341.html#ac1c84cacb850eeefada38d7c41653136',1,'Adafruit_AS7341']]],
   ['getinterruptstatus',['getInterruptStatus',['../class_adafruit___a_s7341.html#a8d2d89787e090e382364c12ecc6da2eb',1,'Adafruit_AS7341']]],
   ['getisdataready',['getIsDataReady',['../class_adafruit___a_s7341.html#af3aa7dc42396b192a90c8f88c07b4111',1,'Adafruit_AS7341']]],
+  ['getledcurrent',['getLEDCurrent',['../class_adafruit___a_s7341.html#afcbd8705a864b4eb52be41110a27a73c',1,'Adafruit_AS7341']]],
   ['getlowthreshold',['getLowThreshold',['../class_adafruit___a_s7341.html#a3ef608890842cd5e13dcd921f75d41b5',1,'Adafruit_AS7341']]],
   ['gettint',['getTINT',['../class_adafruit___a_s7341.html#aee9187b3a84943910610c21953126e0d',1,'Adafruit_AS7341']]]
 ];
