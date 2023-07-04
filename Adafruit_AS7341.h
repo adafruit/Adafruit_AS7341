@@ -148,6 +148,11 @@
 #define AS7341_SPECTRAL_INT_LOW_MSK                                            \
   0b00010000 ///< bitmask to check for a low threshold interrupt
 
+#define AS7341_ANALOG_SATURATION_MSK                                           \
+  1<<3 ///<bitmask to check for sensor saturation
+#define AS7341_DIGITAL_SATURATION_MSK                                          \
+  1<<4 ///<bitmask to check for digital count saturation
+
 /**
  * @brief Allowable gain multipliers for `setGain`
  *
@@ -328,6 +333,9 @@ public:
   bool getGPIOValue(void);
   bool setGPIOValue(bool);
 
+  bool Adafruit_AS7341::getIsDigitalSaturated();
+  bool Adafruit_AS7341::getIsAnalogSaturated();
+
 protected:
   virtual bool _init(int32_t sensor_id);
   uint8_t last_spectral_int_source =
@@ -345,6 +353,7 @@ private:
   void writeRegister(byte addr, byte val);
   void setSMUXLowChannels(bool f1_f4);
   uint16_t _channel_readings[12];
+  uint8_t _saturationState;
   as7341_waiting_t _readingState;
 };
 
