@@ -930,8 +930,8 @@ as7341_gain_t Adafruit_AS7341::getGain() {
  * @return long The current integration time in ms
  */
 long Adafruit_AS7341::getTINT() {
-  uint16_t astep = getASTEP();
-  uint8_t atime = getATIME();
+  long astep = getASTEP();
+  long atime = getATIME();
 
   return (atime + 1) * (astep + 1) * 2.78 / 1000;
 }
